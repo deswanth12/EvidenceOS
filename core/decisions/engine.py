@@ -1,0 +1,367 @@
+"""Deterministic Decision Engine & End-to-End Case Pipeline (Phase 7 / Module 11 & 14).
+
+Produces evidence-backed decisions (`APPROVED`, `PARTIALLY_APPROVED`, `DISPUTED`,
+`MANUAL_REVIEW_REQUIRED`, `INSUFFICIENT_EVIDENCE`) with complete provenance,
+explanations, and support for human reviewer overrides.
+"""
+
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy.orm import Session
+
+from core.audit.logger import AuditService
+from core.conflicts.detector import ConflictDetectionService
+from core.db.models import CaseModel, DecisionRecordModel, EvidenceRecordModel
+from core.entities.resolver import EntityResolutionService
+from core.extraction.service import MultimodalExtractionService
+from core.matching.historical import HistoricalMatchingService
+from core.normalization.service import EvidenceNormalizationService
+from core.rules.engine import DeterministicRuleEngine
+from core.schemas import (
+    CaseDecision,
+    DecisionOutcome,
+    EpistemologicalType,
+    EvidenceConflict,
+    HistoricalMatchWarning,
+    ResolvedEntity,
+)
+
+
+class DecisionEngineService:
+    """Computes final deterministic decision from rules, conflicts, and historical matches."""
+
+    @staticmethod
+    def compute_decision(
+        db: Session,
+        case_id: str,
+        entities: List[ResolvedEntity],
+        conflicts: List[EvidenceConflict],
+        historical_warnings: List[HistoricalMatchWarning],
+        contract_config: Dict[str, Any],
+    ) -> CaseDecision:
+        db.query(DecisionRecordModel).filter(
+            DecisionRecordModel.case_id == case_id,
+            DecisionRecordModel.is_human_override.is_(False),
+        ).delete()
+        db.commit()
+
+        rule_traces, metrics = DeterministicRuleEngine.evaluate_rules(
+            entities=entities,
+            conflicts=conflicts,
+            historical_warnings=historical_warnings,
+            contract_config=contract_config,
+        )
+
+        ordered_qty = metrics["ordered_quantity"]
+        delivered_qty = metrics["delivered_quantity"]
+        verified_dmg = metrics["verified_damaged_quantity"]
+        max_claimed_dmg = metrics["max_claimed_damage"]
+        accepted_qty = metrics["accepted_quantity"]
+        disputed_qty = metrics["disputed_quantity"]
+        payout_adj = metrics["recommended_payout_adjustment_usd"]
+        min_conf = metrics["min_observed_confidence"]
+        has_uncertain = metrics["has_uncertain_evidence"]
+        evidence_ids = metrics["all_evidence_ids"]
+
+        detailed_explanation: List[str] = []
+        for tr in rule_traces:
+            status_tag = "PASS" if tr.passed else "FAIL"
+            detailed_explanation.append(f"[{tr.rule_id}: {status_tag}] {tr.explanation}")
+
+        # Decision state machine (100% deterministic)
+        if not evidence_ids:
+            outcome = DecisionOutcome.INSUFFICIENT_EVIDENCE
+            epistemic = EpistemologicalType.UNCERTAINTY
+            summary = "No evidence artifacts have been uploaded to this case."
+            next_action = "Upload Purchase Order, Delivery Challan, and inspection evidence."
+
+        elif historical_warnings:
+            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+            epistemic = EpistemologicalType.UNCERTAINTY
+            summary = (
+                f"Manual review required: { historical_warnings[0].warning_message } "
+                "Automated settlement is suspended pending human audit of original files."
+            )
+            next_action = "Inspect flagged historical evidence side-by-side in the Conflict & Provenance panel."
+
+        elif has_uncertain or min_conf < 0.75:
+            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+            epistemic = EpistemologicalType.UNCERTAINTY
+            summary = (
+                f"Manual review required due to insufficient or low-confidence evidence "
+                f"(minimum confidence {min_conf:.2f}). Claimed damage of {max_claimed_dmg} units cannot be verified automatically."
+            )
+            next_action = "Request higher-resolution inspection photographs or perform human adjudicator review."
+
+        elif conflicts:
+            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+            epistemic = EpistemologicalType.UNCERTAINTY
+            conflict_summaries = "; ".join(c.description for c in conflicts)
+            summary = (
+                f"Manual review required: {len(conflicts)} cross-modal contradiction(s) detected. "
+                f"{conflict_summaries}"
+            )
+            next_action = "Reconcile conflicting quantities across Purchase Order, Challan, Voice, and Image evidence."
+
+        elif ordered_qty > 0 and delivered_qty == ordered_qty and verified_dmg == 0 and max_claimed_dmg == 0:
+            outcome = DecisionOutcome.APPROVED
+            epistemic = EpistemologicalType.RULE
+            summary = (
+                f"Approved for full settlement: All {ordered_qty} ordered units were delivered intact "
+                "with 0 damaged units verified across documents, images, and voice reports."
+            )
+            next_action = "Release full invoice payment to supplier."
+
+        elif (
+            ordered_qty > 0
+            and delivered_qty == ordered_qty
+            and verified_dmg > 0
+            and all(tr.passed for tr in rule_traces)
+        ):
+            outcome = DecisionOutcome.PARTIALLY_APPROVED
+            epistemic = EpistemologicalType.RULE
+            summary = (
+                f"Partially approved: {delivered_qty} of {ordered_qty} ordered units delivered, "
+                f"with {verified_dmg} damaged units corroborated across visual and voice inspection. "
+                f"Approve {accepted_qty} intact units and credit buyer ${payout_adj:.2f} for {disputed_qty} damaged units."
+            )
+            next_action = f"Issue credit note for ${payout_adj:.2f} ({disputed_qty} damaged units) and settle remaining {accepted_qty} units."
+
+        else:
+            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+            epistemic = EpistemologicalType.UNCERTAINTY
+            summary = "Manual review required: SLA thresholds or quantity checks did not pass automatic settlement rules."
+            next_action = "Assign to procurement dispute specialist for manual determination."
+
+        decision = CaseDecision(
+            case_id=case_id,
+            outcome=outcome,
+            epistemic_status=epistemic,
+            overall_confidence=min_conf,
+            ordered_quantity=ordered_qty,
+            delivered_quantity=delivered_qty,
+            verified_damaged_quantity=verified_dmg,
+            accepted_quantity=accepted_qty,
+            disputed_quantity=disputed_qty,
+            recommended_payout_adjustment_usd=payout_adj,
+            summary_reason=summary,
+            detailed_explanation=detailed_explanation,
+            next_action=next_action,
+            rule_traces=rule_traces,
+            supporting_evidence_ids=evidence_ids,
+            conflict_ids=[c.conflict_id for c in conflicts],
+            historical_warning_ids=[w.match_id for w in historical_warnings],
+        )
+
+        db_dec = DecisionRecordModel(
+            id=decision.decision_id,
+            case_id=case_id,
+            outcome=decision.outcome.value,
+            epistemic_status=decision.epistemic_status.value,
+            overall_confidence=decision.overall_confidence,
+            ordered_quantity=decision.ordered_quantity,
+            delivered_quantity=decision.delivered_quantity,
+            verified_damaged_quantity=decision.verified_damaged_quantity,
+            accepted_quantity=decision.accepted_quantity,
+            disputed_quantity=decision.disputed_quantity,
+            recommended_payout_adjustment_usd=decision.recommended_payout_adjustment_usd,
+            summary_reason=decision.summary_reason,
+            detailed_explanation=decision.detailed_explanation,
+            next_action=decision.next_action,
+            rule_traces=[r.model_dump(mode="json") for r in decision.rule_traces],
+            supporting_evidence_ids=decision.supporting_evidence_ids,
+            conflict_ids=decision.conflict_ids,
+            historical_warning_ids=decision.historical_warning_ids,
+            is_human_override=False,
+            decided_at=decision.decided_at,
+        )
+        db.add(db_dec)
+        db.commit()
+
+        AuditService.record_event(
+            db=db,
+            case_id=case_id,
+            event_type="DECISION_COMPUTED",
+            stage="decision_engine",
+            details={
+                "decision_id": decision.decision_id,
+                "outcome": decision.outcome.value,
+                "epistemic_status": decision.epistemic_status.value,
+                "ordered_quantity": decision.ordered_quantity,
+                "delivered_quantity": decision.delivered_quantity,
+                "verified_damaged_quantity": decision.verified_damaged_quantity,
+                "accepted_quantity": decision.accepted_quantity,
+                "disputed_quantity": decision.disputed_quantity,
+                "recommended_payout_adjustment_usd": decision.recommended_payout_adjustment_usd,
+            },
+        )
+        return decision
+
+    @staticmethod
+    def record_human_override(
+        db: Session,
+        case_id: str,
+        outcome: DecisionOutcome,
+        reviewer: str,
+        notes: str,
+        accepted_quantity: Optional[int] = None,
+        verified_damaged_quantity: Optional[int] = None,
+    ) -> DecisionRecordModel:
+        latest = (
+            db.query(DecisionRecordModel)
+            .filter(DecisionRecordModel.case_id == case_id)
+            .order_by(DecisionRecordModel.decided_at.desc())
+            .first()
+        )
+        ordered_q = latest.ordered_quantity if latest else 0
+        delivered_q = latest.delivered_quantity if latest else 0
+        dmg_q = verified_damaged_quantity if verified_damaged_quantity is not None else (latest.verified_damaged_quantity if latest else 0)
+        acc_q = accepted_quantity if accepted_quantity is not None else max(0, delivered_q - dmg_q)
+        disp_q = max(0, ordered_q - acc_q)
+
+        from core.schemas import new_id
+
+        override_rec = DecisionRecordModel(
+            id=new_id("dec"),
+            case_id=case_id,
+            outcome=outcome.value,
+            epistemic_status=EpistemologicalType.RULE.value,
+            overall_confidence=1.0,
+            ordered_quantity=ordered_q,
+            delivered_quantity=delivered_q,
+            verified_damaged_quantity=dmg_q,
+            accepted_quantity=acc_q,
+            disputed_quantity=disp_q,
+            recommended_payout_adjustment_usd=latest.recommended_payout_adjustment_usd if latest else 0.0,
+            summary_reason=f"Human reviewer ({reviewer}) adjudicated case as {outcome.value.upper()}: {notes}",
+            detailed_explanation=(latest.detailed_explanation if latest else [])
+            + [f"[HUMAN_REVIEW_OVERRIDE by {reviewer}] {notes}"],
+            next_action="Execute human reviewer settlement determination.",
+            rule_traces=latest.rule_traces if latest else [],
+            supporting_evidence_ids=latest.supporting_evidence_ids if latest else [],
+            conflict_ids=latest.conflict_ids if latest else [],
+            historical_warning_ids=latest.historical_warning_ids if latest else [],
+            is_human_override=True,
+            human_reviewer=reviewer,
+            human_override_notes=notes,
+            decided_at=datetime.now(timezone.utc),
+        )
+        db.add(override_rec)
+
+        case = db.query(CaseModel).filter(CaseModel.id == case_id).first()
+        if case:
+            case.status = "human_reviewed"
+
+        db.commit()
+        db.refresh(override_rec)
+
+        AuditService.record_event(
+            db=db,
+            case_id=case_id,
+            event_type="HUMAN_REVIEW_OVERRIDE",
+            stage="human_review",
+            actor=reviewer,
+            details={
+                "decision_id": override_rec.id,
+                "outcome": outcome.value,
+                "reviewer": reviewer,
+                "notes": notes,
+                "accepted_quantity": acc_q,
+                "verified_damaged_quantity": dmg_q,
+            },
+        )
+        return override_rec
+
+
+class CaseVerificationPipeline:
+    """Orchestrates the complete EvidenceOS 12-stage pipeline for a case."""
+
+    def __init__(self, extractor: Optional[MultimodalExtractionService] = None) -> None:
+        self.extractor = extractor or MultimodalExtractionService()
+
+    def run_case_pipeline(self, db: Session, case_id: str) -> Dict[str, Any]:
+        case = db.query(CaseModel).filter(CaseModel.id == case_id).first()
+        if not case:
+            raise ValueError(f"Case '{case_id}' not found.")
+
+        case.status = "processing"
+        db.commit()
+
+        evidence_records = (
+            db.query(EvidenceRecordModel)
+            .filter(EvidenceRecordModel.case_id == case_id)
+            .order_by(EvidenceRecordModel.uploaded_at.asc())
+            .all()
+        )
+
+        # Stage 1-3: Extract each evidence artifact
+        has_docs = False
+        has_images = False
+        has_voice = False
+        for rec in evidence_records:
+            self.extractor.extract_evidence_record(db, rec)
+            if rec.document_role in ("purchase_order", "delivery_challan", "invoice"):
+                has_docs = True
+            elif rec.document_role == "inspection_image":
+                has_images = True
+            elif rec.document_role == "voice_report":
+                has_voice = True
+
+        # Stage 4: Evidence Normalization
+        claims = EvidenceNormalizationService.normalize_case_evidence(db, case_id, evidence_records)
+
+        # Stage 5: Cross-Modal Entity Resolution
+        entities = EntityResolutionService.resolve_entities(db, case_id, evidence_records, claims)
+
+        # Stage 6: Conflict Detection & Historical Matching
+        conflicts = ConflictDetectionService.detect_conflicts(db, case_id, entities)
+        historical_warnings = HistoricalMatchingService.match_against_historical_cases(
+            db, case_id, evidence_records
+        )
+
+        # Stage 7: Deterministic Rule & Decision Engine
+        decision = DecisionEngineService.compute_decision(
+            db=db,
+            case_id=case_id,
+            entities=entities,
+            conflicts=conflicts,
+            historical_warnings=historical_warnings,
+            contract_config=case.contract_sla_config or {},
+        )
+
+        # Update Case checklist and header metadata from PO if not already set
+        for rec in evidence_records:
+            payload = rec.extracted_payload or {}
+            if rec.document_role == "purchase_order":
+                if not case.po_number and payload.get("document_id"):
+                    case.po_number = payload["document_id"]
+                if not case.supplier_name and payload.get("supplier"):
+                    case.supplier_name = payload["supplier"]
+                if not case.buyer_name and payload.get("buyer"):
+                    case.buyer_name = payload["buyer"]
+
+        case.pipeline_Checklist = {
+            "evidence_received": len(evidence_records) > 0,
+            "documents_processed": has_docs,
+            "images_analyzed": has_images,
+            "voice_analyzed": has_voice,
+            "evidence_linked": len(entities) > 0,
+            "conflicts_detected": len(conflicts) > 0 or len(historical_warnings) > 0,
+            "rules_evaluated": len(decision.rule_traces) > 0,
+            "decision": decision.outcome.value,
+        }
+        case.status = "decided"
+        db.commit()
+        db.refresh(case)
+
+        return {
+            "case_id": case.id,
+            "status": case.status,
+            "checklist": case.pipeline_Checklist,
+            "claims_count": len(claims),
+            "entities_count": len(entities),
+            "conflicts_count": len(conflicts),
+            "historical_warnings_count": len(historical_warnings),
+            "decision": decision.model_dump(mode="json"),
+        }

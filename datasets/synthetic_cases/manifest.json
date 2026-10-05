@@ -1,0 +1,137 @@
+[
+  {
+    "case_id": "case_01_clean_delivery",
+    "title": "CASE 1: Clean Delivery \u2014 10 Units Servo Valves",
+    "expected_outcome": "approved",
+    "files": [
+      {
+        "filename": "PO-2026-1001_purchase_order.pdf",
+        "role": "purchase_order",
+        "size_bytes": 1952
+      },
+      {
+        "filename": "DC-2026-1001_delivery_challan.pdf",
+        "role": "delivery_challan",
+        "size_bytes": 1969
+      },
+      {
+        "filename": "dock_photo_case1_intact.png",
+        "role": "inspection_image",
+        "size_bytes": 3172
+      },
+      {
+        "filename": "dock_voice_case1.wav",
+        "role": "voice_report",
+        "size_bytes": 4130
+      }
+    ]
+  },
+  {
+    "case_id": "case_02_partial_damage",
+    "title": "CASE 2: Legitimate Partial Damage \u2014 2 of 10 Units Crushed",
+    "expected_outcome": "partially_approved",
+    "files": [
+      {
+        "filename": "PO-2026-1002_purchase_order.pdf",
+        "role": "purchase_order",
+        "size_bytes": 1954
+      },
+      {
+        "filename": "DC-2026-1002_delivery_challan.pdf",
+        "role": "delivery_challan",
+        "size_bytes": 1969
+      },
+      {
+        "filename": "dock_photo_case2_2damaged.png",
+        "role": "inspection_image",
+        "size_bytes": 3514
+      },
+      {
+        "filename": "dock_voice_case2.wav",
+        "role": "voice_report",
+        "size_bytes": 4131
+      }
+    ]
+  },
+  {
+    "case_id": "case_03_conflicting_evidence",
+    "title": "CASE 3: Multi-Modal Contradiction \u2014 PO 10, Challan 8, Voice 5 Damaged, Image 2 Damaged",
+    "expected_outcome": "manual_review_required",
+    "files": [
+      {
+        "filename": "PO-2026-1003_purchase_order.pdf",
+        "role": "purchase_order",
+        "size_bytes": 1957
+      },
+      {
+        "filename": "DC-2026-1003_delivery_challan.pdf",
+        "role": "delivery_challan",
+        "size_bytes": 1971
+      },
+      {
+        "filename": "dock_photo_case3_2damaged.png",
+        "role": "inspection_image",
+        "size_bytes": 3367
+      },
+      {
+        "filename": "dock_voice_case3_5damaged.wav",
+        "role": "voice_report",
+        "size_bytes": 4112
+      }
+    ]
+  },
+  {
+    "case_id": "case_04_reused_evidence",
+    "title": "CASE 4: Potentially Reused Evidence \u2014 Perceptually Duplicate Damage Photo",
+    "expected_outcome": "manual_review_required",
+    "files": [
+      {
+        "filename": "PO-2026-1004_purchase_order.pdf",
+        "role": "purchase_order",
+        "size_bytes": 1952
+      },
+      {
+        "filename": "DC-2026-1004_delivery_challan.pdf",
+        "role": "delivery_challan",
+        "size_bytes": 1969
+      },
+      {
+        "filename": "resubmitted_photo_case4.png",
+        "role": "inspection_image",
+        "size_bytes": 3517
+      },
+      {
+        "filename": "dock_voice_case4.wav",
+        "role": "voice_report",
+        "size_bytes": 4111
+      }
+    ]
+  },
+  {
+    "case_id": "case_05_insufficient_evidence",
+    "title": "CASE 5: Insufficient / Weak Visual Evidence \u2014 4 Units Claimed Damaged",
+    "expected_outcome": "manual_review_required",
+    "files": [
+      {
+        "filename": "PO-2026-1005_purchase_order.pdf",
+        "role": "purchase_order",
+        "size_bytes": 1950
+      },
+      {
+        "filename": "DC-2026-1005_delivery_challan.pdf",
+        "role": "delivery_challan",
+        "size_bytes": 1964
+      },
+      {
+        "filename": "blurry_weak_photo_case5.png",
+        "role": "inspection_image",
+        "size_bytes": 1270
+      },
+      {
+        "filename": "dock_voice_case5_4damaged.wav",
+        "role": "voice_report",
+        "size_bytes": 4112
+      }
+    ]
+  }
+]

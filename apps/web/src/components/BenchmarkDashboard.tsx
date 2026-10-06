@@ -79,9 +79,9 @@ export function BenchmarkDashboard({
   const baselineAcc = ablation?.strict_regex_baseline?.metrics?.decision_accuracy;
 
   return (
-    <div className="space-y-6">
+    <div className="eos-reveal eos-stagger-1 space-y-6">
       {/* Header & Split Selector */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 rounded-xl p-5">
+      <div className="eos-panel flex flex-wrap items-center justify-between gap-4 bg-slate-900/80 border border-slate-800 rounded-xl p-5">
         <div>
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-sky-400" aria-hidden="true" />
@@ -136,7 +136,7 @@ export function BenchmarkDashboard({
       </div>
 
       {!evalReport || !m ? (
-        <div className="p-8 rounded-xl bg-slate-900/70 border border-slate-800 text-center space-y-3">
+        <div className="eos-panel p-8 rounded-xl bg-slate-900/70 border border-slate-800 text-center space-y-3">
           <p className="text-sm text-slate-300 font-medium">
             {loading
               ? 'Running empirical evaluation pipeline across benchmark cases...'
@@ -146,12 +146,12 @@ export function BenchmarkDashboard({
       ) : (
         <>
           {/* 1. OVERVIEW METRICS */}
-          <section aria-label="Evaluation Overview Metrics" className="space-y-2.5">
+          <section aria-label="Evaluation Overview Metrics" className="eos-reveal eos-stagger-2 space-y-2.5">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
               1. Overview (n = {evalReport.total_cases} Cases, {evalReport.total_evidence_files} Files)
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div className="eos-card p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400 font-medium">Decision Accuracy</div>
                 <div className="text-lg font-bold text-emerald-400 font-mono mt-1">
                   {(m.decision_accuracy * 100).toFixed(1)}%
@@ -164,7 +164,7 @@ export function BenchmarkDashboard({
                 )}
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div className="eos-card p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400 font-medium">Macro F1</div>
                 <div className="text-lg font-bold text-sky-400 font-mono mt-1">
                   {((m.macro_f1 ?? m.decision_accuracy) * 100).toFixed(1)}%
@@ -174,7 +174,7 @@ export function BenchmarkDashboard({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div className="eos-card p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400 font-medium">Conflict Precision</div>
                 <div className="text-lg font-bold text-white font-mono mt-1">
                   {(m.conflict_detection_precision * 100).toFixed(1)}%
@@ -184,7 +184,7 @@ export function BenchmarkDashboard({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div className="eos-card p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400 font-medium">Conflict Recall</div>
                 <div className="text-lg font-bold text-white font-mono mt-1">
                   {(m.conflict_detection_recall * 100).toFixed(1)}%
@@ -194,7 +194,7 @@ export function BenchmarkDashboard({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div className="eos-card p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400 font-medium">False Positive Rate</div>
                 <div className="text-lg font-bold text-emerald-400 font-mono mt-1">
                   {(m.false_positive_rate * 100).toFixed(1)}%
@@ -204,7 +204,7 @@ export function BenchmarkDashboard({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <div className="eos-card p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400 font-medium">False Negative Rate</div>
                 <div className="text-lg font-bold text-amber-300 font-mono mt-1">
                   {(m.false_negative_rate * 100).toFixed(1)}%
@@ -220,7 +220,7 @@ export function BenchmarkDashboard({
           {ablation && semanticAcc !== undefined && baselineAcc !== undefined && (
             <section
               aria-label="Baseline vs Semantic Comparison"
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4"
+              className="eos-panel eos-reveal eos-stagger-3 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -380,7 +380,7 @@ export function BenchmarkDashboard({
           {evalReport.category_breakdown && evalReport.category_breakdown.length > 0 && (
             <section
               aria-label="Category Performance"
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3"
+              className="eos-panel eos-reveal eos-stagger-4 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3"
             >
               <div>
                 <h3 className="text-sm font-bold text-white">
@@ -396,7 +396,7 @@ export function BenchmarkDashboard({
                   return (
                     <div
                       key={cb.category}
-                      className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5"
+                      className="eos-card p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5"
                     >
                       <div
                         className="text-xs font-semibold text-white truncate"
@@ -435,7 +435,7 @@ export function BenchmarkDashboard({
           {evalReport.modality_ablations && evalReport.modality_ablations.length > 0 && (
             <section
               aria-label="Modality Ablation Study"
-              className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3"
+              className="eos-panel eos-reveal eos-stagger-5 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3"
             >
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -506,7 +506,7 @@ export function BenchmarkDashboard({
           {/* 5. FAILURE ANALYSIS (Top Failure Modes & Case Trace) */}
           <section
             aria-label="Failure Analysis"
-            className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4"
+            className="eos-panel eos-reveal eos-stagger-5 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -525,7 +525,7 @@ export function BenchmarkDashboard({
             </div>
 
             {failureCounts.length === 0 ? (
-              <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-emerald-400 flex items-center gap-2">
+              <div className="eos-card p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-emerald-400 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
                 <span>0 failures recorded in this suite ({evalReport.total_cases}/{evalReport.total_cases} passed).</span>
               </div>
@@ -535,7 +535,7 @@ export function BenchmarkDashboard({
                   {failureCounts.map((fc) => (
                     <div
                       key={fc.code}
-                      className="p-3.5 rounded-lg bg-slate-950 border border-amber-500/35 space-y-1"
+                      className="eos-card p-3.5 rounded-lg bg-slate-950 border border-amber-500/35 space-y-1"
                     >
                       <div className="text-xs font-semibold text-white">{fc.label}</div>
                       <div className="text-sm font-mono font-bold text-amber-300">
@@ -551,7 +551,7 @@ export function BenchmarkDashboard({
                     {evalReport.failures.map((f) => (
                       <div
                         key={f.case_id}
-                        className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col gap-1 text-xs"
+                        className="eos-card p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col gap-1 text-xs"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="font-mono font-bold text-white">
@@ -572,7 +572,7 @@ export function BenchmarkDashboard({
           </section>
 
           {/* 6. INDIVIDUAL CASE RESULTS TABLE */}
-          <section className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden">
+          <section className="eos-panel eos-reveal eos-stagger-6 bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden">
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">
               <h3 className="text-sm font-bold text-white">
                 6. Case-by-Case Verification Results (n = {evalReport.case_results.length})

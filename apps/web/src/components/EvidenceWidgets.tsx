@@ -214,7 +214,7 @@ export function InteractiveEvidenceGraph({
             handleTrigger();
           }
         }}
-        className={`p-3 rounded-lg border transition-colors text-left ${borderStyle} ${
+        className={`eos-interactive-card p-3 rounded-lg border text-left ${borderStyle} ${
           isClickable ? 'cursor-pointer hover:bg-slate-900' : ''
         }`}
       >
@@ -243,8 +243,8 @@ export function InteractiveEvidenceGraph({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 border border-slate-800 rounded-lg p-3.5">
+    <div className="eos-reveal eos-stagger-4 space-y-4">
+      <div className="eos-panel flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 border border-slate-800 rounded-lg p-3.5">
         <div className="text-xs text-slate-300">
           <span className="font-semibold text-white">
             Evidence-to-Decision Provenance Graph:
@@ -443,7 +443,7 @@ export function EvidenceInspectorDrawer({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col h-full"
+        className="eos-panel eos-reveal w-full max-w-xl bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col h-full"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
@@ -472,7 +472,7 @@ export function EvidenceInspectorDrawer({
 
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           {/* Direct Action to Open Original File First */}
-          <div className="bg-slate-950 border border-sky-500/30 rounded-lg p-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="eos-card bg-slate-950 border border-sky-500/30 rounded-lg p-3.5 flex flex-wrap items-center justify-between gap-3">
             <div className="text-xs">
               <span className="font-semibold text-white block">
                 Original Immutable Evidence File
@@ -485,7 +485,7 @@ export function EvidenceInspectorDrawer({
               href={rawUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition"
+              className="eos-btn-link inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition"
             >
               <span>Open Original File</span>
               <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
@@ -494,7 +494,7 @@ export function EvidenceInspectorDrawer({
 
           {/* Visual Preview for Images */}
           {item.modality === 'image' && (
-            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
+            <div className="eos-card bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
                 Original Image Artifact
               </span>
@@ -516,7 +516,7 @@ export function EvidenceInspectorDrawer({
 
           {/* Audio Player & Transcript for Voice Reports */}
           {item.modality === 'audio' && (
-            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
+            <div className="eos-card bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
                 Original Audio Recording & Verbatim Transcript
               </span>
@@ -535,7 +535,7 @@ export function EvidenceInspectorDrawer({
           )}
 
           {/* Cryptographic & Perceptual Provenance */}
-          <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2.5">
+          <div className="eos-card bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <Hash className="w-3.5 h-3.5 text-sky-400" aria-hidden="true" />
@@ -574,7 +574,7 @@ export function EvidenceInspectorDrawer({
 
           {/* Inline PDF / Document Evidence Highlighting */}
           {rawTextLines.length > 0 && (
-            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2.5">
+            <div className="eos-card bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-amber-300 block">
                   Inline PDF / Source Evidence Highlighting ({prov?.location || 'page:1'})

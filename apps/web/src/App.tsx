@@ -465,7 +465,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b111e] text-slate-100">
+    <div className="eos-viewport-shell flex flex-col bg-[#0b111e] text-slate-100">
       {/* Top Application Header Shell */}
       <header className="border-b border-slate-800 bg-slate-950/95 sticky top-0 z-30 px-4 lg:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -729,7 +729,7 @@ export function App() {
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           {/* Workflow Breadcrumb Strip: CASE -> EVIDENCE -> INVESTIGATION -> CONFLICTS -> PROVENANCE -> RULES -> DECISION -> HUMAN REVIEW -> AUDIT */}
           {caseDetail && activeTab !== 'create_case' && activeTab !== 'evaluation' && (
-            <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-400">
+            <div className="eos-panel eos-reveal eos-stagger-1 flex flex-wrap items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-400">
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-slate-300 font-semibold">WORKFLOW:</span>
                 {[
@@ -775,7 +775,7 @@ export function App() {
 
           {/* Create Case Screen */}
           {activeTab === 'create_case' && (
-            <div className="max-w-2xl bg-slate-900/80 border border-slate-800 rounded-xl p-6 space-y-4">
+            <div className="eos-panel eos-reveal eos-stagger-1 max-w-2xl bg-slate-900/80 border border-slate-800 rounded-xl p-6 space-y-4">
               <h2 className="text-base font-bold text-white">
                 Create New B2B Delivery Dispute Case
               </h2>
@@ -888,7 +888,7 @@ export function App() {
                 {/* 1. CASE OVERVIEW HEADER */}
                 <section
                   aria-label="Case Overview Header"
-                  className="bg-slate-900/85 border border-slate-800 rounded-xl p-5 space-y-4"
+                  className="eos-panel eos-reveal eos-stagger-2 bg-slate-900/85 border border-slate-800 rounded-xl p-5 space-y-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="space-y-1.5 max-w-3xl">
@@ -919,7 +919,7 @@ export function App() {
                     </div>
 
                     {/* Compact Status & Metadata Box */}
-                    <div className="flex flex-col items-start sm:items-end gap-1.5 bg-slate-950 p-3 rounded-lg border border-slate-800 shrink-0">
+                    <div className="eos-card flex flex-col items-start sm:items-end gap-1.5 bg-slate-950 p-3 rounded-lg border border-slate-800 shrink-0">
                       <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
                         STATUS & DECISION
                       </div>
@@ -1018,7 +1018,7 @@ export function App() {
                     ].map((card) => (
                       <div
                         key={card.label}
-                        className="p-3 rounded-lg bg-slate-950 border border-slate-800"
+                        className="eos-card p-3 rounded-lg bg-slate-950 border border-slate-800"
                       >
                         <div className="text-[11px] font-mono uppercase text-slate-400">
                           {card.label}
@@ -1039,7 +1039,7 @@ export function App() {
                 {/* 3. 5-STAGE INVESTIGATION TIMELINE (with distinct Completed / Current / Needs Attention states) */}
                 <section
                   aria-label="5-Stage Investigation Timeline"
-                  className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-3"
+                  className="eos-panel eos-reveal eos-stagger-3 bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
@@ -1072,7 +1072,7 @@ export function App() {
                           key={s.step}
                           type="button"
                           onClick={() => handleGuidedStepClick(idx)}
-                          className={`text-left p-3 rounded-lg border transition ${st.cls}`}
+                          className={`eos-interactive-card text-left p-3 rounded-lg border transition ${st.cls}`}
                         >
                           <div className="flex items-center justify-between gap-1 mb-1">
                             <span className="text-xs font-bold">{s.title}</span>
@@ -1186,10 +1186,10 @@ export function App() {
                 {/* TAB 1: OVERVIEW (Evidence-First + Conflict Summary + Decision Summary) */}
                 {activeTab === 'overview' &&
                   caseDetail.evidence_items.length > 0 && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="eos-reveal eos-stagger-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
                       {/* Left Column: Pipeline Checklist + Quick Decision Card */}
                       <div className="space-y-5">
-                        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
                           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2">
                             VERIFICATION STAGE STATUS
                           </h3>
@@ -1233,7 +1233,7 @@ export function App() {
                             ].map((row) => (
                               <div
                                 key={row.label}
-                                className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950 border border-slate-800/80"
+                                className="eos-card flex items-center justify-between p-2.5 rounded-lg bg-slate-950 border border-slate-800/80"
                               >
                                 <span className="font-medium text-slate-200">
                                   {row.label}
@@ -1261,7 +1261,7 @@ export function App() {
 
                         {/* Decision Summary Box */}
                         {dec && (
-                          <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3 text-xs">
+                          <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3 text-xs">
                             <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
                               <span className="font-mono uppercase font-bold text-slate-400">
                                 DECISION SUMMARY
@@ -1271,7 +1271,7 @@ export function App() {
                             <p className="text-slate-200 leading-relaxed">
                               {dec.summary_reason}
                             </p>
-                            <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+                            <div className="eos-card p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
                               <span className="text-[11px] font-semibold uppercase text-emerald-400 block">
                                 Next Reviewer Step
                               </span>
@@ -1300,7 +1300,7 @@ export function App() {
                       {/* Right 2 Columns: Evidence First Viewer + Top Claims with [Why?] */}
                       <div className="lg:col-span-2 space-y-5">
                         {/* Evidence Viewer Cards */}
-                        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
                           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
                             <div>
                               <h3 className="text-sm font-bold text-white">
@@ -1335,7 +1335,7 @@ export function App() {
                               return (
                                 <div
                                   key={item.id}
-                                  className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-sky-500/50 transition flex flex-col justify-between gap-3 text-xs"
+                                  className="eos-interactive-card p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-sky-500/50 flex flex-col justify-between gap-3 text-xs"
                                 >
                                   <div className="space-y-1.5">
                                     <div className="flex items-center justify-between gap-2">
@@ -1384,7 +1384,7 @@ export function App() {
                                       href={rawUrl}
                                       target="_blank"
                                       rel="noreferrer"
-                                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-mono text-[11px]"
+                                      className="eos-btn-link inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 font-mono text-[11px]"
                                     >
                                       <span>Original File</span>
                                       <ExternalLink
@@ -1400,7 +1400,7 @@ export function App() {
                         </div>
 
                         {/* Key Extracted Claims with [Why?] Button */}
-                        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
                           <div className="flex items-center justify-between">
                             <div>
                               <h3 className="text-sm font-bold text-white">
@@ -1415,7 +1415,7 @@ export function App() {
                             {caseDetail.claims.slice(0, 8).map((c) => (
                               <div
                                 key={c.claim_id}
-                                className="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-2 text-xs"
+                                className="eos-card p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-2 text-xs"
                               >
                                 <div className="space-y-0.5 min-w-0">
                                   <div className="flex items-center gap-2">
@@ -1455,9 +1455,9 @@ export function App() {
 
                 {/* TAB 2: EVIDENCE VIEWER & UPLOAD */}
                 {activeTab === 'upload' && (
-                  <div className="space-y-6">
+                  <div className="eos-reveal eos-stagger-4 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
+                      <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
                         <h3 className="text-sm font-bold text-white">
                           Upload Multimodal Evidence File (PDF, PNG/JPG, WAV, JSON, CSV)
                         </h3>
@@ -1522,7 +1522,7 @@ export function App() {
                         </form>
                       </div>
 
-                      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
+                      <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
                         <h3 className="text-sm font-bold text-white">
                           Add Manual Dock Note or Voice Transcript
                         </h3>
@@ -1585,7 +1585,7 @@ export function App() {
 
                 {/* TAB 3: CLAIMS & [Why?] PROVENANCE TABLE */}
                 {activeTab === 'timeline' && (
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
+                  <div className="eos-panel eos-reveal eos-stagger-4 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
                     <div>
                       <h3 className="text-sm font-bold text-white">
                         Normalized Cross-Modal Claims & Epistemic Provenance

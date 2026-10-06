@@ -37,9 +37,9 @@ export function DecisionReviewPanel({
   loading,
 }: DecisionReviewPanelProps) {
   return (
-    <div className="space-y-6">
+    <div className="eos-reveal eos-stagger-4 space-y-6">
       {/* Top Decision Panel */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
+      <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-800 pb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export function DecisionReviewPanel({
             </button>
             <a
               href="#human-override-form"
-              className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition"
+              className="eos-btn-link px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition"
             >
               Override Decision
             </a>
@@ -83,7 +83,7 @@ export function DecisionReviewPanel({
 
         {/* Why? Bullet List */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="md:col-span-2 p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+          <div className="eos-card md:col-span-2 p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
               Why did the system reach this decision?
             </span>
@@ -97,7 +97,7 @@ export function DecisionReviewPanel({
             )}
           </div>
 
-          <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5">
+          <div className="eos-card p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block">
               Recommended Reviewer Action
             </span>
@@ -125,7 +125,7 @@ export function DecisionReviewPanel({
 
         {/* If Human Override was applied, display explicit audit box */}
         {decision.is_human_override && (
-          <div className="p-4 rounded-lg bg-sky-950/25 border border-sky-500/40 text-xs space-y-1">
+          <div className="eos-card p-4 rounded-lg bg-sky-950/25 border border-sky-500/40 text-xs space-y-1">
             <div className="font-semibold text-sky-300 flex items-center justify-between">
               <span>Human Reviewer Override Recorded by {decision.human_reviewer}</span>
               <span className="font-mono text-[11px]">
@@ -141,7 +141,7 @@ export function DecisionReviewPanel({
 
       {/* Bottom Grid: Deterministic Rule Trace + Human Override Form */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="eos-panel lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div>
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -158,7 +158,7 @@ export function DecisionReviewPanel({
             {decision.rule_traces.map((rt) => (
               <div
                 key={rt.rule_id}
-                className={`p-3.5 rounded-lg border text-xs ${
+                className={`eos-card p-3.5 rounded-lg border text-xs ${
                   rt.passed
                     ? 'bg-slate-950 border-emerald-500/30'
                     : 'bg-amber-950/15 border-amber-500/40'
@@ -190,7 +190,7 @@ export function DecisionReviewPanel({
         {/* Human Review Form */}
         <div
           id="human-override-form"
-          className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4"
+          className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4"
         >
           <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
             <UserCheck className="w-4 h-4 text-sky-400" aria-hidden="true" />

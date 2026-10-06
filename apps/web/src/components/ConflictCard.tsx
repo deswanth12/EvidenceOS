@@ -29,9 +29,9 @@ export function ConflictPresentationList({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="eos-reveal eos-stagger-4 space-y-5">
       {/* 1. Cross-Modal Contradictions */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
+      <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -56,7 +56,7 @@ export function ConflictPresentationList({
         </div>
 
         {conflicts.length === 0 ? (
-          <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300">
+          <div className="eos-card p-4 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300">
             All submitted sources (Purchase Order, Delivery Challan, Inspection Image, and Voice Report) agree on quantities and item condition.
           </div>
         ) : (
@@ -64,7 +64,7 @@ export function ConflictPresentationList({
             {conflicts.map((cnf) => (
               <div
                 key={cnf.conflict_id}
-                className="rounded-xl bg-slate-950 border border-amber-500/40 overflow-hidden"
+                className="eos-card rounded-xl bg-slate-950 border border-amber-500/40 overflow-hidden"
               >
                 {/* Conflict Top Banner */}
                 <div className="px-4 py-3 bg-amber-500/10 border-b border-amber-500/20 flex flex-wrap items-center justify-between gap-2">
@@ -140,11 +140,11 @@ export function ConflictPresentationList({
       </div>
 
       {/* 2. Historical Duplicate / Reused Evidence Warnings */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
+      <div className="eos-panel bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <History className="w-4 h-4 text-rose-400" aria-hidden="true" />
+              <History className="w-4 h-4 text-amber-400" aria-hidden="true" />
               <span>
                 Historical Evidence Reuse Check (SHA-256 & 64-Bit Perceptual dHash)
               </span>
@@ -156,7 +156,7 @@ export function ConflictPresentationList({
           <span
             className={`px-2.5 py-1 rounded text-xs font-mono font-semibold border ${
               historicalWarnings.length > 0
-                ? 'bg-rose-500/15 text-rose-300 border-rose-500/40'
+                ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
                 : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
             }`}
           >
@@ -167,7 +167,7 @@ export function ConflictPresentationList({
         </div>
 
         {historicalWarnings.length === 0 ? (
-          <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300">
+          <div className="eos-card p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300">
             ✓ All uploaded files and inspection images passed SHA-256 and 64-bit dHash uniqueness checks against prior disputes.
           </div>
         ) : (
@@ -178,13 +178,13 @@ export function ConflictPresentationList({
               return (
                 <div
                   key={w.match_id}
-                  className="p-4 rounded-xl bg-rose-950/25 border border-rose-500/40 space-y-3.5 text-xs"
+                  className="eos-card p-4 rounded-xl bg-amber-950/20 border border-amber-500/40 space-y-3.5 text-xs"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-500/20 text-rose-200 border border-rose-500/40 font-bold font-mono">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-200 border border-amber-500/40 font-bold font-mono">
                       ⚠ Potentially reused evidence
                     </span>
-                    <span className="font-mono text-rose-200 bg-rose-950/60 px-2.5 py-1 rounded border border-rose-500/30">
+                    <span className="font-mono text-amber-200 bg-amber-950/60 px-2.5 py-1 rounded border border-amber-500/30">
                       Match: {w.match_type} • Similarity:{' '}
                       {(w.similarity_score * 100).toFixed(1)}% (Hamming Distance:{' '}
                       {w.hamming_distance ?? 0}/64)
@@ -199,7 +199,7 @@ export function ConflictPresentationList({
                     className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1"
                   >
                     {/* Left: Current Claim Image */}
-                    <div className="rounded-lg bg-slate-950 border border-slate-800 p-3 space-y-2">
+                    <div className="eos-card rounded-lg bg-slate-950 border border-slate-800 p-3 space-y-2">
                       <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
                         <span className="font-semibold text-sky-300 uppercase tracking-wider text-[11px] font-mono">
                           Current Claim Image
@@ -228,7 +228,7 @@ export function ConflictPresentationList({
                     </div>
 
                     {/* Right: Historical Prior-Claim Image */}
-                    <div className="rounded-lg bg-slate-950 border border-rose-500/30 p-3 space-y-2">
+                    <div className="eos-card rounded-lg bg-slate-950 border border-amber-500/30 p-3 space-y-2">
                       <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
                         <span className="font-semibold text-amber-300 uppercase tracking-wider text-[11px] font-mono">
                           Historical Image (Prior Claim)

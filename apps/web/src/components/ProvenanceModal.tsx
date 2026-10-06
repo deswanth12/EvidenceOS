@@ -92,7 +92,7 @@ export function ProvenanceModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="eos-panel eos-reveal w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -119,7 +119,7 @@ export function ProvenanceModal({
         {/* Body */}
         <div className="p-5 overflow-y-auto space-y-4 text-xs">
           {/* Breadcrumb Trace Chain */}
-          <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-slate-950 border border-slate-800 font-mono text-[11px] text-slate-300">
+          <div className="eos-card flex flex-wrap items-center gap-2 p-3 rounded-lg bg-slate-950 border border-slate-800 font-mono text-[11px] text-slate-300">
             <span className="px-2 py-0.5 rounded bg-violet-500/15 text-violet-300 border border-violet-500/30">
               Decision: {decision?.outcome?.replace(/_/g, ' ').toUpperCase() || 'PENDING'}
             </span>
@@ -139,7 +139,7 @@ export function ProvenanceModal({
 
           {/* CLAIM & TYPE Box */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+            <div className="eos-card p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
               <span className="text-[11px] font-mono uppercase text-slate-400 block">
                 CLAIM
               </span>
@@ -151,7 +151,7 @@ export function ProvenanceModal({
               </div>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+            <div className="eos-card p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
               <span className="text-[11px] font-mono uppercase text-slate-400 block">
                 EPISTEMIC TYPE & EXTRACTION REASON
               </span>
@@ -166,7 +166,7 @@ export function ProvenanceModal({
           </div>
 
           {/* SUPPORTED BY Section */}
-          <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5">
+          <div className="eos-card p-4 rounded-lg bg-slate-950 border border-slate-800 space-y-2.5">
             <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 block">
               SUPPORTED BY ({supportingItems.length} Evidence Source
               {supportingItems.length === 1 ? '' : 's'})
@@ -178,7 +178,7 @@ export function ProvenanceModal({
                 return (
                   <div
                     key={ev.id}
-                    className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3"
+                    className="eos-card p-3 rounded-lg bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-2.5">
                       <Icon className="w-4 h-4 text-sky-400 shrink-0" aria-hidden="true" />
@@ -207,7 +207,7 @@ export function ProvenanceModal({
                         href={rawUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-medium"
+                        className="eos-btn-link inline-flex items-center gap-1 px-2.5 py-1 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-medium"
                       >
                         <span>Original File</span>
                         <ExternalLink className="w-3 h-3" aria-hidden="true" />
@@ -221,7 +221,7 @@ export function ProvenanceModal({
 
           {/* Inline Highlighted Source Snippet */}
           {claim.provenance.raw_snippet && (
-            <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+            <div className="eos-card p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-mono uppercase text-amber-300 font-semibold block">
                   INLINE SOURCE HIGHLIGHT (@ {claim.provenance.location || 'Document'})

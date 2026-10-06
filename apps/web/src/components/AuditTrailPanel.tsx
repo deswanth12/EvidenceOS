@@ -45,7 +45,7 @@ export function AuditTrailPanel({ auditTrail }: AuditTrailPanelProps) {
   };
 
   return (
-    <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-5">
+    <div className="eos-panel eos-reveal eos-stagger-4 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
         <div>
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -97,7 +97,7 @@ export function AuditTrailPanel({ auditTrail }: AuditTrailPanelProps) {
           return (
             <div
               key={ev.id}
-              className="relative rounded-lg bg-slate-950 border border-slate-800 p-3.5 text-xs"
+              className="eos-card relative rounded-lg bg-slate-950 border border-slate-800 p-3.5 text-xs"
             >
               {/* Timeline Dot */}
               <span

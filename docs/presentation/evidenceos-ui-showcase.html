@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvidenceOS — VeriDock | Enterprise Investigation & Research Workstation Showcase</title>
+
+    <!-- Typography: Plus Jakarta Sans (UI Geometry) + JetBrains Mono (Tabular Telemetry, Hashes, Claims) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           PALANTIR + LINEAR DARK OBSIDIAN WORKSTATION TOKENS
+           ========================================================================== */
+        :root {
+            --bg-obsidian: #060911;
+            --bg-panel: #0B101B;
+            --bg-elevated: #101726;
+            --bg-surface: #151E31;
+            --bg-hover: #1B263E;
+
+            --border-subtle: #1D283E;
+            --border-strong: #2B3B59;
+            --border-focus: #3B82F6;
+
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+
+            /* Semantic Signal Tokens */
+            --blue-primary: #3B82F6;
+            --blue-soft: rgba(59, 130, 246, 0.14);
+            --blue-border: rgba(59, 130, 246, 0.38);
+
+            --cyan-accent: #06B6D4;
+            --cyan-soft: rgba(6, 182, 212, 0.13);
+            --cyan-border: rgba(6, 182, 212, 0.36);
+
+            --emerald-safe: #10B981;
+            --emerald-soft: rgba(16, 185, 129, 0.13);
+            --emerald-border: rgba(16, 185, 129, 0.36);
+
+            --amber-warn: #F59E0B;
+            --amber-soft: rgba(245, 158, 11, 0.14);
+            --amber-border: rgba(245, 158, 11, 0.40);
+
+            --red-conflict: #EF4444;
+            --red-soft: rgba(239, 68, 68, 0.14);
+            --red-border: rgba(239, 68, 68, 0.42);
+
+            --purple-semantic: #A855F7;
+            --purple-soft: rgba(168, 85, 247, 0.14);
+            --purple-border: rgba(168, 85, 247, 0.38);
+
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-obsidian);
+            background-image:
+                radial-gradient(circle at 15% 0%, rgba(59, 130, 246, 0.08), transparent 38%),
+                radial-gradient(circle at 85% 10%, rgba(6, 182, 212, 0.06), transparent 35%),
+                linear-gradient(to right, rgba(29, 40, 62, 0.22) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(29, 40, 62, 0.22) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            line-height: 1.45;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+           GLOBAL APPLICATION HEADER
+           ========================================================================== */
+        .top-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 52px;
+            background: rgba(11, 16, 27, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--blue-primary), var(--cyan-accent));
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 13px;
+            color: #fff;
+            letter-spacing: -0.04em;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-app-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 7px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 4px;
+            color: var(--cyan-accent);
+        }
+
+        .system-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 9px;
+            background: var(--emerald-soft);
+            border: 1px solid var(--emerald-border);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--emerald-safe);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+        }
+
+        .nav-btn.active {
+            color: var(--text-primary);
+            background: var(--blue-soft);
+            border-color: var(--blue-border);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            padding: 4px 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 5px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+
+        .avatar-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 3px 8px 3px 4px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-strong);
+            border-radius: 5px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .avatar-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #2563EB, #0891B2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* ==========================================================================
+           PRODUCT THESIS & EPISTEMIC TRUST RIBBON
+           ========================================================================== */
+        .thesis-ribbon {
+            background: linear-gradient(90deg, rgba(16, 23, 38, 0.95), rgba(15, 23, 42, 0.95));
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 9px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .thesis-quote {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .thesis-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: var(--purple-soft);
+            border: 1px solid var(--purple-border);
+            color: #C084FC;
+        }
+
+        .trust-pipeline-pills {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--text-secondary);
+        }
+
+        .trust-step {
+            padding: 2px 7px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 3px;
+        }
+
+        .trust-arrow {
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           EPISTEMIC BADGES (FACT / INFERENCE / RULE / UNCERTAINTY)
+           ========================================================================== */
+        .epistemic-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .ep-fact {
+            background: var(--emerald-soft);
+            border: 1px solid var(--emerald-border);
+            color: var(--emerald-safe);
+        }
+
+        .ep-inference {
+            background: var(--purple-soft);
+            border: 1px solid var(--purple-border);
+            color: #C084FC;
+        }
+
+        .ep-rule {
+            background: var(--blue-soft);
+            border: 1px solid var(--blue-border);
+            color: #60A5FA;
+        }
+
+        .ep-uncertainty {
+            background: var(--amber-soft);
+            border: 1px solid var(--amber-border);
+            color: var(--amber-warn);
+        }
+
+        .ep-conflict {
+            background: var(--red-soft);
+            border: 1px solid var(--red-border);
+            color: var(--red-conflict);
+        }
+
+        /* ==========================================================================
+           MAIN WORKSPACE CONTAINER & GRID LAYOUTS
+           ========================================================================== */
+        .workspace-shell {
+            max-width: 1680px;
+            margin: 0 auto;
+            padding: 16px 20px 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 10px 14px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .panel-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-kicker {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .panel-body {
+            padding: 14px;
+        }
+
+        /* ==========================================================================
+           CASE HEADER & 6 COMPACT SUMMARY CARDS
+           ========================================================================== */
+        .case-header-bar {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--amber-warn);
+            border-radius: 6px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .case-id-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .case-code {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--cyan-accent);
+            background: var(--cyan-soft);
+            border: 1px solid var(--cyan-border);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .case-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .status-review-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            background: var(--amber-soft);
+            border: 1px solid var(--amber-border);
+            color: var(--amber-warn);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .case-meta-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .case-meta-item strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .btn-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 13px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid var(--border-strong);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-primary {
+            background: var(--blue-primary);
+            border-color: #2563EB;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #2563EB;
+        }
+
+        .btn-amber {
+            background: var(--amber-soft);
+            border-color: var(--amber-border);
+            color: var(--amber-warn);
+        }
+
+        /* 6 Metric Cards */
+        .summary-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .metric-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 11px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+        }
+
+        .metric-card.state-ok { border-top: 2px solid var(--emerald-safe); }
+        .metric-card.state-info { border-top: 2px solid var(--blue-primary); }
+        .metric-card.state-warn { border-top: 2px solid var(--amber-warn); }
+        .metric-card.state-conflict { border-top: 2px solid var(--red-conflict); }
+
+        .metric-label {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .metric-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* ==========================================================================
+           5-STAGE INVESTIGATION TIMELINE
+           ========================================================================== */
+        .timeline-bar {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .timeline-step.completed {
+            border-color: var(--emerald-border);
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .timeline-step.active-warn {
+            border-color: var(--amber-warn);
+            background: rgba(245, 158, 11, 0.12);
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25);
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .completed .step-icon {
+            background: var(--emerald-soft);
+            color: var(--emerald-safe);
+            border: 1px solid var(--emerald-border);
+        }
+
+        .active-warn .step-icon {
+            background: var(--amber-soft);
+            color: var(--amber-warn);
+            border: 1px solid var(--amber-border);
+        }
+
+        .pending .step-icon {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .step-state {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--text-secondary);
+        }
+
+        /* ==========================================================================
+           3-COLUMN INVESTIGATION WORKBENCH GRID
+           ========================================================================== */
+        .workbench-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr 430px;
+            gap: 14px;
+            align-items: start;
+        }
+
+        /* Filter Tabs */
+        .tab-strip {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-obsidian);
+            overflow-x: auto;
+        }
+
+        .tab-pill {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 4px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .tab-pill.active {
+            background: var(--blue-soft);
+            border-color: var(--blue-border);
+            color: var(--text-primary);
+        }
+
+        /* Evidence List Cards */
+        .evidence-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .ev-card {
+            padding: 10px 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ev-card:hover {
+            border-color: var(--border-strong);
+            background: var(--bg-surface);
+        }
+
+        .ev-card.selected {
+            border-color: var(--blue-primary);
+            background: rgba(59, 130, 246, 0.09);
+        }
+
+        .ev-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .ev-filename {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ev-type-tag {
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            color: var(--cyan-accent);
+        }
+
+        .ev-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        /* Document Preview Table inside Inspector */
+        .doc-sheet {
+            background: #080D18;
+            border: 1px solid var(--border-strong);
+            border-radius: 5px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .doc-sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 7px 10px;
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            font-size: 10.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-strong);
+        }
+
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .data-table tr.highlighted-span {
+            background: rgba(245, 158, 11, 0.16);
+            outline: 1px solid var(--amber-warn);
+        }
+
+        .span-callout {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--amber-warn);
+            background: var(--amber-soft);
+            border: 1px solid var(--amber-border);
+            padding: 2px 7px;
+            border-radius: 3px;
+            margin-left: 8px;
+        }
+
+        .claims-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .claim-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-strong);
+            border-radius: 5px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .claim-chip:hover {
+            border-color: var(--blue-primary);
+        }
+
+        /* Historical Image Comparison */
+        .hist-compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 140px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .warehouse-svg-frame {
+            background: #070B12;
+            border: 1px solid var(--border-strong);
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .similarity-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            padding: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--amber-border);
+            border-radius: 5px;
+        }
+
+        /* Benchmark & Calibration Bars */
+        .bar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .bar-label-line {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+        }
+
+        .bar-track {
+            height: 8px;
+            background: var(--bg-obsidian);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        /* Audit Log Stream */
+        .audit-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .audit-row {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-left: 2px solid var(--cyan-accent);
+            border-radius: 4px;
+            padding: 7px 10px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .audit-row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .audit-time {
+            color: var(--cyan-accent);
+            font-weight: 700;
+        }
+
+        .audit-hash {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        details.audit-json summary {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        details.audit-json pre {
+            margin-top: 6px;
+            padding: 6px 8px;
+            background: var(--bg-obsidian);
+            border: 1px solid var(--border-subtle);
+            border-radius: 3px;
+            color: #93C5FD;
+            font-size: 10px;
+            overflow-x: auto;
+        }
+
+        /* Provenance Trace Chain */
+        .trace-chain {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 10px;
+            background: var(--bg-obsidian);
+            border: 1px solid var(--border-strong);
+            border-radius: 5px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .trace-node {
+            padding: 3px 7px;
+            border-radius: 3px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-strong);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1360px) {
+            .workbench-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .timeline-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================================================
+         GLOBAL APPLICATION HEADER
+         ========================================================================== -->
+    <header class="top-header">
+        <div class="brand-cluster">
+            <div class="brand-mark">EO</div>
+            <div class="brand-name">
+                EvidenceOS
+                <span class="brand-app-tag">VeriDock</span>
+            </div>
+            <span class="system-status-pill" title="All verification workers, perceptual dHash index, and deterministic rules operational">
+                <span class="status-dot"></span>
+                SYSTEM OK
+            </span>
+        </div>
+
+        <nav class="main-nav" aria-label="Primary Workspace Navigation">
+            <button class="nav-btn" onclick="switchView('all')">Showcase Board (All Panels)</button>
+            <button class="nav-btn active" id="nav-investigation" onclick="switchView('investigation')">Investigation</button>
+            <button class="nav-btn" id="nav-benchmarks" onclick="switchView('benchmarks')">Benchmarks (N=150)</button>
+            <button class="nav-btn" id="nav-audit" onclick="switchView('audit')">Audit Trail</button>
+        </nav>
+
+        <div class="header-actions">
+            <div class="search-box">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span>Search cases, SKUs, SHA-256...</span>
+                <kbd style="background: var(--bg-surface); padding: 1px 5px; border-radius: 3px; font-size: 10px;">Ctrl+K</kbd>
+            </div>
+            <button class="icon-btn" aria-label="Notifications" title="2 Active Conflict Alerts">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </button>
+            <button class="icon-btn" aria-label="Settings" title="Rule Engine & SLA Configuration">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <div class="avatar-chip">
+                <span class="avatar-circle">KD</span>
+                <span>K. Deswanth</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+         PRODUCT THESIS & EPISTEMIC TRUST RIBBON
+         ========================================================================== -->
+    <section class="thesis-ribbon" aria-label="Core Architectural Principle">
+        <div class="thesis-quote">
+            <span class="thesis-tag">Core Principle</span>
+            <span>“The AI interprets evidence. Deterministic rules constrain the decision. Uncertainty triggers human review.”</span>
+        </div>
+        <div class="trust-pipeline-pills">
+            <span class="trust-step">AI Interpretation</span>
+            <span class="trust-arrow">→</span>
+            <span class="trust-step">Evidence Normalization</span>
+            <span class="trust-arrow">→</span>
+            <span class="trust-step">Cross-Modal Verification</span>
+            <span class="trust-arrow">→</span>
+            <span class="trust-step">Deterministic Rules</span>
+            <span class="trust-arrow">→</span>
+            <span class="trust-step" style="border-color: var(--amber-border); color: var(--amber-warn);">Decision OR Human Review</span>
+            <span class="trust-arrow">→</span>
+            <span class="trust-step" style="border-color: var(--emerald-border); color: var(--emerald-safe);">Tamper-Evident Audit</span>
+        </div>
+    </section>
+
+    <main class="workspace-shell">
+
+        <!-- ==========================================================================
+             SCREEN 1: CASE INVESTIGATION WORKSPACE (CASE VD-0042)
+             ========================================================================== -->
+        <div id="section-investigation" style="display: flex; flex-direction: column; gap: 14px;">
+
+            <!-- Case Header -->
+            <section class="case-header-bar">
+                <div>
+                    <div class="case-id-row">
+                        <span class="case-code">CASE VD-0042</span>
+                        <h1 class="case-title">Delivery Dispute — Damaged Packaging</h1>
+                        <span class="status-review-badge">
+                            <span class="status-dot"></span>
+                            MANUAL REVIEW REQUIRED
+                        </span>
+                    </div>
+                    <div class="case-meta-grid">
+                        <span class="case-meta-item">Supplier: <strong>Sri Balaji Traders</strong></span>
+                        <span class="case-meta-item">Buyer: <strong>Tirupati Retail Pvt Ltd</strong></span>
+                        <span class="case-meta-item">Created: <strong>2026-09-14 10:24</strong></span>
+                        <span class="case-meta-item">Updated: <strong>2026-09-14 11:08</strong></span>
+                        <span class="case-meta-item">Primary SKU: <strong>SKU-IND-201 (Steel Bracket)</strong></span>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn" onclick="alert('Exported signed cryptographic investigation dossier for CASE VD-0042.')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export Report
+                    </button>
+                    <button class="btn btn-primary" onclick="runInvestigationPulse()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Run Investigation
+                    </button>
+                </div>
+            </section>
+
+            <!-- 6 Case Summary Cards -->
+            <section class="summary-cards-grid" aria-label="Case Summary Metrics">
+                <div class="metric-card state-info">
+                    <div class="metric-label">
+                        <span>Ordered</span>
+                        <span class="epistemic-badge ep-fact">FACT</span>
+                    </div>
+                    <div class="metric-value">10 units</div>
+                    <div class="metric-sub">PO Batch • Steel Bracket</div>
+                </div>
+                <div class="metric-card state-info">
+                    <div class="metric-label">
+                        <span>Received</span>
+                        <span class="epistemic-badge ep-fact">FACT</span>
+                    </div>
+                    <div class="metric-value">8 units</div>
+                    <div class="metric-sub">Challan verified on dock</div>
+                </div>
+                <div class="metric-card state-warn">
+                    <div class="metric-label">
+                        <span>Damaged</span>
+                        <span class="epistemic-badge ep-fact">FACT</span>
+                    </div>
+                    <div class="metric-value" style="color: var(--amber-warn);">2 units</div>
+                    <div class="metric-sub">Visual + Challan corroborated</div>
+                </div>
+                <div class="metric-card state-conflict">
+                    <div class="metric-label">
+                        <span>Conflicts</span>
+                        <span class="epistemic-badge ep-conflict">HIGH</span>
+                    </div>
+                    <div class="metric-value" style="color: var(--red-conflict);">2</div>
+                    <div class="metric-sub">Quantity + Historical dHash</div>
+                </div>
+                <div class="metric-card state-ok">
+                    <div class="metric-label">
+                        <span>Evidence</span>
+                        <span class="epistemic-badge ep-fact">7 FILES</span>
+                    </div>
+                    <div class="metric-value">7 items</div>
+                    <div class="metric-sub">2 PDF • 3 IMG • 1 WAV • 1 CSV</div>
+                </div>
+                <div class="metric-card state-warn">
+                    <div class="metric-label">
+                        <span>Review</span>
+                        <span class="epistemic-badge ep-rule">RULE R4</span>
+                    </div>
+                    <div class="metric-value" style="color: var(--amber-warn);">Required</div>
+                    <div class="metric-sub">Safe abstention triggered</div>
+                </div>
+            </section>
+
+            <!-- 5-Stage Horizontal Investigation Timeline -->
+            <section class="timeline-bar" aria-label="Investigation Workflow Timeline">
+                <div class="timeline-step completed">
+                    <div class="step-icon">✓</div>
+                    <div>
+                        <div class="step-title">1 Upload &amp; Ingest</div>
+                        <div class="step-state" style="color: var(--emerald-safe);">Completed • 7/7 SHA-256</div>
+                    </div>
+                </div>
+                <div class="timeline-step completed">
+                    <div class="step-icon">✓</div>
+                    <div>
+                        <div class="step-title">2 Investigate Claims</div>
+                        <div class="step-state" style="color: var(--emerald-safe);">Completed • 14 Claims</div>
+                    </div>
+                </div>
+                <div class="timeline-step active-warn">
+                    <div class="step-icon">!</div>
+                    <div>
+                        <div class="step-title">3 Evidence Conflict</div>
+                        <div class="step-state" style="color: var(--amber-warn);">Needs attention (2)</div>
+                    </div>
+                </div>
+                <div class="timeline-step pending">
+                    <div class="step-icon">4</div>
+                    <div>
+                        <div class="step-title">4 Explain Provenance</div>
+                        <div class="step-state">Not started</div>
+                    </div>
+                </div>
+                <div class="timeline-step pending">
+                    <div class="step-icon">5</div>
+                    <div>
+                        <div class="step-title">5 Rules &amp; Decision</div>
+                        <div class="step-state">Not started</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main 3-Column Investigation Grid -->
+            <div class="workbench-grid">
+
+                <!-- COLUMN 1: EVIDENCE OVERVIEW PANEL -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-accent)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Evidence Overview
+                        </div>
+                        <span class="panel-kicker">SHA-256 + 64-BIT DHASH</span>
+                    </div>
+
+                    <div class="tab-strip" role="tablist">
+                        <button class="tab-pill active" onclick="filterEvidence('ALL', this)">All (7)</button>
+                        <button class="tab-pill" onclick="filterEvidence('PDF', this)">PDF (2)</button>
+                        <button class="tab-pill" onclick="filterEvidence('IMG', this)">Images (3)</button>
+                        <button class="tab-pill" onclick="filterEvidence('WAV', this)">Audio (1)</button>
+                        <button class="tab-pill" onclick="filterEvidence('OTHER', this)">Other (1)</button>
+                    </div>
+
+                    <div class="evidence-list" id="evidenceList">
+                        <div class="ev-card selected" data-type="PDF">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag">PDF</span>
+                                    delivery_challan.pdf
+                                </span>
+                                <span class="epistemic-badge ep-fact">EXTRACTED</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-01 • 418 KB</span>
+                                <span>10:24:03</span>
+                            </div>
+                        </div>
+
+                        <div class="ev-card" data-type="IMG">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag" style="color: var(--emerald-safe);">PNG</span>
+                                    damage_photo_01.png
+                                </span>
+                                <span class="epistemic-badge ep-fact">VERIFIED</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-02 • 1.84 MB</span>
+                                <span>10:24:03</span>
+                            </div>
+                        </div>
+
+                        <div class="ev-card" data-type="IMG">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag" style="color: var(--amber-warn);">PNG</span>
+                                    damage_photo_02.png
+                                </span>
+                                <span class="epistemic-badge ep-uncertainty">DHASH MATCH</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-03 • 1.62 MB</span>
+                                <span>10:24:04</span>
+                            </div>
+                        </div>
+
+                        <div class="ev-card" data-type="WAV">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag" style="color: #C084FC;">WAV</span>
+                                    voice_report.wav
+                                </span>
+                                <span class="epistemic-badge ep-conflict">CONFLICT (5 DMG)</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-04 • 892 KB • 00:18s</span>
+                                <span>10:24:04</span>
+                            </div>
+                        </div>
+
+                        <div class="ev-card" data-type="PDF">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag">PDF</span>
+                                    invoice.pdf
+                                </span>
+                                <span class="epistemic-badge ep-fact">EXTRACTED</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-05 • 312 KB</span>
+                                <span>10:24:04</span>
+                            </div>
+                        </div>
+
+                        <div class="ev-card" data-type="IMG">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag" style="color: var(--emerald-safe);">PNG</span>
+                                    pallet_seal_check.png
+                                </span>
+                                <span class="epistemic-badge ep-fact">VERIFIED</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-06 • 1.15 MB</span>
+                                <span>10:24:05</span>
+                            </div>
+                        </div>
+
+                        <div class="ev-card" data-type="OTHER">
+                            <div class="ev-top">
+                                <span class="ev-filename">
+                                    <span class="ev-type-tag" style="color: var(--text-secondary);">CSV</span>
+                                    gate_inward_register.csv
+                                </span>
+                                <span class="epistemic-badge ep-fact">NORMALIZED</span>
+                            </div>
+                            <div class="ev-meta">
+                                <span>ID: EV-0042-07 • 24 KB</span>
+                                <span>10:24:05</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- COLUMN 2: EVIDENCE INSPECTOR DRAWER + HISTORICAL COMPARISON -->
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+
+                    <!-- Evidence Inspector Drawer (Original Document First) -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue-primary)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                Evidence Inspector — <code style="color: var(--cyan-accent);">delivery_challan.pdf</code>
+                            </div>
+                            <span class="panel-kicker">PAGE 1 OF 1 • SHA-256: 8f9c2d1e...44b1</span>
+                        </div>
+                        <div class="panel-body">
+                            <!-- Original Document Preview First -->
+                            <div class="doc-sheet">
+                                <div class="doc-sheet-header">
+                                    <div>
+                                        <strong style="color: var(--text-primary); font-size: 12.5px;">DELIVERY CHALLAN #DC-2026-0891</strong>
+                                        <div style="color: var(--text-muted); font-size: 10.5px;">Supplier: Sri Balaji Traders → Buyer: Tirupati Retail Pvt Ltd • Dock Gate B</div>
+                                    </div>
+                                    <span class="epistemic-badge ep-fact">ORIGINAL DOCUMENT VIEW</span>
+                                </div>
+
+                                <table class="data-table" aria-label="Delivery Challan Line Items">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th style="text-align: right;">Ordered</th>
+                                            <th style="text-align: right;">Received</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>A4 Paper Box</td>
+                                            <td style="text-align: right;">100</td>
+                                            <td style="text-align: right;">100</td>
+                                            <td><span style="color: var(--emerald-safe);">OK</span></td>
+                                        </tr>
+                                        <tr class="highlighted-span" id="pdfHighlightedRow">
+                                            <td><strong>Steel Bracket</strong> <code style="color: var(--cyan-accent);">(SKU-IND-201)</code></td>
+                                            <td style="text-align: right; font-weight: 700;">50</td>
+                                            <td style="text-align: right; font-weight: 700; color: var(--amber-warn);">48</td>
+                                            <td>
+                                                <strong style="color: var(--amber-warn);">Damaged (2 units crushed)</strong>
+                                                <span class="span-callout">← Extracted Claim Span (Page 1, Line 14, Char 182..234)</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Plastic Cover</td>
+                                            <td style="text-align: right;">200</td>
+                                            <td style="text-align: right;">200</td>
+                                            <td><span style="color: var(--emerald-safe);">OK</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Extracted Claims Strip -->
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span class="panel-kicker">EXTRACTED CLAIMS FROM HIGHLIGHTED SPAN (CLICK TO TRACE PROVENANCE)</span>
+                                <span style="font-family: var(--font-mono); font-size: 10.5px; color: var(--text-secondary);">Parser: Structured PDF Table Extractor</span>
+                            </div>
+                            <div class="claims-pill-row">
+                                <div class="claim-chip" onclick="flashProvenance()">
+                                    <span>48 received</span>
+                                    <span class="epistemic-badge ep-fact">FACT</span>
+                                </div>
+                                <div class="claim-chip" style="border-color: var(--amber-border);" onclick="flashProvenance()">
+                                    <span style="color: var(--amber-warn);">2 damaged</span>
+                                    <span class="epistemic-badge ep-fact">FACT</span>
+                                </div>
+                                <div class="claim-chip" onclick="flashProvenance()">
+                                    <span style="color: var(--cyan-accent);">SKU-IND-201</span>
+                                    <span class="epistemic-badge ep-fact">FACT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Historical Evidence Comparison Panel -->
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amber-warn)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                Historical Evidence Comparison — Perceptual 64-bit <code style="color: var(--amber-warn);">dHash</code>
+                            </div>
+                            <span class="epistemic-badge ep-uncertainty">⚠ Potentially reused evidence</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="hist-compare-grid">
+                                <!-- Left: Current Claim Image -->
+                                <div class="warehouse-svg-frame">
+                                    <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10.5px; margin-bottom: 6px;">
+                                        <strong style="color: var(--text-primary);">Current Claim Image</strong>
+                                        <span style="color: var(--cyan-accent);">damage_photo_02.png</span>
+                                    </div>
+                                    <!-- Realistic Warehouse Pallet SVG -->
+                                    <svg viewBox="0 0 260 135" width="100%" height="125" style="background: #0B1320; border-radius: 4px; border: 1px solid #1E293B;">
+                                        <!-- Warehouse Rack Background -->
+                                        <line x1="0" y1="25" x2="260" y2="25" stroke="#1E293B" stroke-width="2"/>
+                                        <line x1="0" y1="115" x2="260" y2="115" stroke="#334155" stroke-width="3"/>
+                                        <!-- Wooden Pallet Base -->
+                                        <rect x="35" y="103" width="190" height="10" fill="#78350F" stroke="#92400E"/>
+                                        <rect x="45" y="106" width="22" height="5" fill="#0B1320"/>
+                                        <rect x="118" y="106" width="24" height="5" fill="#0B1320"/>
+                                        <rect x="193" y="106" width="22" height="5" fill="#0B1320"/>
+                                        <!-- Intact Cartons -->
+                                        <rect x="40" y="66" width="44" height="37" fill="#A16207" stroke="#CA8A04"/>
+                                        <rect x="86" y="66" width="44" height="37" fill="#A16207" stroke="#CA8A04"/>
+                                        <rect x="132" y="66" width="44" height="37" fill="#A16207" stroke="#CA8A04"/>
+                                        <rect x="40" y="30" width="44" height="34" fill="#A16207" stroke="#CA8A04"/>
+                                        <rect x="86" y="30" width="44" height="34" fill="#A16207" stroke="#CA8A04"/>
+                                        <!-- 2 Damaged Crushed Cartons (Highlighted Bounding Box) -->
+                                        <polygon points="178,66 220,70 218,103 178,103" fill="#7F1D1D" stroke="#EF4444" stroke-width="1.5"/>
+                                        <polygon points="132,32 175,36 173,64 132,64" fill="#7F1D1D" stroke="#EF4444" stroke-width="1.5"/>
+                                        <rect x="129" y="28" width="95" height="78" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 2"/>
+                                        <text x="134" y="22" fill="#F59E0B" font-family="JetBrains Mono" font-size="8.5" font-weight="bold">CV: 2 DAMAGED UNITS</text>
+                                    </svg>
+                                    <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 5px;">
+                                        Case: VD-0042 • 2026-09-14 • dHash: <code style="color: var(--text-primary);">f4a9c2819b3e7012</code>
+                                    </div>
+                                </div>
+
+                                <!-- Center Similarity Telemetry -->
+                                <div class="similarity-center">
+                                    <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--amber-warn);">94%</div>
+                                    <div style="font-size: 11px; font-weight: 700; color: var(--text-primary);">Visual Similarity</div>
+                                    <div style="font-family: var(--font-mono); font-size: 10px; color: var(--cyan-accent); background: var(--cyan-soft); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--cyan-border);">
+                                        dHash Distance: 4 / 64
+                                    </div>
+                                    <div style="font-family: var(--font-mono); font-size: 9.5px; color: var(--text-secondary); margin-top: 2px;">
+                                        SHA-256 Exact Match:<br>
+                                        <strong style="color: var(--amber-warn);">NO (Recompressed)</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Right: Historical Image — Prior Claim -->
+                                <div class="warehouse-svg-frame">
+                                    <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10.5px; margin-bottom: 6px;">
+                                        <strong style="color: var(--text-primary);">Historical Image — Prior Claim</strong>
+                                        <span style="color: var(--amber-warn);">CASE VD-0019 (41d ago)</span>
+                                    </div>
+                                    <svg viewBox="0 0 260 135" width="100%" height="125" style="background: #0D1624; border-radius: 4px; border: 1px solid #1E293B;">
+                                        <line x1="0" y1="25" x2="260" y2="25" stroke="#1E293B" stroke-width="2"/>
+                                        <line x1="0" y1="115" x2="260" y2="115" stroke="#334155" stroke-width="3"/>
+                                        <rect x="37" y="103" width="188" height="10" fill="#854D0E" stroke="#A16207"/>
+                                        <rect x="47" y="106" width="22" height="5" fill="#0D1624"/>
+                                        <rect x="119" y="106" width="24" height="5" fill="#0D1624"/>
+                                        <rect x="194" y="106" width="22" height="5" fill="#0D1624"/>
+                                        <rect x="42" y="66" width="44" height="37" fill="#B45309" stroke="#D97706"/>
+                                        <rect x="88" y="66" width="44" height="37" fill="#B45309" stroke="#D97706"/>
+                                        <rect x="134" y="66" width="44" height="37" fill="#B45309" stroke="#D97706"/>
+                                        <rect x="42" y="30" width="44" height="34" fill="#B45309" stroke="#D97706"/>
+                                        <rect x="88" y="30" width="44" height="34" fill="#B45309" stroke="#D97706"/>
+                                        <polygon points="180,66 221,70 219,103 180,103" fill="#991B1B" stroke="#F87171" stroke-width="1.5"/>
+                                        <polygon points="134,32 176,36 174,64 134,64" fill="#991B1B" stroke="#F87171" stroke-width="1.5"/>
+                                        <text x="134" y="22" fill="#94A3B8" font-family="JetBrains Mono" font-size="8.5">ARCHIVED: +14 RGB SHIFT</text>
+                                    </svg>
+                                    <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 5px;">
+                                        Case: VD-0019 • 2026-08-04 • dHash: <code style="color: var(--text-primary);">f4a9c2819b3e7416</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 10px; padding: 8px 10px; background: var(--bg-obsidian); border: 1px solid var(--border-subtle); border-radius: 4px; font-size: 11.5px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
+                                <span><strong style="color: var(--amber-warn);">Epistemic Notice:</strong> Perceptual similarity (`Hamming = 4 / 64`) is surfaced as an investigation signal (<em>Potentially reused evidence</em>), not an automatic fraud determination.</span>
+                                <span class="epistemic-badge ep-inference">INFERENCE</span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- COLUMN 3: CONFLICT ANALYSIS + PROVENANCE "WHY?" MODAL + DECISION REVIEW -->
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+
+                    <!-- Conflict Analysis Card -->
+                    <section class="panel" style="border-color: var(--red-border);">
+                        <div class="panel-header" style="background: rgba(239, 68, 68, 0.10);">
+                            <div class="panel-title" style="color: #FCA5A5;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red-conflict)" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                ⚠ QUANTITY CONFLICT
+                            </div>
+                            <span class="epistemic-badge ep-conflict">SEVERITY: HIGH</span>
+                        </div>
+                        <div class="panel-body">
+                            <table class="data-table" style="margin-bottom: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Modality</th>
+                                        <th>Reported</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Delivery Challan</td>
+                                        <td><span class="epistemic-badge ep-fact">PDF</span></td>
+                                        <td><strong>8 received</strong> (2 damaged)</td>
+                                    </tr>
+                                    <tr style="background: rgba(239, 68, 68, 0.09);">
+                                        <td>Voice Report</td>
+                                        <td><span class="epistemic-badge ep-fact">AUDIO</span></td>
+                                        <td><strong style="color: var(--red-conflict);">5 damaged</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Image Evidence</td>
+                                        <td><span class="epistemic-badge ep-fact">VISION</span></td>
+                                        <td><strong style="color: var(--emerald-safe);">2 damaged</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+                                <strong style="color: var(--text-primary);">Conflict reason:</strong> “Differing damage quantities across evidence modalities.”
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span class="epistemic-badge ep-uncertainty">Potentially reused evidence</span>
+                                <button class="btn" style="padding: 4px 9px; font-size: 11px;" onclick="flashProvenance()">
+                                    View Supporting Evidence (3)
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Provenance / "Why is this claim made?" Modal -->
+                    <section class="panel" id="provenanceModalPanel" style="border-color: var(--blue-border);">
+                        <div class="panel-header" style="background: rgba(59, 130, 246, 0.10);">
+                            <div class="panel-title">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue-primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Why is this claim made?
+                            </div>
+                            <span class="epistemic-badge ep-fact">PROVENANCE GRAPH</span>
+                        </div>
+                        <div class="panel-body" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: var(--bg-obsidian); padding: 8px 10px; border-radius: 5px; border: 1px solid var(--border-subtle);">
+                                <div>
+                                    <div class="panel-kicker">CLAIM</div>
+                                    <div style="font-family: var(--font-mono); font-weight: 700; font-size: 12.5px; color: var(--amber-warn);">2 units damaged</div>
+                                </div>
+                                <div>
+                                    <div class="panel-kicker">TYPE</div>
+                                    <div><span class="epistemic-badge ep-fact">FACT (Extracted)</span></div>
+                                </div>
+                                <div>
+                                    <div class="panel-kicker">CONFIDENCE</div>
+                                    <div style="font-family: var(--font-mono); font-weight: 700; color: var(--emerald-safe);">High (0.92)</div>
+                                </div>
+                            </div>
+
+                            <div class="panel-kicker">SUPPORTED BY (3 MODALITIES)</div>
+                            <div style="display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 11px;">
+                                <div style="display: flex; justify-content: space-between; padding: 6px 8px; background: var(--bg-elevated); border-radius: 4px; border: 1px solid var(--border-subtle);">
+                                    <span style="color: var(--cyan-accent);">damage_photo_02.png</span>
+                                    <span style="color: var(--text-secondary);">Image / Visual analysis</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 8px; background: var(--bg-elevated); border-radius: 4px; border: 1px solid var(--border-subtle);">
+                                    <span style="color: #C084FC;">voice_report.wav</span>
+                                    <span style="color: var(--text-secondary);">Audio / Transcription</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 8px; background: var(--bg-elevated); border-radius: 4px; border: 1px solid var(--border-subtle);">
+                                    <span style="color: var(--emerald-safe);">delivery_challan.pdf</span>
+                                    <span style="color: var(--text-secondary);">PDF / Table extraction</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-obsidian); padding: 8px 10px; border-radius: 5px; border: 1px solid var(--amber-border);">
+                                <div>
+                                    <div class="panel-kicker" style="color: var(--amber-warn);">EVIDENCE IN DOCUMENT</div>
+                                    <div style="font-size: 11.5px;">Page 1 • Highlighted source span (<code>Steel Bracket | 50 | 48 | Damaged</code>)</div>
+                                </div>
+                                <button class="btn btn-amber" style="padding: 5px 10px; font-size: 11px;" onclick="scrollToPdfSpan()">
+                                    Open in PDF
+                                </button>
+                            </div>
+
+                            <div>
+                                <div class="panel-kicker" style="margin-bottom: 5px;">END-TO-END AUDITABLE TRACEABILITY</div>
+                                <div class="trace-chain">
+                                    <span class="trace-node">Decision</span>
+                                    <span>→</span>
+                                    <span class="trace-node">Rule (R4)</span>
+                                    <span>→</span>
+                                    <span class="trace-node">Claim (2 dmg)</span>
+                                    <span>→</span>
+                                    <span class="trace-node">Evidence (EV-01)</span>
+                                    <span>→</span>
+                                    <span class="trace-node" style="border-color: var(--emerald-border); color: var(--emerald-safe);">Original File</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Decision Review Panel -->
+                    <section class="panel" style="border-color: var(--amber-border);">
+                        <div class="panel-header" style="background: rgba(245, 158, 11, 0.12);">
+                            <div class="panel-title" id="decisionOutcomeTitle" style="color: var(--amber-warn);">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                MANUAL REVIEW REQUIRED
+                            </div>
+                            <span class="epistemic-badge ep-rule" id="decisionBadge">SELECTIVE ABSTENTION</span>
+                        </div>
+                        <div class="panel-body">
+                            <div style="font-weight: 700; font-size: 13px; color: var(--text-primary); margin-bottom: 6px;" id="decisionReasonText">
+                                Reason: Evidence conflicts across multiple sources.
+                            </div>
+                            <ul style="padding-left: 18px; color: var(--text-secondary); font-size: 12px; display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px;">
+                                <li>Challan reports <strong>8 delivered</strong> (2 damaged on SKU-IND-201)</li>
+                                <li>Voice report claims <strong>5 damaged</strong> (uncorroborated excess quantity)</li>
+                                <li>Images support <strong>2 damaged</strong> (with historical `dHash` similarity `4/64`)</li>
+                                <li>Automatic settlement cannot be safely applied — escalated to human reviewer</li>
+                            </ul>
+
+                            <div style="padding: 8px 10px; background: var(--bg-obsidian); border: 1px solid var(--border-strong); border-radius: 4px; font-family: var(--font-mono); font-size: 11px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <span id="decisionSourceLabel">Decision source: <strong style="color: var(--cyan-accent);">Deterministic Rule Engine</strong></span>
+                                <span class="epistemic-badge ep-rule">R4 + R6</span>
+                            </div>
+
+                            <div class="btn-row" style="justify-content: flex-end;">
+                                <button class="btn" onclick="scrollToPdfSpan()">Review Evidence</button>
+                                <button class="btn btn-primary" id="overrideBtn" onclick="toggleHumanOverride()">Override Decision</button>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================================================
+             SCREEN 2: BENCHMARK & CONFIDENCE CALIBRATION DASHBOARD
+             ========================================================================== -->
+        <section class="panel" id="section-benchmarks">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-safe)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    EvidenceOS Evaluation — Blind Held-Out Benchmark (N=150) &amp; Scoped Stress Suites
+                </div>
+                <span class="system-status-pill">TAG: v1.0.0-benchmark-frozen (seed=42)</span>
+            </div>
+
+            <div class="panel-body" style="display: flex; flex-direction: column; gap: 14px;">
+
+                <!-- Top 4 Primary Benchmark KPIs -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                    <div class="metric-card state-ok">
+                        <div class="metric-label">
+                            <span>Primary Frozen Benchmark</span>
+                            <span class="epistemic-badge ep-fact">N = 150</span>
+                        </div>
+                        <div class="metric-value" style="font-size: 26px; color: var(--emerald-safe);">94.0%</div>
+                        <div class="metric-sub"><strong>Decision Accuracy</strong> • <code>141 / 150</code> (95% CI <code>[89.0%, 96.8%]</code>)</div>
+                    </div>
+
+                    <div class="metric-card state-info">
+                        <div class="metric-label">
+                            <span>Self-Audit Corrected Metric</span>
+                            <span class="epistemic-badge ep-fact">N = 150</span>
+                        </div>
+                        <div class="metric-value" style="font-size: 26px; color: var(--cyan-accent);">98.0%</div>
+                        <div class="metric-sub"><strong>Strict Claim-to-SKU Attribution</strong> • <code>147 / 150</code></div>
+                    </div>
+
+                    <div class="metric-card state-ok">
+                        <div class="metric-label">
+                            <span>Safety Guarantee</span>
+                            <span class="epistemic-badge ep-rule">ZERO WRONG PAYOUTS</span>
+                        </div>
+                        <div class="metric-value" style="font-size: 26px; color: var(--emerald-safe);">0.0%</div>
+                        <div class="metric-sub"><strong>Confident Error Rate</strong> • All 9 misses safely abstain</div>
+                    </div>
+
+                    <div class="metric-card state-info">
+                        <div class="metric-label">
+                            <span>Abstention Recall</span>
+                            <span class="epistemic-badge ep-rule">108 / 108</span>
+                        </div>
+                        <div class="metric-value" style="font-size: 26px; color: var(--blue-primary);">100.0%</div>
+                        <div class="metric-sub"><strong>Appropriate Escalation Capture</strong> on true conflicts</div>
+                    </div>
+                </div>
+
+                <!-- 3-Column Research Breakdown: 4-System Chart | Multi-SKU Stress Test (N=42) | Confidence Calibration -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+
+                    <!-- Card 1: Blind Held-Out Benchmark Comparison (N=150) -->
+                    <div class="panel" style="background: var(--bg-elevated);">
+                        <div class="panel-header">
+                            <span class="panel-title">Blind Held-Out Benchmark — N=150</span>
+                            <span class="epistemic-badge ep-fact">FROZEN PRIMARY</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="bar-row">
+                                <div class="bar-label-line">
+                                    <span><strong>EvidenceOS (AI + Graph + Rules)</strong></span>
+                                    <strong style="color: var(--emerald-safe);">94.0% (141/150)</strong>
+                                </div>
+                                <div class="bar-track"><div class="bar-fill" style="width: 94%; background: var(--emerald-safe);"></div></div>
+                            </div>
+
+                            <div class="bar-row">
+                                <div class="bar-label-line">
+                                    <span>Structured Normalizer + Rules</span>
+                                    <span style="color: var(--cyan-accent);">78.0% (117/150)</span>
+                                </div>
+                                <div class="bar-track"><div class="bar-fill" style="width: 78%; background: var(--cyan-accent);"></div></div>
+                            </div>
+
+                            <div class="bar-row">
+                                <div class="bar-label-line">
+                                    <span>Strict Regex + Rules</span>
+                                    <span style="color: var(--blue-primary);">72.0% (108/150)</span>
+                                </div>
+                                <div class="bar-track"><div class="bar-fill" style="width: 72%; background: var(--blue-primary);"></div></div>
+                            </div>
+
+                            <div class="bar-row" style="margin-bottom: 0;">
+                                <div class="bar-label-line">
+                                    <span>Semantic Multimodal AI Only (No Rules)</span>
+                                    <span style="color: var(--red-conflict);">44.0% (66/150)</span>
+                                </div>
+                                <div class="bar-track"><div class="bar-fill" style="width: 44%; background: var(--red-conflict);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Multi-SKU Entity Linking Stress Test (N=42) -->
+                    <div class="panel" style="background: var(--bg-elevated);">
+                        <div class="panel-header">
+                            <span class="panel-title">Multi-SKU Entity Linking (N = 42)</span>
+                            <span class="epistemic-badge ep-inference">Scoped Stress Benchmark</span>
+                        </div>
+                        <div class="panel-body">
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-obsidian); padding: 8px 12px; border-radius: 5px; border: 1px solid var(--border-strong); margin-bottom: 10px; font-family: var(--font-mono);">
+                                <div>
+                                    <div style="font-size: 10px; color: var(--text-muted);">v1_frozen</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--amber-warn);">57.1% <span style="font-size: 11px;">(24/42)</span></div>
+                                </div>
+                                <div style="font-size: 18px; color: var(--cyan-accent);">→</div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 10px; color: var(--text-muted);">v2_context_aware</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--emerald-safe);">100.0% <span style="font-size: 11px;">(42/42)</span></div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 11px;">
+                                <div style="display: flex; justify-content: space-between;"><span>• Similar SKU names (`201A` vs `201B`)</span><span style="color: var(--emerald-safe);">0% → 100%</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span>• Reordered line items (PO vs Challan)</span><span style="color: var(--emerald-safe);">0% → 100%</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span>• Missing visual barcodes (`ITEM:UNKNOWN`)</span><span style="color: var(--emerald-safe);">0% → 100%</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span>• OCR-noisy identifiers (`SKU-IND-2O2`)</span><span style="color: var(--emerald-safe);">0% → 100%</span></div>
+                                <div style="display: flex; justify-content: space-between;"><span>• Conflicting SKU references (Abstain)</span><span style="color: var(--emerald-safe);">100% → 100%</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Confidence Calibration & Selective Prediction -->
+                    <div class="panel" style="background: var(--bg-elevated);">
+                        <div class="panel-header">
+                            <span class="panel-title">Confidence Calibration &amp; Abstention</span>
+                            <span class="epistemic-badge ep-rule">ECE: 0.0207</span>
+                        </div>
+                        <div class="panel-body" style="display: flex; flex-direction: column; gap: 8px; font-family: var(--font-mono); font-size: 11.5px;">
+                            <div style="padding: 8px 10px; background: var(--bg-obsidian); border: 1px solid var(--emerald-border); border-radius: 5px;">
+                                <div style="color: var(--text-muted); font-size: 10px;">AUTO-SETTLEMENT PRECISION (WHEN ACTING)</div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 3px;">
+                                    <span>EvidenceOS: <strong style="color: var(--emerald-safe);">100.0% (33 / 33)</strong></span>
+                                    <span>Semantic AI: <strong style="color: var(--red-conflict);">33.3% (36 / 108)</strong></span>
+                                </div>
+                            </div>
+
+                            <div style="padding: 8px 10px; background: var(--bg-obsidian); border: 1px solid var(--border-subtle); border-radius: 5px;">
+                                <div style="color: var(--text-muted); font-size: 10px;">CONFIDENT ERROR RATE (WRONG AUTO-PAYOUTS)</div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 3px;">
+                                    <span>EvidenceOS: <strong style="color: var(--emerald-safe);">0.0% (0 / 150)</strong></span>
+                                    <span>Semantic AI: <strong style="color: var(--red-conflict);">48.0% (72 / 150)</strong></span>
+                                </div>
+                            </div>
+
+                            <div style="font-family: var(--font-sans); font-size: 11.5px; color: var(--text-secondary);">
+                                Policy: <strong style="color: var(--text-primary);">“I don't have enough evidence — send to human review.”</strong> Preferred over unverified auto-settlement.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+             CHRONOLOGICAL TAMPER-EVIDENT AUDIT TRAIL PANEL
+             ========================================================================== -->
+        <section class="panel" id="section-audit">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-safe)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                    Tamper-Evident Audit Trail — Append-Only SHA-256 Hash Chain
+                </div>
+                <span class="system-status-pill">🟢 Audit Chain Integrity Verified (7/7 Blocks)</span>
+            </div>
+            <div class="panel-body">
+                <div class="audit-stream">
+                    <div class="audit-row">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:03</span> • <strong>Evidence uploaded</strong> • Actor: <code>ingestion_service</code> • Evidence ID: <code>EV-0042-01..07</code></span>
+                            <span class="audit-hash">prev: GENESIS → hash: 3a91c0f8...82d1</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre>{"case_id": "VD-0042", "files_count": 7, "magic_bytes_verified": true, "storage_backend": "immutable_local"}</pre>
+                        </details>
+                    </div>
+
+                    <div class="audit-row">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:04</span> • <strong>SHA-256 generated</strong> • Actor: <code>crypto_hasher</code> • Evidence ID: <code>EV-0042-03</code></span>
+                            <span class="audit-hash">prev: 3a91c0f8...82d1 → hash: 7c44e9b1...19a4</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre>{"evidence_id": "EV-0042-03", "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", "dhash_64": "f4a9c2819b3e7012"}</pre>
+                        </details>
+                    </div>
+
+                    <div class="audit-row">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:05</span> • <strong>Evidence normalized</strong> • Actor: <code>normalization_engine</code> • Evidence ID: <code>EV-0042-ALL</code></span>
+                            <span class="audit-hash">prev: 7c44e9b1...19a4 → hash: 1e82d4a0...55f2</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre>{"claims_extracted": 14, "epistemic_distribution": {"FACT": 11, "INFERENCE": 2, "UNCERTAINTY": 1}, "entity_sku": "SKU-IND-201"}</pre>
+                        </details>
+                    </div>
+
+                    <div class="audit-row" style="border-left-color: var(--red-conflict);">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:07</span> • <strong style="color: #FCA5A5;">Conflict detected</strong> • Actor: <code>conflict_detector</code> • Evidence ID: <code>EV-0042-01 vs EV-0042-04</code></span>
+                            <span class="audit-hash">prev: 1e82d4a0...55f2 → hash: 9b20f1c7...30e8</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre>{"conflict_type": "QUANTITY_CONFLICT", "severity": "HIGH", "challan_received": 8, "voice_damaged": 5, "image_damaged": 2}</pre>
+                        </details>
+                    </div>
+
+                    <div class="audit-row" style="border-left-color: var(--amber-warn);">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:08</span> • <strong style="color: var(--amber-warn);">Historical similarity detected</strong> • Actor: <code>dhash_matcher</code> • Evidence ID: <code>EV-0042-03</code></span>
+                            <span class="audit-hash">prev: 9b20f1c7...30e8 → hash: 4d18a7e3...91c0</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre>{"prior_case_id": "VD-0019", "similarity_pct": 94.0, "hamming_distance": 4, "sha256_exact_match": false, "label": "Potentially reused evidence"}</pre>
+                        </details>
+                    </div>
+
+                    <div class="audit-row">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:09</span> • <strong>Rule evaluation completed</strong> • Actor: <code>deterministic_rule_engine</code> • Evidence ID: <code>CASE-VD-0042</code></span>
+                            <span class="audit-hash">prev: 4d18a7e3...91c0 → hash: 8e65b2d9...04a7</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre>{"rules_evaluated": ["R1_COMPLETENESS", "R2_SLA_48H", "R4_CORROBORATION", "R6_HISTORICAL_UNIQUENESS"], "failed_rules": ["R4_CORROBORATION", "R6_HISTORICAL_UNIQUENESS"]}</pre>
+                        </details>
+                    </div>
+
+                    <div class="audit-row" id="auditFinalRow" style="border-left-color: var(--amber-warn);">
+                        <div class="audit-row-top">
+                            <span><span class="audit-time">10:24:09</span> • <strong style="color: var(--amber-warn);" id="auditFinalStatus">Manual review required</strong> • Actor: <code id="auditFinalActor">decision_engine</code> • Evidence ID: <code>DEC-VD-0042</code></span>
+                            <span class="audit-hash">prev: 8e65b2d9...04a7 → hash: f209e4c1...77b9</span>
+                        </div>
+                        <details class="audit-json">
+                            <summary>Expand JSON metadata</summary>
+                            <pre id="auditFinalJson">{"outcome": "MANUAL_REVIEW_REQUIRED", "decision_source": "Deterministic Rule Engine", "auto_settlement_blocked": true}</pre>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function filterEvidence(type, btn) {
+            document.querySelectorAll('.tab-strip .tab-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('#evidenceList .ev-card').forEach(card => {
+                if (type === 'ALL' || card.dataset.type === type) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function scrollToPdfSpan() {
+            const row = document.getElementById('pdfHighlightedRow');
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            row.style.transition = 'background 0.25s ease';
+            row.style.background = 'rgba(245, 158, 11, 0.38)';
+            setTimeout(() => {
+                row.style.background = 'rgba(245, 158, 11, 0.16)';
+            }, 900);
+        }
+
+        function flashProvenance() {
+            const modal = document.getElementById('provenanceModalPanel');
+            modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            modal.style.boxShadow = '0 0 0 2px var(--blue-primary)';
+            setTimeout(() => {
+                modal.style.boxShadow = 'none';
+            }, 900);
+        }
+
+        let isHumanOverridden = false;
+        function toggleHumanOverride() {
+            isHumanOverridden = !isHumanOverridden;
+            const sourceLabel = document.getElementById('decisionSourceLabel');
+            const outcomeTitle = document.getElementById('decisionOutcomeTitle');
+            const badge = document.getElementById('decisionBadge');
+            const btn = document.getElementById('overrideBtn');
+            const auditStatus = document.getElementById('auditFinalStatus');
+            const auditActor = document.getElementById('auditFinalActor');
+            const auditJson = document.getElementById('auditFinalJson');
+
+            if (isHumanOverridden) {
+                sourceLabel.innerHTML = 'Decision source: <strong style="color: var(--emerald-safe);">Human Reviewer (K. Deswanth)</strong>';
+                outcomeTitle.innerHTML = 'PARTIALLY APPROVED (2 DAMAGED UNITS VERIFIED)';
+                outcomeTitle.style.color = 'var(--emerald-safe)';
+                badge.textContent = 'HUMAN OVERRIDE LOGGED';
+                badge.className = 'epistemic-badge ep-fact';
+                btn.textContent = 'Revert to Rule Engine';
+                auditStatus.textContent = 'Human Override: Partially Approved (2 units)';
+                auditStatus.style.color = 'var(--emerald-safe)';
+                auditActor.textContent = 'human_reviewer:k_deswanth';
+                auditJson.textContent = '{"outcome": "PARTIALLY_APPROVED", "decision_source": "Human Reviewer", "verified_damaged_units": 2, "override_reason": "Verified 2 crushed Steel Brackets on Challan + Photo"}';
+            } else {
+                sourceLabel.innerHTML = 'Decision source: <strong style="color: var(--cyan-accent);">Deterministic Rule Engine</strong>';
+                outcomeTitle.innerHTML = 'MANUAL REVIEW REQUIRED';
+                outcomeTitle.style.color = 'var(--amber-warn)';
+                badge.textContent = 'SELECTIVE ABSTENTION';
+                badge.className = 'epistemic-badge ep-rule';
+                btn.textContent = 'Override Decision';
+                auditStatus.textContent = 'Manual review required';
+                auditStatus.style.color = 'var(--amber-warn)';
+                auditActor.textContent = 'decision_engine';
+                auditJson.textContent = '{"outcome": "MANUAL_REVIEW_REQUIRED", "decision_source": "Deterministic Rule Engine", "auto_settlement_blocked": true}';
+            }
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.main-nav .nav-btn').forEach(b => b.classList.remove('active'));
+            const inv = document.getElementById('section-investigation');
+            const bench = document.getElementById('section-benchmarks');
+            const audit = document.getElementById('section-audit');
+
+            if (view === 'all') {
+                inv.style.display = 'flex';
+                bench.style.display = 'block';
+                audit.style.display = 'block';
+                event.target.classList.add('active');
+            } else if (view === 'investigation') {
+                inv.style.display = 'flex';
+                bench.style.display = 'block';
+                audit.style.display = 'block';
+                document.getElementById('nav-investigation').classList.add('active');
+                inv.scrollIntoView({ behavior: 'smooth' });
+            } else if (view === 'benchmarks') {
+                inv.style.display = 'flex';
+                bench.style.display = 'block';
+                audit.style.display = 'block';
+                document.getElementById('nav-benchmarks').classList.add('active');
+                bench.scrollIntoView({ behavior: 'smooth' });
+            } else if (view === 'audit') {
+                inv.style.display = 'flex';
+                bench.style.display = 'block';
+                audit.style.display = 'block';
+                document.getElementById('nav-audit').classList.add('active');
+                audit.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function runInvestigationPulse() {
+            const timeline = document.querySelector('.timeline-bar');
+            timeline.style.boxShadow = '0 0 0 2px var(--cyan-accent)';
+            setTimeout(() => {
+                timeline.style.boxShadow = 'none';
+            }, 600);
+        }
+    </script>
+</body>
+</html>

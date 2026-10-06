@@ -29,6 +29,47 @@ Purely generative LLM pipelines are unsafe for autonomous financial settlement: 
 
 We evaluate EvidenceOS across three strictly separated datasets (`seed=42`) to prevent benchmark overfitting. **We never market regression or development metrics as open-world accuracy.**
 
+```text
+Held-out test set: 150 cases (564 files across 25 adversarial categories, zero filename/metadata leakage)
+
+Semantic multimodal + deterministic rules (System D — EvidenceOS):
+Decision accuracy: 94.0% (141/150, 95% Wilson CI: [89.0%, 96.8%])
+Macro F1: 91.3% (0.9132)
+Conflict F1: 95.1% (Precision: 90.6%, Recall: 100.0%)
+Confident error rate: 0.0% (0/150 wrong automated settlements; all 9 misses safely abstain to manual review)
+
+Deterministic baselines:
+- Baseline A (Strict Regex + Rules):
+  Decision accuracy: 72.0% (108/150, 95% CI: [64.3%, 78.6%])
+  Macro F1: 42.5% (0.4245)
+  Conflict F1: 71.6%
+  Confident error rate: 4.0% (6/150)
+- Baseline B (Structured Normalizer + Rules):
+  Decision accuracy: 78.0% (117/150, 95% CI: [70.7%, 83.9%])
+  Macro F1: 45.6% (0.4558)
+  Conflict F1: 79.0%
+  Confident error rate: 0.0%
+- System C (Semantic Multimodal AI Only — No Rule Engine):
+  Decision accuracy: 44.0% (66/150, 95% CI: [36.3%, 52.0%])
+  Macro F1: 49.7% (0.4969)
+  Confident error rate: 48.0% (72/150 unsafe automated settlements on SLA breaches & high-value claims)
+
+Most difficult category:
+multi_sku_dispute (50.0% accuracy, 3/6) — followed by colloquial_wording (66.7%, 4/6), typos_and_ocr_noise (66.7%, 4/6), and multilingual_or_mixed_terms (66.7%, 4/6).
+
+Most common failure:
+ENTITY_LINKING_ERROR (3/9 failures) — In blind pixel mode with no per-parcel barcode text, visual damage on secondary SKUs (SKU-IND-202) defaults to the primary shipment item (SKU-IND-201), triggering a cross-modal conflict and manual review.
+
+AI advantage:
++22.0% decision accuracy over Strict Regex (72.0% -> 94.0%) and +16.0% over Structured Normalizer (78.0% -> 94.0%) by resolving unstructured prose documents, spoken number words, hedged audio uncertainty, and pixel-level image degradation (low-light, blur, occlusion).
+
+AI limitation:
+Standalone semantic AI without the deterministic rule engine (System C) suffers a 48.0% confident error rate (auto-approving late SLA filings, high-value disputes >= $5,000, and uncorroborated claims). Even with rules (System D), unseen regional slang ("munted", "total toast"), digit-level OCR corruption ("lO" for "10"), and untranslated German headers ("Bestellmenge") cause 6 extraction misses (all safely abstaining to manual_review_required).
+
+Reproducibility:
+PASS (Deterministic seed=42, 11/11 pytest, 3/3 vitest, 0 ruff errors, single-command `python -m scripts.run_evaluation`)
+```
+
 ### 2.1 Performance Across Dataset Splits (`System D: Full EvidenceOS`)
 
 | Dataset Split | Cases / Files | Decision Accuracy (95% Wilson CI) | Macro-F1 | Field Accuracy (95% CI) | Conflict F1 | Confident Error Rate |

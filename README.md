@@ -13,54 +13,99 @@
 
 ## 1. What is EvidenceOS?
 
+> **Core Architectural Thesis**: *"The AI interprets evidence; deterministic rules constrain the decision; uncertainty triggers human review."*
+
 B2B supply chain and procurement disputes require reconciling conflicting, noisy, multimodal evidence—**Purchase Orders (PDF)**, **Delivery Challans (PDF)**, **Dock Inspection Photographs (PNG)**, **Warehouse Voice Reports (WAV)**, and **Historical Claim Ledgers**—against strict contractual Service-Level Agreements (SLAs).
 
-Purely generative LLM pipelines are unsafe for autonomous financial settlement: they hallucinate unstated quantities, fail to enforce exact SLA deadlines, and are vulnerable to adversarial prompt injection. Conversely, purely deterministic regex pipelines break down on colloquial warehouse speech, OCR typos, and degraded visual evidence.
+Purely generative LLM pipelines are unsafe for autonomous financial settlement: they hallucinate unstated quantities, fail to enforce exact SLA deadlines, and are vulnerable to adversarial prompt injection (`48.0%` confident error rate in our standalone AI ablation). Conversely, purely deterministic regex pipelines break down on colloquial warehouse speech, OCR typos, and degraded visual evidence (`72.0%` accuracy).
 
 **EvidenceOS (`VeriDock`)** solves this through an **epistemically typed hybrid architecture**:
-1. **Multimodal Semantic Extraction with Explicit Epistemic Typing**: Extracts claims from documents, blind pixel-level computer vision (`analyze_pallet_pixels_blind`), and audio transcripts while tagging every claim as `FACT`, `INFERENCE`, `RULE`, or `UNCERTAINTY` with exact source provenance (`evidence_id`, `sha256`, character/pixel span).
-2. **Cross-Modal Conflict Graph & Entity Resolution**: Links claims across modalities to canonical SKU entities and isolates quantity, damage, and missing-evidence contradictions.
+1. **Multimodal Semantic Extraction with Explicit Epistemic Typing**: Extracts claims from documents, blind pixel-level computer vision (`analyze_pallet_pixels_blind` / `GeminiAIProvider`), and audio transcripts while tagging every claim as `FACT`, `INFERENCE`, `RULE`, or `UNCERTAINTY` with exact source provenance (`evidence_id`, `sha256`, character/pixel span).
+2. **Cross-Modal Conflict Graph & Entity Resolution**: Links claims across modalities to canonical SKU entities and isolates quantity, damage, chronology, and missing-evidence contradictions.
 3. **Cryptographic (`SHA-256`) + Perceptual (`64-bit dHash`) Fraud Detection**: Detects both byte-identical and visually perturbed (recompressed, brightness-shifted, cropped) duplicate photos across historical claims (`Hamming distance <= 6`).
-4. **Deterministic Rule Engine (`R1–R8`) & Hash-Chained Audit Ledger**: Enforces 48-hour SLA windows, high-value manual review thresholds (`>= $5,000`), and mandatory abstention (`manual_review_required`) whenever evidence is degraded (`UNCERTAINTY`) or contradictory.
+4. **Deterministic Rule Engine (`R1–R8`) & Hash-Chained Audit Ledger**: Enforces 48-hour SLA windows, high-value manual review thresholds (`>= \$5,000`), and mandatory abstention (`manual_review_required`) whenever evidence is degraded (`UNCERTAINTY`) or contradictory.
+
+### 1.1 System Architecture Diagram
+
+```mermaid
+flowchart LR
+    subgraph Ingest["1. Untrusted Multimodal Ingestion"]
+        PO["Purchase Order (PDF)"]
+        DC["Delivery Challan (PDF)"]
+        IMG["Dock Photo (PNG)"]
+        WAV["Voice Report (WAV)"]
+    end
+
+    subgraph Hash["2. Cryptographic & Perceptual Hashing"]
+        SHA["SHA-256 Digest + Magic Bytes"]
+        DHASH["64-bit Perceptual dHash (Hamming <= 6)"]
+        HIST[("Historical Ledger Match")]
+    end
+
+    subgraph Extract["3. Epistemic Extraction & Sanitization"]
+        SAN["Prompt Injection Sanitizer"]
+        AI["Multimodal Extractor (Gemini 2.5 Flash / Offline CV)"]
+        CLAIMS["Typed Claims: FACT | INFERENCE | UNCERTAINTY"]
+    end
+
+    subgraph Graph["4. Entity & Cross-Modal Conflict Graph"]
+        ENT["SKU Entity Resolver (v1_frozen / v2_context_aware)"]
+        DAG["Evidence Provenance DAG"]
+        CONF["Conflict Detector (Quantity / Chronology / Fraud)"]
+    end
+
+    subgraph Decide["5. Deterministic Rule & Abstention Engine"]
+        RULES["Contract & SLA Rules (R1–R8)"]
+        AUTO["Auto-Settle: Approved / Partially Approved (100% Precision)"]
+        ABSTAIN["Abstain: Manual Review Required (Zero Confident Errors)"]
+        AUDIT["Tamper-Evident SHA-256 Hash-Chained Audit Log"]
+    end
+
+    PO & DC & IMG & WAV --> SHA --> DHASH
+    DHASH <--> HIST
+    DHASH --> SAN --> AI --> CLAIMS
+    CLAIMS --> ENT --> DAG --> CONF
+    HIST --> CONF
+    CONF --> RULES
+    RULES -->|"Corroborated & Conf >= 0.75"| AUTO
+    RULES -->|"Conflict / Degraded / SLA Breach"| ABSTAIN
+    AUTO & ABSTAIN --> AUDIT
+```
 
 ---
 
-## 2. Reproducible Research Evaluation Summary
+## 2. Reproducible Research Evaluation Summary (`v1.0.0-benchmark-frozen` & `v1.1.0-research-hardened`)
 
-> *"On a held-out evaluation set of 150 cases, the full EvidenceOS pipeline achieved **94.0%** decision accuracy (`141/150`, 95% Wilson CI `[89.0%, 96.8%]`). The deterministic baselines achieved **72.0%** (strict regex) and **78.0%** (structured normalizer), while standalone semantic extraction without deterministic rules achieved **44.0%** (`48.0%` confident error rate). The largest performance gap occurred in unstructured prose documents, colloquial warehouse voice transcripts, and degraded visual evidence."*
+> *"On a frozen, blind held-out evaluation set of **150 cases** (`v1.0.0-benchmark-frozen`), the full EvidenceOS pipeline achieved **94.0%** decision accuracy (`141/150`, 95% Wilson CI `[89.0%, 96.8%]`), **98.0%** strict claim-to-SKU attribution accuracy (`147/150`), and **100.0% precision whenever it automatically settled a claim** (`33/33`, `0.0%` confident error rate, `ECE = 0.0207`). The deterministic baselines achieved **72.0%** (strict regex) and **78.0%** (structured normalizer), while standalone semantic extraction without deterministic rules achieved **44.0%** (`48.0%` confident error rate)."*
 
-We evaluate EvidenceOS across three strictly separated datasets (`seed=42`) to prevent benchmark overfitting. **We never market regression or development metrics as open-world accuracy.**
+We follow a strict **Freeze $\rightarrow$ Evaluate $\rightarrow$ Attack $\rightarrow$ Audit $\rightarrow$ Document $\rightarrow$ Release** discipline (`seed=42`). **We never market regression tests, development sets, or scoped sub-benchmarks as overall open-world accuracy.**
 
 ```text
-Held-out test set: 150 cases (564 files across 25 adversarial categories, zero filename/metadata leakage)
+Held-out test set: 150 cases (564 files across 25 adversarial categories, zero filename/metadata leakage, frozen at v1.0.0-benchmark-frozen)
 
 Semantic multimodal + deterministic rules (System D — EvidenceOS):
 Decision accuracy: 94.0% (141/150, 95% Wilson CI: [89.0%, 96.8%])
+Strict claim-to-SKU attribution accuracy: 98.0% (147/150, corrected via self-audit from 100.0% entity-count accuracy)
 Macro F1: 91.3% (0.9132)
 Conflict F1: 95.1% (Precision: 90.6%, Recall: 100.0%)
-Confident error rate: 0.0% (0/150 wrong automated settlements; all 9 misses safely abstain to manual review)
+Auto-settlement precision (when confident & acting): 100.0% (33/33 auto-settled; 95% CI: [89.6%, 100.0%])
+True escalation capture rate (abstention recall): 100.0% (108/108 genuine review cases escalated)
+Confident error rate: 0.0% (0/150 wrong automated settlements; all 9 extraction/linking misses safely abstain to manual review)
+Expected Calibration Error (ECE): 0.0207 (2.1%)
 
-Deterministic baselines:
+Deterministic & AI-only baselines:
 - Baseline A (Strict Regex + Rules):
-  Decision accuracy: 72.0% (108/150, 95% CI: [64.3%, 78.6%])
-  Macro F1: 42.5% (0.4245)
-  Conflict F1: 71.6%
-  Confident error rate: 4.0% (6/150)
+  Decision accuracy: 72.0% (108/150, 95% CI: [64.3%, 78.6%]) | Macro F1: 42.5% | Confident error rate: 4.0% (6/150)
 - Baseline B (Structured Normalizer + Rules):
-  Decision accuracy: 78.0% (117/150, 95% CI: [70.7%, 83.9%])
-  Macro F1: 45.6% (0.4558)
-  Conflict F1: 79.0%
-  Confident error rate: 0.0%
+  Decision accuracy: 78.0% (117/150, 95% CI: [70.7%, 83.9%]) | Macro F1: 45.6% | Confident error rate: 0.0%
 - System C (Semantic Multimodal AI Only — No Rule Engine):
-  Decision accuracy: 44.0% (66/150, 95% CI: [36.3%, 52.0%])
-  Macro F1: 49.7% (0.4969)
-  Confident error rate: 48.0% (72/150 unsafe automated settlements on SLA breaches & high-value claims)
+  Decision accuracy: 44.0% (66/150, 95% CI: [36.3%, 52.0%]) | Macro F1: 49.7% | Auto-settlement precision: 33.3% (36/108) | Confident error rate: 48.0% (72/150) | ECE: 0.5694
 
-Most difficult category:
-multi_sku_dispute (50.0% accuracy, 3/6) — followed by colloquial_wording (66.7%, 4/6), typos_and_ocr_noise (66.7%, 4/6), and multilingual_or_mixed_terms (66.7%, 4/6).
+Most difficult category on frozen held-out 150:
+multi_sku_dispute (50.0% accuracy, 3/6 in v1_frozen) — followed by colloquial_wording (66.7%, 4/6), typos_and_ocr_noise (66.7%, 4/6), and multilingual_or_mixed_terms (66.7%, 4/6).
 
-Most common failure:
-ENTITY_LINKING_ERROR (3/9 failures) — In blind pixel mode with no per-parcel barcode text, visual damage on secondary SKUs (SKU-IND-202) defaults to the primary shipment item (SKU-IND-201), triggering a cross-modal conflict and manual review.
+Most common failure on frozen held-out 150:
+ENTITY_LINKING_ERROR (3/9 failures) — In blind pixel mode with no per-parcel barcode text, v1_frozen defaulted visual damage on secondary SKUs (SKU-IND-202) to the primary shipment item (SKU-IND-201). Evaluated separately on a post-freeze 42-case Multi-SKU stress benchmark, our context-aware v2_context_aware resolver improved Multi-SKU decision accuracy from 57.1% (24/42) to 100.0% (42/42) while keeping v1_frozen untouched.
 
 AI advantage:
 +22.0% decision accuracy over Strict Regex (72.0% -> 94.0%) and +16.0% over Structured Normalizer (78.0% -> 94.0%) by resolving unstructured prose documents, spoken number words, hedged audio uncertainty, and pixel-level image degradation (low-light, blur, occlusion).
@@ -69,10 +114,10 @@ AI limitation:
 Standalone semantic AI without the deterministic rule engine (System C) suffers a 48.0% confident error rate (auto-approving late SLA filings, high-value disputes >= $5,000, and uncorroborated claims). Even with rules (System D), unseen regional slang ("munted", "total toast"), digit-level OCR corruption ("lO" for "10"), and untranslated German headers ("Bestellmenge") cause 6 extraction misses (all safely abstaining to manual_review_required).
 
 Reproducibility:
-PASS (Deterministic seed=42, 12/12 pytest, 10/10 vitest, 0 ruff errors, single-command `python -m scripts.run_evaluation`)
+PASS (Deterministic seed=42, 13/13 pytest, 10/10 vitest, 0 ruff errors, frozen SHA-256 manifest verified)
 ```
 
-### 2.1 Performance Across Dataset Splits (`System D: Full EvidenceOS`)
+### 2.1 Performance Across Dataset Splits (`System D: Full EvidenceOS`, Frozen `v1_frozen`)
 
 | Dataset Split | Cases / Files | Decision Accuracy (95% Wilson CI) | Macro-F1 | Field Accuracy (95% CI) | Conflict F1 | Confident Error Rate |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -80,7 +125,7 @@ PASS (Deterministic seed=42, 12/12 pytest, 10/10 vitest, 0 ruff errors, single-c
 | **2. Development Benchmark (`development_60`)** | `60` / `234` | `96.7%` (`58/60`) `[88.6%, 99.1%]` | `0.9583` | `100.0%` `[98.4%, 100.0%]` | `0.9643` | `1.7%` (`1/60`) |
 | **3. Blind Held-Out Test Set (`heldout_150`)** | **`150` / `564`** | **`94.0%` (`141/150`) `[89.0%, 96.8%]`** | **`0.9132`** | **`95.6%` `[93.2%, 97.1%]`** | **`0.9505`** | **`0.0%` (`0/150`)** |
 
-*Note on Held-Out Data Origins (`N=150`)*: All filename hints and PNG metadata chunks are stripped (`artifact_01.pdf`..`artifact_04.wav`). On the `116` `SYNTHETIC` held-out cases, `System D` achieves **100.0%** (`116/116`, CI `[96.8%, 100.0%]`). On the `34` `REAL_WORLD_INSPIRED` adversarial cases (unseen slang, severe OCR noise, multilingual headers, blind multi-SKU attribution), `System D` achieves **73.5%** (`25/34`, CI `[56.9%, 85.4%]`), with all `9` errors safely abstaining to `manual_review_required` (`0.0%` Confident Error Rate).
+*Note on Held-Out Data Origins (`N=150`)*: All filename hints and PNG metadata chunks are stripped (`artifact_01.pdf`..`artifact_04.wav`, `assert b"tEXt" not in png_bytes`). On the `116` `SYNTHETIC` held-out cases, `System D` achieves **100.0%** (`116/116`, CI `[96.8%, 100.0%]`). On the `34` `REAL_WORLD_INSPIRED` adversarial cases (unseen slang, severe OCR noise, multilingual headers, blind multi-SKU attribution), `System D` achieves **73.5%** (`25/34`, CI `[56.9%, 85.4%]`), with all `9` errors safely abstaining to `manual_review_required` (`0.0%` Confident Error Rate).
 
 ### 2.2 Four-System Comparison on Blind Held-Out Test Set (`N = 150`)
 
@@ -133,6 +178,7 @@ In the frozen `heldout_150` benchmark (`v1.0.0-benchmark-frozen`), `multi_sku_di
 
 ## 3. Research & Engineering Documentation
 
+- **[GitHub Release Notes & Technical Showcase Kit (`docs/release-v1.1.0-and-showcase.md`)](docs/release-v1.1.0-and-showcase.md)**: Ready-to-publish `v1.1.0` release notes, LinkedIn/showcase posts, and technical FAQ.
 - **[Independent Code, Metric & Research Audit (`docs/independent-audit.md`)](docs/independent-audit.md)**: Cryptographic freeze manifest (`v1.0.0-benchmark-frozen`), code audit for synthetic/metric shortcuts (`AUDIT_NOTE_01`, `AUDIT_FINDING_02..04`), 42-case Multi-SKU study, and 150-case confidence calibration analysis.
 - **[3-Minute Technical Demo Walkthrough (`docs/demo-walkthrough.md`)](docs/demo-walkthrough.md)**: Step-by-step live walkthrough of the UI, inline PDF evidence highlighting, side-by-side reused image inspection (`dHash`), and evaluation dashboard.
 - **[Research Report (`docs/research-report.md`)](docs/research-report.md)**: 18-section empirical study covering the research questions, blind computer vision design, statistical confidence intervals, confusion matrices, calibration, and limitations.

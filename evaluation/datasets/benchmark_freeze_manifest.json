@@ -1,0 +1,25 @@
+{
+  "benchmark_tag": "v1.0.0-benchmark-frozen",
+  "frozen_at_utc": "2026-10-06T06:17:07.856945+00:00",
+  "seed": 42,
+  "heldout_cases": 150,
+  "heldout_files": 564,
+  "locked_system_d_metrics": {
+    "decision_accuracy": 0.94,
+    "decision_accuracy_ci_95": [
+      0.89,
+      0.968
+    ],
+    "macro_f1": 0.9132,
+    "field_level_accuracy": 0.9556,
+    "conflict_f1": 0.9505,
+    "confident_error_rate": 0.0,
+    "appropriate_abstention_rate": 1.0,
+    "strict_entity_claim_linking_accuracy": 0.98
+  },
+  "artifact_sha256_digests": {
+    "evaluation/results.json": "3d235d9981af6558f9a53b1e32b87fd2e740752dee7fcbddf31fa879cf84eca8",
+    "evaluation/failures.json": "8888354de8ce471630a1e7e09e30e5d4016fa67d77bbce8aff26b742bc02b75f",
+    "evaluation/datasets/heldout_test_150_manifest.json": "2ec5157df9db722053144fd070795c05aaf201216c783b10406b6c1cf952113b"
+  }
+}

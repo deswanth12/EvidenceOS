@@ -1,0 +1,300 @@
+{
+  "freeze_manifest": {
+    "benchmark_tag": "v1.0.0-benchmark-frozen",
+    "frozen_at_utc": "2026-10-06T06:17:07.856945+00:00",
+    "seed": 42,
+    "heldout_cases": 150,
+    "heldout_files": 564,
+    "locked_system_d_metrics": {
+      "decision_accuracy": 0.94,
+      "decision_accuracy_ci_95": [
+        0.89,
+        0.968
+      ],
+      "macro_f1": 0.9132,
+      "field_level_accuracy": 0.9556,
+      "conflict_f1": 0.9505,
+      "confident_error_rate": 0.0,
+      "appropriate_abstention_rate": 1.0,
+      "strict_entity_claim_linking_accuracy": 0.98
+    },
+    "artifact_sha256_digests": {
+      "evaluation/results.json": "3d235d9981af6558f9a53b1e32b87fd2e740752dee7fcbddf31fa879cf84eca8",
+      "evaluation/failures.json": "8888354de8ce471630a1e7e09e30e5d4016fa67d77bbce8aff26b742bc02b75f",
+      "evaluation/datasets/heldout_test_150_manifest.json": "2ec5157df9db722053144fd070795c05aaf201216c783b10406b6c1cf952113b"
+    }
+  },
+  "multi_sku_stress_benchmark_42": {
+    "total_cases": 42,
+    "categories_count": 7,
+    "v1_frozen_baseline_resolver": {
+      "resolver_mode": "v1_frozen",
+      "total_cases": 42,
+      "decision_accuracy": 0.5714,
+      "decision_accuracy_ci_95": [
+        0.4221,
+        0.7088
+      ],
+      "strict_entity_claim_linking_accuracy": 0.4286,
+      "strict_entity_linking_ci_95": [
+        0.2912,
+        0.5779
+      ],
+      "confident_error_rate": 0.0,
+      "category_breakdown": [
+        {
+          "category": "explicit_multi_sku",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "similar_sku_names_and_codes",
+          "total_cases": 6,
+          "decision_passed": 0,
+          "decision_accuracy": 0.0,
+          "strict_entity_linked": 0,
+          "strict_entity_linking_accuracy": 0.0
+        },
+        {
+          "category": "reordered_line_items",
+          "total_cases": 6,
+          "decision_passed": 0,
+          "decision_accuracy": 0.0,
+          "strict_entity_linked": 0,
+          "strict_entity_linking_accuracy": 0.0
+        },
+        {
+          "category": "missing_visual_barcodes_blind_cv",
+          "total_cases": 6,
+          "decision_passed": 0,
+          "decision_accuracy": 0.0,
+          "strict_entity_linked": 0,
+          "strict_entity_linking_accuracy": 0.0
+        },
+        {
+          "category": "partial_pallet_visibility",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "conflicting_sku_references",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "ocr_noisy_sku_identifiers",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 0,
+          "strict_entity_linking_accuracy": 0.0
+        }
+      ]
+    },
+    "v2_context_aware_resolver": {
+      "resolver_mode": "v2_context_aware",
+      "total_cases": 42,
+      "decision_accuracy": 1.0,
+      "decision_accuracy_ci_95": [
+        0.9162,
+        1.0
+      ],
+      "strict_entity_claim_linking_accuracy": 1.0,
+      "strict_entity_linking_ci_95": [
+        0.9162,
+        1.0
+      ],
+      "confident_error_rate": 0.0,
+      "category_breakdown": [
+        {
+          "category": "explicit_multi_sku",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "similar_sku_names_and_codes",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "reordered_line_items",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "missing_visual_barcodes_blind_cv",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "partial_pallet_visibility",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "conflicting_sku_references",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        },
+        {
+          "category": "ocr_noisy_sku_identifiers",
+          "total_cases": 6,
+          "decision_passed": 6,
+          "decision_accuracy": 1.0,
+          "strict_entity_linked": 6,
+          "strict_entity_linking_accuracy": 1.0
+        }
+      ]
+    }
+  },
+  "confidence_calibration_and_selective_prediction_150": {
+    "dataset": "heldout_150",
+    "total_cases": 150,
+    "total_auto_settled_cases": 33,
+    "auto_settlement_coverage": 0.22,
+    "auto_settlement_precision": 1.0,
+    "auto_settlement_precision_ci_95": [
+      0.8957,
+      1.0
+    ],
+    "total_abstained_to_human_review": 117,
+    "abstention_coverage": 0.78,
+    "confident_error_count": 0,
+    "confident_error_rate": 0.0,
+    "expected_calibration_error_auto_settlement": 0.0207,
+    "system_c_ai_only_comparison": {
+      "auto_settled_cases": 108,
+      "auto_settlement_coverage": 0.72,
+      "auto_settlement_precision": 0.3333,
+      "confident_error_count": 72,
+      "confident_error_rate": 0.48
+    },
+    "reliability_bins": [
+      {
+        "bin_range": "[0.00, 0.50]",
+        "case_count": 24,
+        "mean_confidence": 0.3875,
+        "empirical_decision_accuracy": 1.0,
+        "auto_settlement_count": 0,
+        "auto_settlement_precision": 1.0
+      },
+      {
+        "bin_range": "[0.50, 0.70]",
+        "case_count": 6,
+        "mean_confidence": 0.58,
+        "empirical_decision_accuracy": 1.0,
+        "auto_settlement_count": 0,
+        "auto_settlement_precision": 1.0
+      },
+      {
+        "bin_range": "[0.70, 0.85)",
+        "case_count": 0,
+        "mean_confidence": 0.0,
+        "empirical_decision_accuracy": 0.0,
+        "auto_settlement_count": 0,
+        "auto_settlement_precision": 1.0
+      },
+      {
+        "bin_range": "[0.85, 0.92]",
+        "case_count": 114,
+        "mean_confidence": 0.9058,
+        "empirical_decision_accuracy": 0.9211,
+        "auto_settlement_count": 33,
+        "auto_settlement_precision": 1.0
+      },
+      {
+        "bin_range": "[0.92, 1.00]",
+        "case_count": 6,
+        "mean_confidence": 0.92,
+        "empirical_decision_accuracy": 1.0,
+        "auto_settlement_count": 0,
+        "auto_settlement_precision": 1.0
+      }
+    ],
+    "selective_prediction_threshold_sweep": [
+      {
+        "confidence_threshold_tau": 0.5,
+        "auto_settled_cases": 33,
+        "auto_settlement_coverage": 0.22,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.6,
+        "auto_settled_cases": 33,
+        "auto_settlement_coverage": 0.22,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.7,
+        "auto_settled_cases": 33,
+        "auto_settlement_coverage": 0.22,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.75,
+        "auto_settled_cases": 33,
+        "auto_settlement_coverage": 0.22,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.8,
+        "auto_settled_cases": 33,
+        "auto_settlement_coverage": 0.22,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.85,
+        "auto_settled_cases": 33,
+        "auto_settlement_coverage": 0.22,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.9,
+        "auto_settled_cases": 15,
+        "auto_settlement_coverage": 0.1,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      },
+      {
+        "confidence_threshold_tau": 0.95,
+        "auto_settled_cases": 0,
+        "auto_settlement_coverage": 0.0,
+        "selective_precision_when_acting": 1.0,
+        "selective_risk_error_rate": 0.0
+      }
+    ]
+  }
+}

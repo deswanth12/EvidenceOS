@@ -324,6 +324,7 @@ class CaseVerificationPipeline:
         case_id: str,
         use_rule_engine: bool = True,
         enable_historical_matching: bool = True,
+        resolver_mode: str = "v1_frozen",
     ) -> Dict[str, Any]:
         import time
 
@@ -377,7 +378,9 @@ class CaseVerificationPipeline:
 
         # Stage 5: Cross-Modal Entity Resolution
         t_ent = time.perf_counter()
-        entities = EntityResolutionService.resolve_entities(db, case_id, evidence_records, claims)
+        entities = EntityResolutionService.resolve_entities(
+            db, case_id, evidence_records, claims, resolver_mode=resolver_mode
+        )
         stage_latencies_ms["entity_resolution_ms"] = round((time.perf_counter() - t_ent) * 1000.0, 3)
 
         # Stage 6: Conflict Detection & Historical Matching

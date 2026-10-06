@@ -331,4 +331,97 @@ def test_phase2_adversarial_attack_probes(isolated_env):
     assert verify_res["decision"]["outcome"] == "manual_review_required"
 
 
+def test_multi_sku_v2_context_aware_and_calibration(isolated_env):
+    """Verify v1_frozen vs v2_context_aware multi-SKU entity linking and post-freeze calibration artifacts."""
+    import json
+    from pathlib import Path
+
+    from core.datasets_generator import generate_pdf_bytes
+    from core.decisions.engine import CaseVerificationPipeline
+    from core.extraction.service import MultimodalExtractionService
+
+    db, storage = isolated_env
+    sem_provider = HeuristicLocalAIProvider()
+    ingestor = EvidenceIngestionService(storage=storage)
+    extractor = MultimodalExtractionService(ai_provider=sem_provider, storage=storage)
+    pipeline = CaseVerificationPipeline(extractor=extractor)
+
+    # Create a multi-SKU case where secondary item SKU-IND-202 is damaged and audio has OCR typo SKU-IND-2O2
+    po_bytes = generate_pdf_bytes(
+        document_title="PURCHASE ORDER",
+        document_id="PO-MSKU-99",
+        po_reference="PO-MSKU-99",
+        shipment_id="SHP-MSKU-99",
+        supplier="Apex",
+        buyer="Vertex",
+        date_str="2026-10-01",
+        items=[
+            {"sku": "SKU-IND-201", "name": "Primary Valve", "ordered_quantity": 5, "unit_price": 180.0},
+            {"sku": "SKU-IND-202", "name": "Secondary Actuator", "ordered_quantity": 5, "unit_price": 320.0},
+        ],
+    )
+    dc_bytes = generate_pdf_bytes(
+        document_title="DELIVERY CHALLAN",
+        document_id="DC-MSKU-99",
+        po_reference="PO-MSKU-99",
+        shipment_id="SHP-MSKU-99",
+        supplier="Apex",
+        buyer="Vertex",
+        date_str="2026-10-02",
+        items=[
+            {"sku": "SKU-IND-201", "name": "Primary Valve", "delivered_quantity": 5, "damaged_quantity": 0, "unit_price": 180.0},
+            {"sku": "SKU-IND-202", "name": "Secondary Actuator", "delivered_quantity": 5, "damaged_quantity": 0, "unit_price": 320.0},
+        ],
+    )
+    blind_png = generate_inspection_png_bytes(
+        sku="SKU-IND-202",
+        visible_quantity=10,
+        damaged_quantity=2,
+        packaging_condition="crushed_corner",
+        blind_mode=True,
+    )
+    wav_bytes = generate_wav_voice_bytes(
+        "Two boxes of SKU-IND-2O2 were damaged during unloading."
+    )
+
+    # 1. Run under v1_frozen (default): blind image links to SKU-IND-201 & OCR typo spawns 3rd entity -> manual_review_required
+    c1 = CaseModel(id="case_msku_v1", title="Multi-SKU v1_frozen", status="created")
+    db.add(c1)
+    db.commit()
+    ingestor.ingest_file(db, "case_msku_v1", "artifact_01.pdf", po_bytes, "purchase_order")
+    ingestor.ingest_file(db, "case_msku_v1", "artifact_02.pdf", dc_bytes, "delivery_challan")
+    ingestor.ingest_file(db, "case_msku_v1", "artifact_03.png", blind_png, "inspection_image")
+    ingestor.ingest_file(db, "case_msku_v1", "artifact_04.wav", wav_bytes, "voice_report")
+    res_v1 = pipeline.run_case_pipeline(
+        db, "case_msku_v1", enable_historical_matching=False, resolver_mode="v1_frozen"
+    )
+    assert res_v1["decision"]["outcome"] == "manual_review_required"
+
+    # 2. Run under v2_context_aware: OCR canonicalizes SKU-IND-2O2 -> SKU-IND-202 and links blind image via corroboration
+    c2 = CaseModel(id="case_msku_v2", title="Multi-SKU v2_context_aware", status="created")
+    db.add(c2)
+    db.commit()
+    ingestor.ingest_file(db, "case_msku_v2", "artifact_01.pdf", po_bytes, "purchase_order")
+    ingestor.ingest_file(db, "case_msku_v2", "artifact_02.pdf", dc_bytes, "delivery_challan")
+    ingestor.ingest_file(db, "case_msku_v2", "artifact_03.png", blind_png, "inspection_image")
+    ingestor.ingest_file(db, "case_msku_v2", "artifact_04.wav", wav_bytes, "voice_report")
+    res_v2 = pipeline.run_case_pipeline(
+        db, "case_msku_v2", enable_historical_matching=False, resolver_mode="v2_context_aware"
+    )
+    assert res_v2["decision"]["outcome"] == "partially_approved"
+    assert res_v2["decision"]["verified_damaged_quantity"] == 2
+    assert res_v2["entities_count"] == 2
+
+    # 3. Verify frozen benchmark manifest and post-freeze audit artifacts exist and pass invariants
+    root = Path(__file__).resolve().parents[2]
+    freeze_manifest = json.loads((root / "evaluation/datasets/benchmark_freeze_manifest.json").read_text(encoding="utf-8"))
+    assert freeze_manifest["benchmark_tag"] == "v1.0.0-benchmark-frozen"
+    assert freeze_manifest["locked_system_d_metrics"]["decision_accuracy"] == 0.94
+
+    post_freeze = json.loads((root / "evaluation/post_freeze_audit_experiments.json").read_text(encoding="utf-8"))
+    assert post_freeze["multi_sku_stress_benchmark_42"]["v1_frozen_baseline_resolver"]["decision_accuracy"] == 0.5714
+    assert post_freeze["multi_sku_stress_benchmark_42"]["v2_context_aware_resolver"]["decision_accuracy"] == 1.0
+    assert post_freeze["confidence_calibration_and_selective_prediction_150"]["auto_settlement_precision"] == 1.0
+
+
 

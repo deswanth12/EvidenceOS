@@ -239,12 +239,66 @@ Measured across all `150` cases (`564` files) in the Held-Out Test Set:
 | **Total End-to-End Case Pipeline** | **`148.83 ms`** | **`112.92 ms`** | **`286.67 ms`** |
 
 **Token & Cloud API Cost Projection**:
-- **Local Hybrid Execution**: `$0.00` external API cost (`~6.7 cases/sec` sequential throughput).
-- **Cloud Gemini 2.5 Flash Multimodal Equivalent**: Estimated `1,532` tokens/case (`229,800` tokens across `150` cases), corresponding to **`$0.00055` per case** (`$0.0825` per `150`-case evaluation run).
+- **Local Hybrid Execution**: `\$0.00` external API cost (`~6.7 cases/sec` sequential throughput).
+- **Cloud Gemini 2.5 Flash Multimodal Equivalent**: Estimated `1,532` tokens/case (`229,800` tokens across `150` cases), corresponding to **`\$0.00055` per case** (`\$0.0825` per `150`-case evaluation run).
 
 ---
 
-## 14. Limitations & Threats to Validity
+## 14. Confidence Calibration & Selective Prediction (`N = 150` Held-Out Set)
+
+In high-stakes financial dispute resolution, overall accuracy is less critical than **Selective Prediction (Risk-Coverage)**:
+1. **When EvidenceOS is confident and acts (`approved` / `partially_approved`), how often is it right?**
+2. **When evidence is degraded, ambiguous, or contradictory, how reliably does it abstain (`manual_review_required`)?**
+
+| Selective Prediction Metric ($N=150$ Held-Out Set) | `System D: Full EvidenceOS` (AI + Graph + Rules) | `System C: Semantic AI Only` (No Rule Engine) |
+| :--- | :---: | :---: |
+| **Auto-Settled Cases (`approved` / `partially_approved`)** | **`33 / 150` (`22.0%` total; `78.6%` of valid claims)** | `108 / 150` (`72.0%` total) |
+| **Auto-Settlement Precision (Accuracy when Acting)** | **`100.0%` (`33 / 33`)** *(95% CI: `[89.6%, 100.0%]`)* | `33.3%` (`36 / 108`) *(95% CI: `[25.1%, 42.7%]`)* |
+| **Abstained to Human Review (`manual_review_required`)** | **`117 / 150` (`78.0%`)** (`108` true + `9` conservative) | `42 / 150` (`28.0%`) |
+| **True Escalation Capture Rate (Abstention Recall)** | **`100.0%` (`108 / 108`)** | `33.3%` (`36 / 108`) |
+| **Confident Error Rate (`conf >= 0.80` & Wrong Action)** | **`0.0%` (`0 / 150`)** | `48.0%` (`72 / 150`) |
+| **Auto-Settlement Expected Calibration Error (ECE)** | **`0.0207` (`2.1%`)** | `0.5694` (`56.9%`) |
+
+### Reliability by Minimum Modality Confidence Bin (`System D`, $N=150$)
+
+| Confidence Bin | Cases ($N$) | Mean Conf | Auto-Settled | Auto-Settlement Precision | Abstained (`manual_review`) | Overall Decision Accuracy |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`[0.00, 0.50]` (Degraded Vision)** | `24` | `0.3875` | `0` | `N/A` (100% abstained) | `24 / 24` (`100.0%`) | **`100.0%` (`24/24`)** |
+| **`[0.50, 0.70]` (Hedged Speech)** | `6` | `0.5800` | `0` | `N/A` (100% abstained) | `6 / 6` (`100.0%`) | **`100.0%` (`6/6`)** |
+| **`[0.85, 0.92]` (Standard Corroborated)** | `114` | `0.9058` | `33` | **`100.0%` (`33/33`)** | `81 / 114` (`71.1%`) | **`92.1%` (`105/114`)** |
+| **`[0.92, 1.00]` (High Certainty)** | `6` | `0.9200` | `0` | `N/A` (100% abstained) | `6 / 6` (`100.0%`) | **`100.0%` (`6/6`)** |
+
+---
+
+## 15. Attacking the Weakest Point: Multi-SKU Entity Linking Stress Study (`N = 42`)
+
+In the frozen `heldout_150` benchmark (`v1.0.0-benchmark-frozen`), `multi_sku_dispute` was the hardest category (`50.0%` decision accuracy, `3/6`), because blind pallet photos (`ITEM:UNKNOWN`) defaulted to the primary PO line item (`SKU-IND-201`) even when the voice transcript reported damage on `SKU-IND-202`.
+
+Without modifying the frozen `v1_frozen` benchmark results, we built a dedicated **42-case Multi-SKU Stress Benchmark** ([`evaluation/multi_sku_and_calibration.py`](../evaluation/multi_sku_and_calibration.py)) across 7 failure modes and compared `v1_frozen` against a context-aware resolver (`v2_context_aware` in [`core/entities/resolver.py`](../core/entities/resolver.py)) that combines OCR-canonicalized SKU matching with cross-modal damage corroboration linking:
+
+| Multi-SKU Stress Category ($N=6$ each) | `v1_frozen` Decision Acc | `v1_frozen` Strict SKU Attribution | `v2_context_aware` Decision Acc | `v2_context_aware` Strict SKU Attribution |
+| :--- | :---: | :---: | :---: | :---: |
+| **1. `explicit_multi_sku`** | `100.0%` (`6/6`) | `100.0%` (`6/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **2. `similar_sku_names_and_codes`** (`201A` vs `201B`) | `0.0%` (`0/6`) | `0.0%` (`0/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **3. `reordered_line_items`** (3 SKUs, reverse order) | `0.0%` (`0/6`) | `0.0%` (`0/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **4. `missing_visual_barcodes_blind_cv`** (`ITEM:UNKNOWN`) | `0.0%` (`0/6`) | `0.0%` (`0/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **5. `partial_pallet_visibility`** (50% occluded pallet) | `100.0%` (`6/6`) | `100.0%` (`6/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **6. `conflicting_sku_references`** (Challan `201` vs Audio `202`) | `100.0%` (`6/6`) | `100.0%` (`6/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **7. `ocr_noisy_sku_identifiers`** (`SKU-IND-2O2` / `SKUIND-202`) | `100.0%` (`6/6`) | `0.0%` (`0/6`) | **`100.0%` (`6/6`)** | **`100.0%` (`6/6`)** |
+| **OVERALL ($N = 42$)** | **`57.1%` (`24/42`)** | **`42.9%` (`18/42`)** | **`100.0%` (`42/42`)** | **`100.0%` (`42/42`)** |
+
+---
+
+## 16. Independent Code & Metric Audit Summary
+
+Full audit findings are published in [`docs/independent-audit.md`](independent-audit.md):
+1. **Zero Held-Out Filename/Metadata Leakage (`PASS`)**: All 150 held-out cases use opaque filenames (`artifact_01..04`), `role="unknown"`, and `blind_mode=True` (`assert b"tEXt" not in png_bytes`).
+2. **Offline Pixel Grid Geometry Coupling (`AUDIT_NOTE_01`)**: Offline `analyze_pallet_pixels_blind` inspects the `2x5` parcel grid (`320x240`) of our procedural renderer; unconstrained smartphone dock photos require `GEMINI_API_KEY` (`GeminiAIProvider` multimodal vision) or a trained object detector.
+3. **Entity Count vs. Strict Claim Attribution (`AUDIT_FINDING_02`)**: While entity *count* accuracy on `heldout_150` is `100.0%`, **strict claim-to-entity attribution accuracy** on `heldout_150` (`v1_frozen`) is **`98.0%` (`147 / 150`)** due to the 3 `multi_sku_dispute` cases.
+
+---
+
+## 17. Limitations & Threats to Validity
 
 1. **Synthetic & Procedurally Inspired Artifacts**: Although the 150-case Held-Out Test Set eliminates filename and metadata leakage and includes `34` real-world-inspired adversarial cases, the PDFs, PNGs, and WAVs are generated within a controlled testbed rather than sampled from live enterprise ERP production logs.
 2. **2D Grid Vision Assumptions**: The blind pixel CV analyzer inspects a canonical 2×5 pallet grid and global luminance statistics. Wild camera angles, perspective distortion, or arbitrary warehouse backgrounds require a fine-tuned object detection head (e.g., OWL-ViT / YOLOv8) or live cloud VLM call.
@@ -253,8 +307,8 @@ Measured across all `150` cases (`564` files) in the Held-Out Test Set:
 
 ---
 
-## 15. Future Work
+## 18. Future Work
 
 1. **Live Vision-Language & ASR Benchmarking**: Run side-by-side evaluations comparing the local blind pixel/acoustic extractors against live `gemini-2.5-flash` and `gemini-2.5-pro` API calls on scanned physical paper documents.
 2. **Rotation-Invariant Embeddings**: Augment 64-bit `dHash` with lightweight CLIP/SigLIP visual embeddings for rotation- and perspective-invariant duplicate detection.
-3. **Multi-SKU Barcode & Bounding-Box Grounding**: Integrate barcode/QR decoding (`pyzbar`) so visual damage in multi-SKU shipments is automatically linked to the exact SKU entity.
+3. **Multi-SKU Barcode & Bounding-Box Grounding**: Integrate barcode/QR decoding (`pyzbar`) alongside `v2_context_aware` cross-modal corroboration so visual damage in multi-SKU shipments is grounded directly to parcel labels.

@@ -4,13 +4,13 @@
 **Git Lineage & Release Tags**:
 - `v1.0.0-benchmark-frozen` (`commit 07c8065`) — Cryptographically locked 150-case blind held-out benchmark (`94.0%` decision accuracy, `0.0%` confident error rate)
 - `v1.1.0-research-hardened` (`commit d5f1138`, lineage `66df00c`) — Research release tag: Multi-SKU entity linking stress study (`57.1%` $\rightarrow$ `100.0%`), 150-case confidence calibration (`ECE = 0.0207`), and 14-slide presentation deck
-- `main` (`HEAD`) — Post-release adversarial audit remediations (`AUD-01` row payload re-hashing, `AUD-02` monotonic audit sequence, and final pre-release audit report)
+- `v1.1.1-final` (`HEAD`) — Final audited release tag: Post-release adversarial audit remediations (`AUD-01` row payload re-hashing, `AUD-02` monotonic audit sequence, and final pre-release audit report)
 
 ---
 
-## 1. Ready-to-Publish GitHub Release (`v1.1.0-research-hardened`)
+## 1. Ready-to-Publish GitHub Release (`v1.1.1-final`)
 
-> Copy and paste the block below directly into **`https://github.com/deswanth12/EvidenceOS/releases/new?tag=v1.1.0-research-hardened`**
+> Copy and paste the block below directly into **`https://github.com/deswanth12/EvidenceOS/releases/new?tag=v1.1.1-final`**
 
 ### Release Title
 `v1.1.0-research-hardened — Epistemic Multimodal Verification, Frozen Held-Out Benchmark (N=150), Calibration & Multi-SKU Audit`

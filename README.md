@@ -230,7 +230,7 @@ To ensure complete transparency between tagged releases and post-release audit h
 | **`v1.0.0-benchmark-frozen`** | `07c8065` | Cryptographically locked 150-case benchmark baseline (`94.0%` accuracy, `0.0%` confident error rate). |
 | **`v1.1.0-research-hardened`** | `d5f1138` (lineage `66df00c`) | Research release tag: $N=42$ Multi-SKU stress suite, calibration, and 14-slide presentation deck. |
 | **UI Motion Polish** | `5c25ca9` | Machined double-bezel (`Doppelrand`), spring curves, `:active` haptics, and staggered entry. |
-| **Pre-Release Audit Hardening** | `HEAD` (`main`) | Independent 26-phase pre-release audit ([`docs/final-pre-release-audit.md`](docs/final-pre-release-audit.md)), resolving `AUD-02` (monotonic audit sequence) and `AUD-01` (row payload re-hashing). |
+| **`v1.1.1-final`** | `HEAD` (`main`) | Final audited release tag: Independent 26-phase pre-release audit ([`docs/final-pre-release-audit.md`](docs/final-pre-release-audit.md)), resolving `AUD-02` (monotonic audit sequence) and `AUD-01` (row payload re-hashing). |
 
 ---
 

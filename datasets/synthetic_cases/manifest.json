@@ -17,7 +17,7 @@
       {
         "filename": "dock_photo_case1_intact.png",
         "role": "inspection_image",
-        "size_bytes": 3172
+        "size_bytes": 1609
       },
       {
         "filename": "dock_voice_case1.wav",
@@ -44,7 +44,7 @@
       {
         "filename": "dock_photo_case2_2damaged.png",
         "role": "inspection_image",
-        "size_bytes": 3514
+        "size_bytes": 1746
       },
       {
         "filename": "dock_voice_case2.wav",
@@ -71,7 +71,7 @@
       {
         "filename": "dock_photo_case3_2damaged.png",
         "role": "inspection_image",
-        "size_bytes": 3367
+        "size_bytes": 1730
       },
       {
         "filename": "dock_voice_case3_5damaged.wav",
@@ -98,7 +98,7 @@
       {
         "filename": "resubmitted_photo_case4.png",
         "role": "inspection_image",
-        "size_bytes": 3517
+        "size_bytes": 1774
       },
       {
         "filename": "dock_voice_case4.wav",

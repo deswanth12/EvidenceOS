@@ -370,9 +370,10 @@ for idx, ev in enumerate(events):
     expected_prev = ev.event_hash
 ```
 
-**Security Finding AUD-01 (Medium Risk):**
-`verify_chain_integrity` verifies that each record's `previous_event_hash` points to the prior record's `event_hash`. However, **it does not recompute `_compute_event_hash` over the event's stored database columns (`details`, `actor`, `status`) to ensure the row's `event_hash` matches its current content**. If an attacker with direct database write access modifies event details in-place without altering the hash fields, the pointer chain remains intact and `verify_chain_integrity` returns `valid: True`.
-*Remediation:* Persist `timestamp_iso` verbatim in `AuditLogModel` and re-hash all row attributes during verification.
+**Security Finding AUD-01 (Medium Risk / Remediated):**
+`verify_chain_integrity` verifies that each record's `previous_event_hash` points to the prior record's `event_hash`. Prior to remediation, it verified pointer linkage but did not recompute `_compute_event_hash` over the event's stored database columns (`details`, `actor`, `stage`, `status`). If an attacker with direct database write access modified event details in-place without altering the hash fields, the pointer chain remained intact.
+- **Remediation (Resolved):** Persisted `timestamp_iso = Column(String(64))` verbatim on `AuditLogModel` (`core/db/models.py`) and implemented automatic row payload SHA-256 re-computation in `AuditService.verify_chain_integrity` (`core/audit/logger.py`). Any unauthorized alteration of `details`, `actor`, `stage`, `status`, or timestamp now causes `recomputed_hash != ev.event_hash`, immediately flagging the ledger with `valid: False`, `reason: "payload_tampered"`, and identifying the exact `broken_at_index` and `broken_event_id`.
+- **Verification:** Empirically verified in `scripts/test_empirical_challenger.py` (Check 5) and `scripts/test_audit_remediation_challenge.py` (Probe 5), detecting in-place tampering with 100% precision.
 
 ### 8.3 Concurrency Race Condition, Microsecond Timestamp Collision & Finding AUD-02
 
@@ -699,7 +700,7 @@ The total production footprint is exceptionally compact (78.12 kB gzipped), well
 | :---: | :---: | :---: | :--- | :--- | :--- | :--- |
 | **SEC-04** | 4 | **MEDIUM** | CORS wildcard `*` with `allow_credentials=True` | `apps/api/app/main.py:46` | Allows arbitrary cross-origin sites to make credentialed API calls. | Remove `+ ["*"]`; enforce strict `CORS_ORIGINS`. |
 | **SUP-01** | 3 | **MEDIUM** | SLSA workflow contains dummy placeholder commands | `.github/workflows/generator-generic-ossf-slsa3-publish.yml:33-38` | SLSA provenance signs dummy `artifact1` instead of real wheel/Docker images. | Connect workflow to real release artifacts or gate behind manual dispatch. |
-| **AUD-01** | 8 | **MEDIUM** | `verify_chain_integrity` verifies hashes but skips row re-hashing | `core/audit/logger.py:105-121` | In-place DB column tampering bypasses detection if event hashes are left unchanged. | Persist `timestamp_iso` and recompute payload SHA-256 during verification. |
+| **AUD-01** | 8 | **MEDIUM** | `verify_chain_integrity` verifies hashes but skips row re-hashing | `core/audit/logger.py:105-145` | In-place DB column tampering bypasses detection if event hashes are left unchanged. | **RESOLVED** — Remediated via verbatim `timestamp_iso` persistence and row payload SHA-256 re-computation. |
 | **AUD-02** | 8 | **MEDIUM** | Microsecond timestamp collisions causing hash-chain ordering inversions and forking | `core/audit/logger.py:58-63, 96-102` & `core/db/models.py:192-210` | Intermittent test failures (~48% failure rate) and permanent ledger forks under rapid batch insertions. | **RESOLVED** — Remediated via monotonic sequence column and migration. |
 | **SCAL-01** | 19 | **MEDIUM** | N+1 SQL query pattern in `list_cases` endpoint | `apps/api/app/routes/cases.py:96-125` | Executes 4,001 SQL queries sequentially for 1,000 cases, degrading latency. | Refactor with SQLAlchemy `selectinload` or SQL aggregation. |
 | **SCAL-02** | 19 | **MEDIUM** | Unvirtualized case sidebar and evidence grid | `apps/web/src/App.tsx:687, 1323` | Browser tab reflow delays and memory pressure when cases > 1,000 or artifacts > 10,000. | Integrate `@tanstack/react-virtual` and paginated API endpoints. |

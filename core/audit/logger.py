@@ -64,6 +64,7 @@ class AuditService:
         sequence_num = (last_event.sequence_num + 1) if (last_event and last_event.sequence_num is not None) else 1
         previous_hash = last_event.event_hash if last_event else "GENESIS"
         now = datetime.now(timezone.utc)
+        timestamp_iso = now.isoformat()
         event_hash = _compute_event_hash(
             case_id=case_id,
             event_type=event_type,
@@ -72,7 +73,7 @@ class AuditService:
             status=status,
             details=details,
             previous_hash=previous_hash,
-            timestamp_iso=now.isoformat(),
+            timestamp_iso=timestamp_iso,
         )
         entry = AuditLogModel(
             id=new_id("aud"),
@@ -87,6 +88,7 @@ class AuditService:
             details=details,
             previous_event_hash=previous_hash,
             event_hash=event_hash,
+            timestamp_iso=timestamp_iso,
             created_at=now,
         )
         db.add(entry)
@@ -108,13 +110,47 @@ class AuditService:
         events = AuditService.list_case_audit_trail(db, case_id)
         expected_prev = "GENESIS"
         for idx, ev in enumerate(events):
+            # Check 1: Chain pointer verification (previous_event_hash matches parent)
             if ev.previous_event_hash != expected_prev:
                 return {
                     "valid": False,
                     "event_count": len(events),
                     "broken_at_index": idx,
                     "broken_event_id": ev.id,
+                    "reason": "chain_pointer_broken",
                 }
+
+            # Check 2 (AUD-01): Recompute payload hash to detect in-place row tampering
+            ts_str = getattr(ev, "timestamp_iso", None)
+            if not ts_str and ev.created_at:
+                ts_str = (
+                    ev.created_at.isoformat()
+                    if ev.created_at.tzinfo
+                    else ev.created_at.replace(tzinfo=timezone.utc).isoformat()
+                )
+
+            if ts_str:
+                recomputed_hash = _compute_event_hash(
+                    case_id=ev.case_id,
+                    event_type=ev.event_type,
+                    actor=ev.actor,
+                    stage=ev.stage,
+                    status=ev.status,
+                    details=ev.details,
+                    previous_hash=ev.previous_event_hash,
+                    timestamp_iso=ts_str,
+                )
+                if recomputed_hash != ev.event_hash:
+                    return {
+                        "valid": False,
+                        "event_count": len(events),
+                        "broken_at_index": idx,
+                        "broken_event_id": ev.id,
+                        "reason": "payload_tampered",
+                        "stored_hash": ev.event_hash,
+                        "recomputed_hash": recomputed_hash,
+                    }
+
             expected_prev = ev.event_hash
         return {
             "valid": True,

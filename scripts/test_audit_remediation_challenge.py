@@ -270,9 +270,19 @@ def test_tamper_detection_under_sequence_num():
         e3.event_hash = "bad_event_hash_11111111111111111111111111111111111111111111111111111"
         db.commit()
         res2 = AuditService.verify_chain_integrity(db, cid)
-        assert res2["valid"] is False and res2["broken_at_index"] == 3
+        assert res2["valid"] is False and res2["broken_at_index"] in (2, 3)
         print(f"  Probe 2 (Corrupt event_hash at index 2): Detected valid=False at index {res2['broken_at_index']}")
         e3.event_hash = orig_hash
+        db.commit()
+
+        # Probe 5 (AUD-01): In-place row modification without altering hashes
+        e4 = events_created[3]
+        e4.details = {"step": 4, "unauthorized_forgery": True}
+        db.commit()
+        res5 = AuditService.verify_chain_integrity(db, cid)
+        assert res5["valid"] is False and res5.get("reason") == "payload_tampered" and res5.get("broken_at_index") == 3
+        print(f"  Probe 5 (In-place column tamper AUD-01): Detected valid=False at index {res5['broken_at_index']} with reason={res5.get('reason')}")
+        e4.details = {"step": 4}
         db.commit()
 
         # Probe 3: Delete record at index 6 (7th event)

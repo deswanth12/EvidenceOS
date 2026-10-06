@@ -1,9 +1,10 @@
 # EvidenceOS (`VeriDock`) — GitHub Release Notes (`v1.1.0`) & Technical Showcase Kit
-
+ 
 **Repository**: `https://github.com/deswanth12/EvidenceOS`  
-**Tags Pushed**:
+**Git Lineage & Release Tags**:
 - `v1.0.0-benchmark-frozen` (`commit 07c8065`) — Cryptographically locked 150-case blind held-out benchmark (`94.0%` decision accuracy, `0.0%` confident error rate)
-- `v1.1.0-research-hardened` — Independent code/metric audit, 42-case Multi-SKU entity linking stress study (`57.1%` $\rightarrow$ `100.0%`), 150-case confidence calibration (`ECE = 0.0207`), and 3-minute demo walkthrough
+- `v1.1.0-research-hardened` (`commit d5f1138`, lineage `66df00c`) — Research release tag: Multi-SKU entity linking stress study (`57.1%` $\rightarrow$ `100.0%`), 150-case confidence calibration (`ECE = 0.0207`), and 14-slide presentation deck
+- `main` (`HEAD`) — Post-release adversarial audit remediations (`AUD-01` row payload re-hashing, `AUD-02` monotonic audit sequence, and final pre-release audit report)
 
 ---
 

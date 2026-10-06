@@ -206,6 +206,7 @@ class AuditLogModel(Base):
     details = Column(JSON, nullable=False, default=dict)
     previous_event_hash = Column(String(64), nullable=True)
     event_hash = Column(String(64), nullable=False)
+    timestamp_iso = Column(String(64), nullable=True)
     created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
 
     case = relationship("CaseModel", back_populates="audit_events")
@@ -234,7 +235,7 @@ def get_engine(database_url: Optional[str] = None):
 def init_db(database_url: Optional[str] = None) -> None:
     engine = get_engine(database_url)
     Base.metadata.create_all(bind=engine)
-    # Ensure backwards compatibility for existing SQLite databases missing sequence_num
+    # Ensure backwards compatibility for existing SQLite databases missing sequence_num or timestamp_iso
     try:
         with engine.begin() as conn:
             result = conn.exec_driver_sql("PRAGMA table_info(audit_logs)").fetchall()
@@ -250,6 +251,8 @@ def init_db(database_url: Optional[str] = None) -> None:
                         conn.exec_driver_sql(
                             "UPDATE audit_logs SET sequence_num = ? WHERE id = ?", (idx, rid)
                         )
+            if "timestamp_iso" not in cols and len(cols) > 0:
+                conn.exec_driver_sql("ALTER TABLE audit_logs ADD COLUMN timestamp_iso VARCHAR(64)")
     except Exception:
         pass
 

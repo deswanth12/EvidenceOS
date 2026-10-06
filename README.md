@@ -221,7 +221,20 @@ python -m evaluation.multi_sku_and_calibration
 
 ---
 
-## 5. Known Limitations
+## 5. Git Release & Audit Lineage
+
+To ensure complete transparency between tagged releases and post-release audit hardening:
+
+| Milestone / Tag | Commit | Scope & Purpose |
+| :--- | :---: | :--- |
+| **`v1.0.0-benchmark-frozen`** | `07c8065` | Cryptographically locked 150-case benchmark baseline (`94.0%` accuracy, `0.0%` confident error rate). |
+| **`v1.1.0-research-hardened`** | `d5f1138` (lineage `66df00c`) | Research release tag: $N=42$ Multi-SKU stress suite, calibration, and 14-slide presentation deck. |
+| **UI Motion Polish** | `5c25ca9` | Machined double-bezel (`Doppelrand`), spring curves, `:active` haptics, and staggered entry. |
+| **Pre-Release Audit Hardening** | `HEAD` (`main`) | Independent 26-phase pre-release audit ([`docs/final-pre-release-audit.md`](docs/final-pre-release-audit.md)), resolving `AUD-02` (monotonic audit sequence) and `AUD-01` (row payload re-hashing). |
+
+---
+
+## 6. Known Limitations
 
 1. **Controlled Procedural & Real-World-Inspired Testbed (`AUDIT_NOTE_01`)**: While `heldout_150` eliminates filename/metadata leakage (`assert b"tEXt" not in png_bytes`) and includes `34` real-world-inspired cases (`73.5%` accuracy), offline vision (`analyze_pallet_pixels_blind`) inspects the `2x5` parcel grid of our procedural renderer. Unconstrained smartphone dock photos require enabling `GEMINI_API_KEY` (`GeminiAIProvider` multimodal vision) or a fine-tuned parcel detector.
 2. **Multi-SKU Optical Grounding (`3` Held-Out Errors in `v1_frozen`)**: Without optical barcode/QR text on individual pallet parcels, `v1_frozen` attributes blind visual damage to the primary SKU in multi-SKU shipments (`50.0%` on `multi_sku_dispute`, resolved to `100.0%` in `v2_context_aware` via cross-modal corroboration).

@@ -13,15 +13,15 @@
 > Copy and paste the block below directly into **`https://github.com/deswanth12/EvidenceOS/releases/new?tag=v1.1.1-final`**
 
 ### Release Title
-`v1.1.0-research-hardened — Epistemic Multimodal Verification, Frozen Held-Out Benchmark (N=150), Calibration & Multi-SKU Audit`
+`v1.1.1-final — Final Audited Release: Epistemic Multimodal Verification, Adversarial Audit & Hash Chain Hardening`
 
 ### Release Body (Markdown)
 ```markdown
-## EvidenceOS (`VeriDock`) — `v1.1.0-research-hardened`
+## EvidenceOS (`VeriDock`) — `v1.1.1-final`
 
 > **Core Architectural Principle**: *"The AI interprets evidence; deterministic rules constrain the decision; uncertainty triggers human review."*
 
-This release completes the **Freeze → Evaluate → Attack → Audit → Document → Release** cycle for **EvidenceOS (`VeriDock`)**, an epistemically grounded multimodal AI and deterministic rule engine for high-stakes B2B delivery dispute verification.
+This release represents the complete, audited **Freeze → Evaluate → Attack → Audit → Harden → Document → Release** cycle for **EvidenceOS (`VeriDock`)**, an epistemically grounded multimodal AI and deterministic rule engine for high-stakes B2B delivery dispute verification.
 
 ---
 
@@ -47,19 +47,21 @@ Rather than optimizing for raw accuracy alone, EvidenceOS is architected for **S
 
 ---
 
-### 3. Independent Code & Metric Audit (`docs/independent-audit.md`)
+### 3. Post-Freeze Multi-SKU Entity Linking Stress Benchmark (`N = 42`)
 
-We audited our own evaluation harness for synthetic shortcuts and metric edge cases:
-- **Corrected Entity Attribution Metric (`AUDIT_FINDING_02`)**: Identified that the original `entity_matching_accuracy` (`100.0%`) checked resolved SKU *counts* (`entities_count == 2`), which masked 3 multi-SKU cases where blind parcel damage (`ITEM:UNKNOWN`) linked to the primary SKU instead of the secondary SKU. Under **strict claim-to-SKU attribution accuracy**, the frozen `heldout_150` benchmark scores **`98.0%` (`147/150`)** overall and **`50.0%` (`3/6`)** on `multi_sku_dispute`.
-- **Offline Pixel Grid Disclosure (`AUDIT_NOTE_01`)**: Documented that offline computer vision (`analyze_pallet_pixels_blind`) inspects the `2x5` parcel grid of our procedural renderer; unconstrained smartphone photos require enabling `GEMINI_API_KEY` (`GeminiAIProvider` multimodal vision) or a trained object detector.
+Without modifying the frozen `v1_frozen` benchmark, we evaluated our context-aware resolver (`v2_context_aware`) on a dedicated **42-case Multi-SKU Stress Suite** across 7 failure modes:
+- **`v1_frozen` (Primary-SKU Fallback)**: `57.1%` decision accuracy (`24/42`), `42.9%` strict SKU attribution (`18/42`), `0.0%` confident error rate.
+- **`v2_context_aware` (OCR-Canonicalized + Cross-Modal Corroboration)**: **`100.0%` decision accuracy (`42/42`, 95% CI `[91.6%, 100.0%]`)**, **`100.0%` strict SKU attribution (`42/42`)**, `0.0%` confident error rate.
 
 ---
 
-### 4. Post-Freeze Multi-SKU Entity Linking Stress Benchmark (`N = 42`)
+### 4. Pre-Release Adversarial Audit & Remediations (`docs/final-pre-release-audit.md`)
 
-Without modifying the frozen `v1_frozen` benchmark, we built a dedicated **42-case Multi-SKU Stress Suite** across 7 failure modes (`similar_sku_names_and_codes`, `reordered_line_items`, `missing_visual_barcodes_blind_cv`, `ocr_noisy_sku_identifiers`, etc.) and evaluated our context-aware resolver (`v2_context_aware`):
-- **`v1_frozen` (Primary-SKU Fallback)**: `57.1%` decision accuracy (`24/42`), `42.9%` strict SKU attribution (`18/42`), `0.0%` confident error rate.
-- **`v2_context_aware` (OCR-Canonicalized + Cross-Modal Corroboration)**: **`100.0%` decision accuracy (`42/42`)**, **`100.0%` strict SKU attribution (`42/42`)**, `0.0%` confident error rate.
+EvidenceOS underwent a 26-phase adversarial audit ahead of release:
+- **`AUD-01` Resolved**: Added verbatim `timestamp_iso` persistence and dynamic row payload SHA-256 re-hashing to detect in-place database row tampering with 100% precision.
+- **`AUD-02` Resolved**: Eliminated a sub-millisecond clock collision race condition during rapid sequential event logging using monotonic sequence tracking (verified across a 1,000-event stress loop).
+- **Prompt Injection ASR**: Verified at **`0.0%`** across 8 multimodal probe vectors.
+- **Explicit Disclosures**: Documented that local CV assumes a 2x5 pallet grid, that `GET /cases` requires batching beyond 1,000 cases, and that headline metrics preserve their sample-size scopes ($N=150$, $N=42$, $N=33$).
 
 ---
 
@@ -67,7 +69,8 @@ Without modifying the frozen `v1_frozen` benchmark, we built a dedicated **42-ca
 - `13 / 13` backend unit & integration tests passing (`pytest`)
 - `10 / 10` frontend component & UI tests passing (`vitest`)
 - `0` linter errors (`ruff check .`)
-- Single-command reproduction: `python -m scripts.run_evaluation && python -m evaluation.multi_sku_and_calibration`
+- Production build: `0` TypeScript errors (`78.1 kB gzip`)
+- Documented reproducibility with `seed=42`: `python -m scripts.run_evaluation && python -m evaluation.multi_sku_and_calibration`
 ```
 
 ---

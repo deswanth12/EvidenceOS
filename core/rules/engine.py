@@ -42,6 +42,8 @@ class DeterministicRuleEngine:
         # Aggregate quantities across resolved line items
         ordered_qty = 0
         delivered_qty = 0
+        has_po = False
+        has_challan = False
         unit_price = 250.0
         image_damaged_qty = None
         voice_damaged_qty = None
@@ -54,12 +56,19 @@ class DeterministicRuleEngine:
             all_evidence_ids.extend(ent.linked_evidence_ids)
             attrs = ent.attributes_by_source
 
+            for rel in attrs.get("document_relevance", []):
+                min_observed_conf = min(min_observed_conf, float(rel.get("confidence", 0.25)))
+                if rel.get("epistemic_type") == "UNCERTAINTY":
+                    has_uncertain_evidence = True
+
             for o in attrs.get("ordered_quantity", []):
+                has_po = True
                 if isinstance(o.get("value"), int):
                     ordered_qty += o["value"]
                 min_observed_conf = min(min_observed_conf, float(o.get("confidence", 1.0)))
 
             for d in attrs.get("delivered_quantity", []):
+                has_challan = True
                 if isinstance(d.get("value"), int):
                     delivered_qty += d["value"]
                 min_observed_conf = min(min_observed_conf, float(d.get("confidence", 1.0)))
@@ -85,8 +94,8 @@ class DeterministicRuleEngine:
         all_evidence_ids = sorted(list(set(all_evidence_ids)))
 
         # RULE 1: Minimum Evidence Sufficiency & Confidence Check
-        has_po_or_challan = ordered_qty > 0 or delivered_qty > 0
-        rule1_passed = has_po_or_challan and (not has_uncertain_evidence) and (min_observed_conf >= min_confidence)
+        has_po_and_challan = has_po and has_challan and ordered_qty > 0 and delivered_qty > 0
+        rule1_passed = has_po_and_challan and (not has_uncertain_evidence) and (min_observed_conf >= min_confidence)
         traces.append(
             RuleEvaluationTrace(
                 rule_id="RULE_01_EVIDENCE_SUFFICIENCY",
@@ -94,6 +103,8 @@ class DeterministicRuleEngine:
                 passed=rule1_passed,
                 epistemic_type=EpistemologicalType.RULE,
                 inputs_used={
+                    "has_purchase_order": has_po,
+                    "has_delivery_challan": has_challan,
                     "ordered_quantity": ordered_qty,
                     "delivered_quantity": delivered_qty,
                     "min_observed_confidence": round(min_observed_conf, 3),
@@ -104,15 +115,13 @@ class DeterministicRuleEngine:
                 explanation=(
                     f"All primary evidence sources meet the minimum confidence threshold ({min_observed_conf:.2f} >= {min_confidence:.2f})."
                     if rule1_passed
-                    else f"Evidence sufficiency check failed: observed minimum confidence {min_observed_conf:.2f} (threshold {min_confidence:.2f}) or inconclusive visual evidence."
+                    else f"Evidence sufficiency check failed: observed minimum confidence {min_observed_conf:.2f} (threshold {min_confidence:.2f}), missing primary document, or inconclusive visual evidence."
                 ),
             )
         )
 
         # RULE 2: Ordered vs Delivered Quantity Reconciliation
-        if delivered_qty == 0 and ordered_qty > 0:
-            delivered_qty = ordered_qty  # If no separate challan uploaded, assume ordered quantity under inspection
-        rule2_passed = ordered_qty > 0 and ordered_qty == delivered_qty
+        rule2_passed = has_po and has_challan and ordered_qty > 0 and ordered_qty == delivered_qty
         traces.append(
             RuleEvaluationTrace(
                 rule_id="RULE_02_DELIVERY_COMPLETENESS",
@@ -145,11 +154,16 @@ class DeterministicRuleEngine:
             rule3_passed = not has_uncertain_evidence
             rule3_expl = "Zero damaged units reported across all documents, images, and voice logs."
         else:
-            # For damage > 0 to be deterministically verified, image_damaged_qty must be present and match voice/challan if present
+            has_corroborator = (
+                (voice_damaged_qty is not None and voice_damaged_qty == image_damaged_qty)
+                or (challan_damaged_qty > 0 and challan_damaged_qty == image_damaged_qty)
+            )
             if (
                 image_damaged_qty is not None
                 and image_damaged_qty > 0
+                and has_corroborator
                 and (voice_damaged_qty is None or voice_damaged_qty == image_damaged_qty)
+                and (challan_damaged_qty == 0 or challan_damaged_qty == image_damaged_qty)
                 and not has_uncertain_evidence
             ):
                 verified_damaged_qty = image_damaged_qty
@@ -162,7 +176,7 @@ class DeterministicRuleEngine:
                 verified_damaged_qty = image_damaged_qty or 0
                 rule3_passed = False
                 rule3_expl = (
-                    f"Unresolved discrepancy or missing visual corroboration on damaged units "
+                    f"Unresolved discrepancy or missing corroboration on damaged units "
                     f"(Image={image_damaged_qty}, Voice={voice_damaged_qty}, Challan={challan_damaged_qty})."
                 )
 

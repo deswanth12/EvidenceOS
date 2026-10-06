@@ -92,3 +92,15 @@ def test_health_and_canonical_5_cases_end_to_end():
         base_acc = ablation["strict_regex_baseline"]["metrics"]["decision_accuracy"]
         assert sem_acc >= 0.95
         assert sem_acc > base_acc
+
+        # Test 150-case blind held-out evaluation suite endpoint
+        eval_150 = client.get("/api/evaluation/run?suite=heldout_150")
+        assert eval_150.status_code == 200
+        data_150 = eval_150.json()
+        assert data_150["total_cases"] == 150
+        assert data_150["total_evidence_files"] == 564
+        assert data_150["metrics"]["decision_accuracy"] >= 0.90
+        assert data_150["metrics"]["confident_error_rate"] == 0.0
+        assert len(data_150["four_system_comparison"]) == 4
+        assert len(data_150["modality_ablations"]) == 6
+

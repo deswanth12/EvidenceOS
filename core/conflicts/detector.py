@@ -41,9 +41,58 @@ class ConflictDetectionService:
             ordered_list: List[Dict[str, Any]] = attrs.get("ordered_quantity", [])
             delivered_list: List[Dict[str, Any]] = attrs.get("delivered_quantity", [])
             damaged_list: List[Dict[str, Any]] = attrs.get("damaged_quantity", [])
+            irrelevant_list: List[Dict[str, Any]] = attrs.get("document_relevance", [])
 
-            # 1. Check Ordered vs Delivered discrepancy (e.g., PO says 10 units, Challan says 8 units)
-            if ordered_list and delivered_list:
+            if irrelevant_list:
+                conflicts.append(
+                    EvidenceConflict(
+                        case_id=case_id,
+                        conflict_type="IRRELEVANT_EVIDENCE_ARTIFACT",
+                        severity=ConflictSeverity.MEDIUM,
+                        entity_key=ent.canonical_key,
+                        attribute="document_relevance",
+                        description=(
+                            f"Uploaded artifact ({irrelevant_list[0]['evidence_id']}) does not match any valid procurement document schema."
+                        ),
+                        competing_values=irrelevant_list,
+                        epistemic_type=EpistemologicalType.UNCERTAINTY,
+                    )
+                )
+
+            # 1. Check Ordered vs Delivered discrepancy or missing primary document
+            if ordered_list and not delivered_list:
+                conflicts.append(
+                    EvidenceConflict(
+                        case_id=case_id,
+                        conflict_type="MISSING_DELIVERY_CHALLAN",
+                        severity=ConflictSeverity.HIGH,
+                        entity_key=ent.canonical_key,
+                        attribute="delivered_quantity",
+                        description=(
+                            f"Missing Delivery Challan for {ent.canonical_key}: "
+                            f"Purchase Order specifies {ordered_list[0].get('value')} ordered units, but no dispatch/delivery challan was provided."
+                        ),
+                        competing_values=ordered_list,
+                        epistemic_type=EpistemologicalType.UNCERTAINTY,
+                    )
+                )
+            elif delivered_list and not ordered_list:
+                conflicts.append(
+                    EvidenceConflict(
+                        case_id=case_id,
+                        conflict_type="MISSING_PURCHASE_ORDER",
+                        severity=ConflictSeverity.HIGH,
+                        entity_key=ent.canonical_key,
+                        attribute="ordered_quantity",
+                        description=(
+                            f"Missing Purchase Order for {ent.canonical_key}: "
+                            f"Delivery Challan reports {delivered_list[0].get('value')} delivered units, but no authorizing Purchase Order was provided."
+                        ),
+                        competing_values=delivered_list,
+                        epistemic_type=EpistemologicalType.UNCERTAINTY,
+                    )
+                )
+            elif ordered_list and delivered_list:
                 ord_val = ordered_list[0].get("value")
                 del_val = delivered_list[0].get("value")
                 if isinstance(ord_val, int) and isinstance(del_val, int) and ord_val != del_val:
@@ -68,7 +117,7 @@ class ConflictDetectionService:
                     conflicts.append(
                         EvidenceConflict(
                             case_id=case_id,
-                            conflict_type="SHORT_DELIVERY_MISMATCH",
+                            conflict_type="SHORT_DELIVERY_MISMATCH" if del_val < ord_val else "OVER_DELIVERY_MISMATCH",
                             severity=ConflictSeverity.HIGH,
                             entity_key=ent.canonical_key,
                             attribute="delivered_vs_ordered_quantity",
@@ -84,7 +133,9 @@ class ConflictDetectionService:
             # 2. Check Damaged Quantity contradictions across modalities
             if damaged_list:
                 concrete_dmg = [d for d in damaged_list if isinstance(d.get("value"), int)]
-                uncertain_dmg = [d for d in damaged_list if d.get("value") is None or d.get("epistemic_type") == "UNCERTAINTY"]
+                uncertain_dmg = [
+                    d for d in damaged_list if d.get("value") is None or d.get("epistemic_type") == "UNCERTAINTY"
+                ]
 
                 # Check if someone claims > 0 damage while image/other source is UNCERTAIN / weak
                 positive_claims = [d for d in concrete_dmg if (d.get("value") or 0) > 0]
@@ -99,18 +150,28 @@ class ConflictDetectionService:
                             attribute="damaged_quantity",
                             description=(
                                 f"Damage claim of {positive_claims[0]['value']} units ({positive_claims[0]['document_role']}) "
-                                f"cannot be corroborated because visual evidence ({uncertain_dmg[0]['evidence_id']}) is inconclusive or low-confidence."
+                                f"cannot be corroborated because supporting evidence ({uncertain_dmg[0]['evidence_id']}) is inconclusive or ambiguous."
                             ),
                             competing_values=competing,
                             epistemic_type=EpistemologicalType.UNCERTAINTY,
                         )
                     )
+                elif uncertain_dmg:
+                    conflicts.append(
+                        EvidenceConflict(
+                            case_id=case_id,
+                            conflict_type="INCONCLUSIVE_EVIDENCE_QUALITY",
+                            severity=ConflictSeverity.MEDIUM,
+                            entity_key=ent.canonical_key,
+                            attribute="damaged_quantity",
+                            description=(
+                                f"Evidence artifact ({uncertain_dmg[0]['evidence_id']}) has low clarity or ambiguous phrasing."
+                            ),
+                            competing_values=uncertain_dmg,
+                            epistemic_type=EpistemologicalType.UNCERTAINTY,
+                        )
+                    )
 
-                # Check if concrete damaged quantities disagree across sources
-                # Note: A clean delivery challan generated at dispatch often has 0 damaged, while unloading inspection
-                # image + voice both report 2 damaged. If Image and Voice AGREE on damage > 0, and Challan is 0,
-                # only flag a conflict if Image and Voice disagree with each other OR if Challan also claims a different non-zero number,
-                # OR if Voice claims damage but Image says 0.
                 by_role: Dict[str, List[Dict[str, Any]]] = {}
                 for d in concrete_dmg:
                     by_role.setdefault(d["document_role"], []).append(d)
@@ -166,6 +227,23 @@ class ConflictDetectionService:
                             description=(
                                 f"Voice report claims {voice_vals[0]} damaged units for {ent.canonical_key}, "
                                 "but no photographic evidence was provided to corroborate physical damage."
+                            ),
+                            competing_values=concrete_dmg,
+                            epistemic_type=EpistemologicalType.UNCERTAINTY,
+                        )
+                    )
+                # Case D: Image shows damage > 0, Challan shows 0, and no Voice report was submitted to corroborate unloading damage
+                elif img_vals and img_vals[0] > 0 and not voice_vals and (not challan_vals or challan_vals[0] == 0) and not uncertain_dmg:
+                    conflicts.append(
+                        EvidenceConflict(
+                            case_id=case_id,
+                            conflict_type="UNCORROBORATED_IMAGE_CLAIM",
+                            severity=ConflictSeverity.HIGH,
+                            entity_key=ent.canonical_key,
+                            attribute="damaged_quantity",
+                            description=(
+                                f"Inspection photo shows {img_vals[0]} damaged units for {ent.canonical_key}, "
+                                "while Delivery Challan reports 0 damaged and no receiving voice log was provided."
                             ),
                             competing_values=concrete_dmg,
                             epistemic_type=EpistemologicalType.UNCERTAINTY,

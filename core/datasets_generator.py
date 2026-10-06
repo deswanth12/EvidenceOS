@@ -117,41 +117,51 @@ def generate_inspection_png_bytes(
     visual_seed: int = 101,
     slight_perturbation: bool = False,
     low_clarity: bool = False,
+    low_light: bool = False,
+    occluded: bool = False,
+    brightness_shift: int = 0,
+    crop_perturbation: bool = False,
+    blind_mode: bool = False,
 ) -> bytes:
-    """Create a real RGB PNG image depicting pallets/boxes and embedding structured inspection metadata."""
+    """Create a real RGB PNG image depicting pallets/boxes.
+
+    When `blind_mode=True` (used for the Held-Out Test Set), no `veridock_inspection`
+    metadata chunk is embedded in the PNG header; extraction relies 100% on pixel-level CV.
+    """
     from PIL.PngImagePlugin import PngInfo
 
     width, height = 320, 240
+    import hashlib
+
+    seed_bytes = hashlib.sha256(f"veridock_visual_seed_{visual_seed}".encode("utf-8")).digest()
+    seed_bytes_ext = seed_bytes + hashlib.sha256(seed_bytes).digest() + hashlib.sha256(seed_bytes[::-1]).digest()
+    cell_w = width // 9
+    cell_h = height // 8
+
     if low_clarity:
-        img = Image.new("RGB", (width, height), color=(122, 122, 122))
+        img = Image.new("RGB", (width, height), color=(124, 124, 124))
         draw = ImageDraw.Draw(img)
-        draw.rectangle([20, 20, 300, 220], fill=(125, 125, 125))
-    else:
-        import hashlib
-
-        bg_color = (235, 240, 245)
-        img = Image.new("RGB", (width, height), color=bg_color)
-        draw = ImageDraw.Draw(img)
-
-        # Render a deterministic 9x8 background luminance field derived from visual_seed
-        # so that distinct visual_seeds have expected Hamming distance ~32/64 (uncorrelated),
-        # while slight_perturbation on the same visual_seed has Hamming distance <= 2/64.
-        seed_bytes = hashlib.sha256(f"veridock_visual_seed_{visual_seed}".encode("utf-8")).digest()
-        seed_bytes_ext = seed_bytes + hashlib.sha256(seed_bytes).digest() + hashlib.sha256(seed_bytes[::-1]).digest()
-
-        cell_w = width // 9
-        cell_h = height // 8
         for r_cell in range(8):
             for c_cell in range(9):
                 b_idx = (r_cell * 9 + c_cell) % len(seed_bytes_ext)
-                lum = 40 + (seed_bytes_ext[b_idx] % 180)
-                if slight_perturbation and r_cell == 0 and c_cell == 0:
-                    lum = min(250, lum + 4)
-                x0 = c_cell * cell_w
-                y0 = r_cell * cell_h
-                draw.rectangle([x0, y0, x0 + cell_w, y0 + cell_h], fill=(lum, lum, min(255, lum + 8)))
+                lum = 120 + (seed_bytes_ext[b_idx] % 9)
+                x0, y0 = c_cell * cell_w, r_cell * cell_h
+                draw.rectangle([x0, y0, x0 + cell_w, y0 + cell_h], fill=(lum, lum, lum))
+    elif low_light:
+        img = Image.new("RGB", (width, height), color=(14, 15, 16))
+        draw = ImageDraw.Draw(img)
+        for r_cell in range(8):
+            for c_cell in range(9):
+                b_idx = (r_cell * 9 + c_cell) % len(seed_bytes_ext)
+                lum = 8 + (seed_bytes_ext[b_idx] % 14)
+                x0, y0 = c_cell * cell_w, r_cell * cell_h
+                draw.rectangle([x0, y0, x0 + cell_w, y0 + cell_h], fill=(lum, lum, lum + 2))
+    else:
+        bg_color = (140, 140, 145)
+        img = Image.new("RGB", (width, height), color=bg_color)
+        draw = ImageDraw.Draw(img)
 
-        total_boxes = visible_quantity or 10
+        total_boxes = visible_quantity if visible_quantity is not None else 10
         cols = 5
         for idx in range(min(total_boxes, 10)):
             r = idx // cols
@@ -161,39 +171,82 @@ def generate_inspection_png_bytes(
             x1 = x0 + 46
             y1 = y0 + 64
             is_damaged_box = idx < damaged_quantity
-            box_color = (210, 65, 55) if is_damaged_box else (70, 145, 95)
-            draw.rectangle([x0, y0, x1, y1], fill=box_color, outline=(30, 35, 45), width=2)
+            box_color = (205, 70, 60) if is_damaged_box else (70, 150, 95)
+            draw.rectangle([x0, y0, x1, y1], fill=box_color, outline=(90, 95, 100), width=2)
 
+        # Apply a deterministic 9x8 cell luminance modulation derived from visual_seed across
+        # the full image (preserving R-G chromaticity inside every box while making all 64 bits
+        # of the 9x8 dHash uncorrelated across distinct visual_seeds).
+        pixels = img.load()
+        for r_cell in range(8):
+            y_start = r_cell * cell_h
+            y_end = height if r_cell == 7 else (r_cell + 1) * cell_h
+            for c_cell in range(9):
+                x_start = c_cell * cell_w
+                x_end = width if c_cell == 8 else (c_cell + 1) * cell_w
+                b_idx = (r_cell * 9 + c_cell) % len(seed_bytes_ext)
+                delta_lum = ((seed_bytes_ext[b_idx] % 50) - 25) + brightness_shift
+                if slight_perturbation and r_cell == 0 and c_cell == 0:
+                    delta_lum += 4
+                for py in range(y_start, y_end):
+                    for px in range(x_start, x_end):
+                        pr, pg, pb = pixels[px, py]
+                        pixels[px, py] = (
+                            max(0, min(255, pr + delta_lum)),
+                            max(0, min(255, pg + delta_lum)),
+                            max(0, min(255, pb + delta_lum)),
+                        )
+
+        if occluded:
+            # Draw heavy dark obstruction across the center band y=76..164 with seed variation
+            for r_cell in range(2, 6):
+                for c_cell in range(9):
+                    b_idx = (r_cell * 9 + c_cell) % len(seed_bytes_ext)
+                    occ_lum = 18 + (seed_bytes_ext[b_idx] % 9)
+                    x0 = c_cell * cell_w
+                    y0 = max(76, r_cell * cell_h)
+                    y1 = min(164, (r_cell + 1) * cell_h)
+                    draw.rectangle([x0, y0, x0 + cell_w, y1], fill=(occ_lum, occ_lum, occ_lum + 2))
+
+        if crop_perturbation:
+            # Crop 2px margin and resize back to (width, height)
+            cropped = img.crop((2, 2, width - 2, height - 2))
+            img = cropped.resize((width, height), Image.Resampling.BILINEAR)
+
+    buf = io.BytesIO()
+    if blind_mode:
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+    is_unclear = low_clarity or low_light or occluded
     dmg_indicators = []
-    if damaged_quantity > 0:
+    if damaged_quantity > 0 and not is_unclear:
         dmg_indicators = ["crushed_box_corner", "compromised_tamper_seal"]
-    elif low_clarity:
+    elif is_unclear:
         dmg_indicators = ["insufficient_visual_clarity", "motion_blur_obstruction"]
 
     summary = (
         f"Low-contrast obstructed dock image; cannot confirm physical damage for {sku}."
-        if low_clarity
+        if is_unclear
         else f"Dock inspection photo showing {visible_quantity} units of {sku} ({damaged_quantity} visibly damaged, condition: {packaging_condition})."
     )
 
     meta_dict = {
         "product_name": "Industrial Servo Valve Assembly",
-        "detected_sku": None if low_clarity else sku,
-        "visible_quantity": None if low_clarity else visible_quantity,
-        "damaged_quantity": 0 if low_clarity else damaged_quantity,
-        "packaging_condition": "unclear" if low_clarity else packaging_condition,
+        "detected_sku": None if is_unclear else sku,
+        "visible_quantity": None if is_unclear else visible_quantity,
+        "damaged_quantity": 0 if is_unclear else damaged_quantity,
+        "packaging_condition": "unclear" if is_unclear else packaging_condition,
         "damage_indicators": dmg_indicators,
-        "visible_labels": [] if low_clarity else [sku, f"BATCH-{visual_seed}"],
-        "serial_numbers": [] if low_clarity else [f"SN-{visual_seed}-01"],
-        "supports_damage_claim": None if low_clarity else (damaged_quantity > 0),
-        "confidence": 0.45 if low_clarity else confidence,
+        "visible_labels": [] if is_unclear else [sku, f"BATCH-{visual_seed}"],
+        "serial_numbers": [] if is_unclear else [f"SN-{visual_seed}-01"],
+        "supports_damage_claim": None if is_unclear else (damaged_quantity > 0),
+        "confidence": 0.45 if is_unclear else confidence,
         "visual_summary": summary,
     }
 
     png_info = PngInfo()
     png_info.add_text("veridock_inspection", json.dumps(meta_dict))
-
-    buf = io.BytesIO()
     img.save(buf, format="PNG", pnginfo=png_info)
     return buf.getvalue()
 

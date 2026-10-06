@@ -1,0 +1,1945 @@
+{
+  "git_commit": "daf2911",
+  "dataset_version": "evidenceos-benchmark-v3.0-split-5-60-150",
+  "timestamp": "2026-10-06T05:12:39.692244+00:00",
+  "heldout_150_system_d_failures": [
+    {
+      "case_id": "heldout_case_077",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.89,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('unseen_regional_slang_munted') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_078",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.89,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('unseen_idiom_total_toast') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_083",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('severe_ocr_alphanumeric_substitution_lO_for_10') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_084",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('severe_ocr_alphanumeric_substitution_lO_for_10') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_089",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.89,
+      "expected_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Untranslated non-English logistics field labels ('untranslated_german_logistics_terms') were not matched by English patterns.",
+      "potential_fix": "Expand multilingual procurement lexicon (Bestellmenge, Geliefert, Beschaedigt) or route through multilingual LLM."
+    },
+    {
+      "case_id": "heldout_case_090",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.89,
+      "expected_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Untranslated non-English logistics field labels ('untranslated_german_logistics_terms') were not matched by English patterns.",
+      "potential_fix": "Expand multilingual procurement lexicon (Bestellmenge, Geliefert, Beschaedigt) or route through multilingual LLM."
+    },
+    {
+      "case_id": "heldout_case_142",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "multi_sku_dispute",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "ENTITY_LINKING_ERROR",
+      "failed_stage": "entity_resolution",
+      "root_cause": "Multi-SKU dispute where blind inspection image lacked visible SKU text and defaulted to primary SKU-IND-201 while voice report attributed damage to SKU-IND-202, causing a cross-SKU corroboration split.",
+      "potential_fix": "Support pallet-level damage aggregation across sibling SKUs when image lacks individual SKU barcodes."
+    },
+    {
+      "case_id": "heldout_case_143",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "multi_sku_dispute",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "ENTITY_LINKING_ERROR",
+      "failed_stage": "entity_resolution",
+      "root_cause": "Multi-SKU dispute where blind inspection image lacked visible SKU text and defaulted to primary SKU-IND-201 while voice report attributed damage to SKU-IND-202, causing a cross-SKU corroboration split.",
+      "potential_fix": "Support pallet-level damage aggregation across sibling SKUs when image lacks individual SKU barcodes."
+    },
+    {
+      "case_id": "heldout_case_144",
+      "system": "System D: EvidenceOS (Semantic AI + Deterministic Rules)",
+      "category": "multi_sku_dispute",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "ENTITY_LINKING_ERROR",
+      "failed_stage": "entity_resolution",
+      "root_cause": "Multi-SKU dispute where blind inspection image lacked visible SKU text and defaulted to primary SKU-IND-201 while voice report attributed damage to SKU-IND-202, causing a cross-SKU corroboration split.",
+      "potential_fix": "Support pallet-level damage aggregation across sibling SKUs when image lacks individual SKU barcodes."
+    }
+  ],
+  "heldout_150_system_c_failures": [
+    {
+      "case_id": "heldout_case_013",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 4
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 4
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_014",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 5
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 5
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_015",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 6
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 6
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_016",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 4
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 4
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_017",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 5
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 5
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_018",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 6
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 6
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_031",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_032",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_033",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_034",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_035",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_036",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_037",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_038",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_039",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_040",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_041",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_042",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_043",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.92,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_044",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.92,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_045",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.92,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_046",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.92,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_047",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.92,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_048",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.92,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    },
+    {
+      "case_id": "heldout_case_049",
+      "system": "System C: Semantic Multimodal AI Only (No Rule Engine)",
+      "category": "missing_voice_report",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "partially_approved",
+      "confidence": 0.91,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "RULE_ENGINE_LIMITATION",
+      "failed_stage": "rule_and_decision_engine",
+      "root_cause": "Rule engine disabled (System C / Ablation E): auto-settled case as 'partially_approved' instead of gating on SLA cap, missing corroboration, or uncertainty.",
+      "potential_fix": "Enable DeterministicRuleEngine (RULE_01..RULE_05) to gate uncorroborated or SLA-breaching claims."
+    }
+  ],
+  "heldout_150_baseline_b_failures": [
+    {
+      "case_id": "heldout_case_001",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "clean_delivery",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 0
+      },
+      "error_category": "CONFLICT_DETECTION_ERROR",
+      "failed_stage": "conflict_detection",
+      "root_cause": "Expected 'approved' but pipeline produced 'manual_review_required' (conflicts=1).",
+      "potential_fix": "Refine cross-modal conflict detection rules for missing or contradictory modalities."
+    },
+    {
+      "case_id": "heldout_case_002",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "clean_delivery",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "CONFLICT_DETECTION_ERROR",
+      "failed_stage": "conflict_detection",
+      "root_cause": "Expected 'approved' but pipeline produced 'manual_review_required' (conflicts=1).",
+      "potential_fix": "Refine cross-modal conflict detection rules for missing or contradictory modalities."
+    },
+    {
+      "case_id": "heldout_case_003",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 0
+      },
+      "error_category": "CONFLICT_DETECTION_ERROR",
+      "failed_stage": "conflict_detection",
+      "root_cause": "Expected 'approved' but pipeline produced 'manual_review_required' (conflicts=1).",
+      "potential_fix": "Refine cross-modal conflict detection rules for missing or contradictory modalities."
+    },
+    {
+      "case_id": "heldout_case_004",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_005",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 8), delivered=0 (expected 8).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_006",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_010",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_011",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 1
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_012",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_073",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_074",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_075",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 1
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 1 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_076",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_077",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('unseen_regional_slang_munted') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_078",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('unseen_idiom_total_toast') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_079",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_080",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_081",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_082",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_083",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('severe_ocr_alphanumeric_substitution_lO_for_10') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_084",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('severe_ocr_alphanumeric_substitution_lO_for_10') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_085",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Untranslated non-English logistics field labels ('multilingual_or_mixed_terms') were not matched by English patterns.",
+      "potential_fix": "Expand multilingual procurement lexicon (Bestellmenge, Geliefert, Beschaedigt) or route through multilingual LLM."
+    },
+    {
+      "case_id": "heldout_case_086",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Untranslated non-English logistics field labels ('multilingual_or_mixed_terms') were not matched by English patterns.",
+      "potential_fix": "Expand multilingual procurement lexicon (Bestellmenge, Geliefert, Beschaedigt) or route through multilingual LLM."
+    },
+    {
+      "case_id": "heldout_case_087",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Untranslated non-English logistics field labels ('multilingual_or_mixed_terms') were not matched by English patterns.",
+      "potential_fix": "Expand multilingual procurement lexicon (Bestellmenge, Geliefert, Beschaedigt) or route through multilingual LLM."
+    },
+    {
+      "case_id": "heldout_case_088",
+      "system": "Baseline B: Structured Deterministic Normalizer",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.85,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Untranslated non-English logistics field labels ('multilingual_or_mixed_terms') were not matched by English patterns.",
+      "potential_fix": "Expand multilingual procurement lexicon (Bestellmenge, Geliefert, Beschaedigt) or route through multilingual LLM."
+    }
+  ],
+  "heldout_150_baseline_a_failures": [
+    {
+      "case_id": "heldout_case_004",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_005",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 8,
+        "delivered": 8,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 8), delivered=0 (expected 8).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_006",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "clean_delivery",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_007",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "partial_damage",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "error_category": "CONFLICT_DETECTION_ERROR",
+      "failed_stage": "conflict_detection",
+      "root_cause": "Expected 'partially_approved' but pipeline produced 'manual_review_required' (conflicts=1).",
+      "potential_fix": "Refine cross-modal conflict detection rules for missing or contradictory modalities."
+    },
+    {
+      "case_id": "heldout_case_008",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "partial_damage",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "error_category": "CONFLICT_DETECTION_ERROR",
+      "failed_stage": "conflict_detection",
+      "root_cause": "Expected 'partially_approved' but pipeline produced 'manual_review_required' (conflicts=1).",
+      "potential_fix": "Refine cross-modal conflict detection rules for missing or contradictory modalities."
+    },
+    {
+      "case_id": "heldout_case_009",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "error_category": "CONFLICT_DETECTION_ERROR",
+      "failed_stage": "conflict_detection",
+      "root_cause": "Expected 'partially_approved' but pipeline produced 'manual_review_required' (conflicts=1).",
+      "potential_fix": "Refine cross-modal conflict detection rules for missing or contradictory modalities."
+    },
+    {
+      "case_id": "heldout_case_010",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_011",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 1
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_012",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "partial_damage",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "DOCUMENT_EXTRACTION_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Document parser extracted ordered=0 (expected 10), delivered=0 (expected 10).",
+      "potential_fix": "Use semantic prose extraction instead of rigid pipe-table regex."
+    },
+    {
+      "case_id": "heldout_case_043",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "IMAGE_INTERPRETATION_ERROR",
+      "failed_stage": "image_analysis",
+      "root_cause": "Visual condition in 'missing_image_evidence' was not properly extracted or corroborated (verified_damaged=0).",
+      "potential_fix": "Calibrate pixel luminance/contrast thresholds and cross-modal image corroboration rules."
+    },
+    {
+      "case_id": "heldout_case_044",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "IMAGE_INTERPRETATION_ERROR",
+      "failed_stage": "image_analysis",
+      "root_cause": "Visual condition in 'missing_image_evidence' was not properly extracted or corroborated (verified_damaged=0).",
+      "potential_fix": "Calibrate pixel luminance/contrast thresholds and cross-modal image corroboration rules."
+    },
+    {
+      "case_id": "heldout_case_045",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "IMAGE_INTERPRETATION_ERROR",
+      "failed_stage": "image_analysis",
+      "root_cause": "Visual condition in 'missing_image_evidence' was not properly extracted or corroborated (verified_damaged=0).",
+      "potential_fix": "Calibrate pixel luminance/contrast thresholds and cross-modal image corroboration rules."
+    },
+    {
+      "case_id": "heldout_case_046",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "IMAGE_INTERPRETATION_ERROR",
+      "failed_stage": "image_analysis",
+      "root_cause": "Visual condition in 'missing_image_evidence' was not properly extracted or corroborated (verified_damaged=0).",
+      "potential_fix": "Calibrate pixel luminance/contrast thresholds and cross-modal image corroboration rules."
+    },
+    {
+      "case_id": "heldout_case_047",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "IMAGE_INTERPRETATION_ERROR",
+      "failed_stage": "image_analysis",
+      "root_cause": "Visual condition in 'missing_image_evidence' was not properly extracted or corroborated (verified_damaged=0).",
+      "potential_fix": "Calibrate pixel luminance/contrast thresholds and cross-modal image corroboration rules."
+    },
+    {
+      "case_id": "heldout_case_048",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "expected_outcome": "manual_review_required",
+      "actual_outcome": "approved",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "error_category": "IMAGE_INTERPRETATION_ERROR",
+      "failed_stage": "image_analysis",
+      "root_cause": "Visual condition in 'missing_image_evidence' was not properly extracted or corroborated (verified_damaged=0).",
+      "potential_fix": "Calibrate pixel luminance/contrast thresholds and cross-modal image corroboration rules."
+    },
+    {
+      "case_id": "heldout_case_073",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_074",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_075",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 1
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 1
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 1 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_076",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('colloquial_wording') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_077",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('unseen_regional_slang_munted') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_078",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "partially_approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 2
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 2
+      },
+      "error_category": "VOICE_INTERPRETATION_ERROR",
+      "failed_stage": "voice_analysis",
+      "root_cause": "Unseen regional slang/idiom in voice transcript ('unseen_idiom_total_toast') caused voice extractor to report 0 damaged units while image showed 2 damaged units.",
+      "potential_fix": "Expand semantic damage verb vocabulary or invoke LLM zero-shot transcript parser."
+    },
+    {
+      "case_id": "heldout_case_079",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_080",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_081",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    },
+    {
+      "case_id": "heldout_case_082",
+      "system": "Baseline A: Strict Regex / Keyword Baseline",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "expected_outcome": "approved",
+      "actual_outcome": "manual_review_required",
+      "confidence": 0.8,
+      "expected_quantities": {
+        "ordered": 10,
+        "delivered": 10,
+        "damaged": 0
+      },
+      "actual_quantities": {
+        "ordered": 0,
+        "delivered": 0,
+        "damaged": 0
+      },
+      "error_category": "OCR_OR_TEXT_NOISE_ERROR",
+      "failed_stage": "document_extraction",
+      "root_cause": "Severe character substitution in scanned PDF ('typos_and_ocr_noise') caused quantity extraction mismatch (ordered=0 vs expected=10, delivered=0 vs expected=10).",
+      "potential_fix": "Add OCR post-correction normalization (e.g. 'lO' -> '10', '0RD3R3D' -> 'ORDERED') or VLM page OCR."
+    }
+  ]
+}

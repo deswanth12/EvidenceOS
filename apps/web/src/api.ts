@@ -115,7 +115,9 @@ export const api = {
     return handleJson<{ seeded_cases: number; case_ids: string[] }>(res);
   },
 
-  runEvaluation: async (suite: 'extended_60' | 'canonical_5' = 'extended_60'): Promise<EvaluationReport> => {
+  runEvaluation: async (
+    suite: 'heldout_150' | 'extended_60' | 'canonical_5' = 'extended_60'
+  ): Promise<EvaluationReport> => {
     const res = await fetch(`${API_BASE}/evaluation/run?suite=${suite}`);
     return handleJson<EvaluationReport>(res);
   },

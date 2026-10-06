@@ -164,3 +164,69 @@ def test_audit_trail_tamper_evident_hash_chain(isolated_env):
     integrity = AuditService.verify_chain_integrity(db, "case_audit_1")
     assert integrity["valid"] is True
     assert integrity["event_count"] == 2
+
+
+def test_blind_pixel_cv_zero_metadata_leakage():
+    """Verify that blind_mode=True PNGs contain zero text chunks and are accurately analyzed from pixels alone."""
+    blind_damaged_png = generate_inspection_png_bytes(
+        sku="SKU-IND-201",
+        visible_quantity=10,
+        damaged_quantity=3,
+        packaging_condition="crushed_corner",
+        blind_mode=True,
+    )
+    assert b"veridock_meta" not in blind_damaged_png
+    assert b"tEXt" not in blind_damaged_png
+
+    provider = HeuristicLocalAIProvider()
+    res = provider.analyze_image("ev_blind_1", blind_damaged_png, "artifact_03.png")
+    assert res.visible_quantity == 10
+    assert res.damaged_quantity == 3
+    assert res.supports_damage_claim is True
+    assert res.provenance.epistemic_type == EpistemologicalType.FACT
+
+    blind_low_light_png = generate_inspection_png_bytes(
+        sku="SKU-IND-201",
+        visible_quantity=10,
+        damaged_quantity=2,
+        packaging_condition="low_light",
+        low_light=True,
+        blind_mode=True,
+    )
+    res_dark = provider.analyze_image("ev_blind_dark", blind_low_light_png, "artifact_03.png")
+    assert res_dark.provenance.epistemic_type == EpistemologicalType.UNCERTAINTY
+    assert res_dark.visible_quantity is None
+
+
+def test_hedged_voice_produces_uncertainty():
+    wav_bytes = generate_wav_voice_bytes(
+        "Unloaded SKU-IND-201, maybe around 2 or 3 boxes look possibly dented, hard to tell in the dark."
+    )
+    provider = HeuristicLocalAIProvider()
+    res = provider.analyze_voice("ev_hedged", wav_bytes, "artifact_04.wav", EvidenceModality.AUDIO)
+    assert res.provenance.epistemic_type == EpistemologicalType.UNCERTAINTY
+    assert res.provenance.confidence < 0.65
+
+
+def test_wilson_confidence_interval_and_research_suites():
+    from evaluation.runner import (
+        evaluate_perceptual_hashing_benchmark,
+        evaluate_prompt_injection_suite,
+        wilson_confidence_interval,
+    )
+
+    lo, hi = wilson_confidence_interval(141, 150)
+    assert 0.88 <= lo <= 0.90
+    assert 0.96 <= hi <= 0.98
+
+    hash_res = evaluate_perceptual_hashing_benchmark()
+    assert hash_res["total_pairs"] == 40
+    assert hash_res["dhash_plus_sha256"]["recall"] == 1.0
+    assert hash_res["dhash_plus_sha256"]["precision"] == 1.0
+    assert hash_res["sha256_only"]["recall"] == 0.25
+
+    inj_res = evaluate_prompt_injection_suite()
+    assert inj_res["total_injection_attempts"] == 15
+    assert inj_res["attack_success_rate"] == 0.0
+    assert inj_res["sanitization_trigger_rate"] == 1.0
+

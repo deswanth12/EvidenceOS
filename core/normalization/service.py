@@ -106,7 +106,7 @@ class EvidenceNormalizationService:
                             )
 
             elif role == DocumentRole.INSPECTION_IMAGE:
-                sku = (payload.get("detected_sku") or "SKU-IND-100").upper()
+                sku = (payload.get("detected_sku") or "UNKNOWN").upper()
                 entity_key = f"ITEM:{sku}"
                 pkg_cond = payload.get("packaging_condition", "unknown")
 
@@ -152,18 +152,37 @@ class EvidenceNormalizationService:
                         )
 
             elif role == DocumentRole.VOICE_REPORT:
-                sku = (payload.get("sku_mentioned") or "SKU-IND-100").upper()
+                sku = (payload.get("sku_mentioned") or "UNKNOWN").upper()
                 entity_key = f"ITEM:{sku}"
-                claimed_qty = int(payload.get("claimed_quantity", 0))
+                claimed_qty = payload.get("claimed_quantity")
+                val_to_store = (
+                    None
+                    if base_prov.epistemic_type == EpistemologicalType.UNCERTAINTY
+                    else int(claimed_qty or 0)
+                )
                 claims.append(
                     NormalizedClaim(
                         case_id=case_id,
                         entity_key=entity_key,
                         attribute="damaged_quantity",
-                        value=claimed_qty,
+                        value=val_to_store,
                         unit=payload.get("target_object", "units"),
                         epistemic_type=base_prov.epistemic_type,
                         reason=f"Voice report ({record.original_filename}) states {claimed_qty} {payload.get('target_object', 'units')} damaged during {payload.get('event_stage', 'unloading')}.",
+                        provenance=base_prov,
+                    )
+                )
+
+            elif role == DocumentRole.UNKNOWN:
+                claims.append(
+                    NormalizedClaim(
+                        case_id=case_id,
+                        entity_key="ITEM:UNKNOWN",
+                        attribute="document_relevance",
+                        value=None,
+                        unit="document",
+                        epistemic_type=EpistemologicalType.UNCERTAINTY,
+                        reason=f"Uploaded artifact ({record.original_filename}) is unrecognized or irrelevant to procurement dispute verification.",
                         provenance=base_prov,
                     )
                 )

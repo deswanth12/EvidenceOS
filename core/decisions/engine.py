@@ -39,6 +39,7 @@ class DecisionEngineService:
         conflicts: List[EvidenceConflict],
         historical_warnings: List[HistoricalMatchWarning],
         contract_config: Dict[str, Any],
+        use_rule_engine: bool = True,
     ) -> CaseDecision:
         db.query(DecisionRecordModel).filter(
             DecisionRecordModel.case_id == case_id,
@@ -69,70 +70,107 @@ class DecisionEngineService:
             status_tag = "PASS" if tr.passed else "FAIL"
             detailed_explanation.append(f"[{tr.rule_id}: {status_tag}] {tr.explanation}")
 
-        # Decision state machine (100% deterministic)
-        if not evidence_ids:
-            outcome = DecisionOutcome.INSUFFICIENT_EVIDENCE
-            epistemic = EpistemologicalType.UNCERTAINTY
-            summary = "No evidence artifacts have been uploaded to this case."
-            next_action = "Upload Purchase Order, Delivery Challan, and inspection evidence."
-
-        elif historical_warnings:
-            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
-            epistemic = EpistemologicalType.UNCERTAINTY
-            summary = (
-                f"Manual review required: { historical_warnings[0].warning_message } "
-                "Automated settlement is suspended pending human audit of original files."
-            )
-            next_action = "Inspect flagged historical evidence side-by-side in the Conflict & Provenance panel."
-
-        elif has_uncertain or min_conf < 0.75:
-            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
-            epistemic = EpistemologicalType.UNCERTAINTY
-            summary = (
-                f"Manual review required due to insufficient or low-confidence evidence "
-                f"(minimum confidence {min_conf:.2f}). Claimed damage of {max_claimed_dmg} units cannot be verified automatically."
-            )
-            next_action = "Request higher-resolution inspection photographs or perform human adjudicator review."
-
-        elif conflicts:
-            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
-            epistemic = EpistemologicalType.UNCERTAINTY
-            conflict_summaries = "; ".join(c.description for c in conflicts)
-            summary = (
-                f"Manual review required: {len(conflicts)} cross-modal contradiction(s) detected. "
-                f"{conflict_summaries}"
-            )
-            next_action = "Reconcile conflicting quantities across Purchase Order, Challan, Voice, and Image evidence."
-
-        elif ordered_qty > 0 and delivered_qty == ordered_qty and verified_dmg == 0 and max_claimed_dmg == 0:
-            outcome = DecisionOutcome.APPROVED
-            epistemic = EpistemologicalType.RULE
-            summary = (
-                f"Approved for full settlement: All {ordered_qty} ordered units were delivered intact "
-                "with 0 damaged units verified across documents, images, and voice reports."
-            )
-            next_action = "Release full invoice payment to supplier."
-
-        elif (
-            ordered_qty > 0
-            and delivered_qty == ordered_qty
-            and verified_dmg > 0
-            and all(tr.passed for tr in rule_traces)
-        ):
-            outcome = DecisionOutcome.PARTIALLY_APPROVED
-            epistemic = EpistemologicalType.RULE
-            summary = (
-                f"Partially approved: {delivered_qty} of {ordered_qty} ordered units delivered, "
-                f"with {verified_dmg} damaged units corroborated across visual and voice inspection. "
-                f"Approve {accepted_qty} intact units and credit buyer ${payout_adj:.2f} for {disputed_qty} damaged units."
-            )
-            next_action = f"Issue credit note for ${payout_adj:.2f} ({disputed_qty} damaged units) and settle remaining {accepted_qty} units."
-
+        if not use_rule_engine:
+            # System C (Semantic AI Only without Deterministic Rule Engine):
+            # Relies on extracted quantities and direct contradictions only; does not enforce
+            # SLA damage ratio caps, strict cross-modal corroboration, or uncertainty abstention rules.
+            direct_contradictions = [
+                c
+                for c in conflicts
+                if c.conflict_type
+                in ("SHORT_DELIVERY_MISMATCH", "OVER_DELIVERY_MISMATCH", "DAMAGE_QUANTITY_CONTRADICTION")
+            ]
+            if not evidence_ids or (ordered_qty == 0 and delivered_qty == 0):
+                outcome = DecisionOutcome.INSUFFICIENT_EVIDENCE
+                epistemic = EpistemologicalType.UNCERTAINTY
+                summary = "System C (AI-Only): No valid quantities extracted."
+                next_action = "Upload procurement documents."
+            elif direct_contradictions:
+                outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+                epistemic = EpistemologicalType.INFERENCE
+                summary = f"System C (AI-Only): Direct quantity contradiction detected ({direct_contradictions[0].conflict_type})."
+                next_action = "Review conflicting claims."
+            elif max_claimed_dmg > 0:
+                outcome = DecisionOutcome.PARTIALLY_APPROVED
+                epistemic = EpistemologicalType.INFERENCE
+                verified_dmg = max_claimed_dmg
+                accepted_qty = max(0, (delivered_qty or ordered_qty) - verified_dmg)
+                disputed_qty = max(0, ordered_qty - accepted_qty)
+                min_conf = max(min_conf, 0.86)
+                summary = f"System C (AI-Only): Auto-approving partial damage claim of {verified_dmg} units without deterministic rule gating."
+                next_action = "Settle partial claim."
+            else:
+                outcome = DecisionOutcome.APPROVED
+                epistemic = EpistemologicalType.INFERENCE
+                min_conf = max(min_conf, 0.88)
+                summary = "System C (AI-Only): Approved based on extracted quantities without deterministic rule gating."
+                next_action = "Release payment."
+            rule_traces = []
         else:
-            outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
-            epistemic = EpistemologicalType.UNCERTAINTY
-            summary = "Manual review required: SLA thresholds or quantity checks did not pass automatic settlement rules."
-            next_action = "Assign to procurement dispute specialist for manual determination."
+            # Decision state machine (100% deterministic - System D)
+            if not evidence_ids:
+                outcome = DecisionOutcome.INSUFFICIENT_EVIDENCE
+                epistemic = EpistemologicalType.UNCERTAINTY
+                summary = "No evidence artifacts have been uploaded to this case."
+                next_action = "Upload Purchase Order, Delivery Challan, and inspection evidence."
+
+            elif historical_warnings:
+                outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+                epistemic = EpistemologicalType.UNCERTAINTY
+                summary = (
+                    f"Manual review required: { historical_warnings[0].warning_message } "
+                    "Automated settlement is suspended pending human audit of original files."
+                )
+                next_action = "Inspect flagged historical evidence side-by-side in the Conflict & Provenance panel."
+
+            elif has_uncertain or min_conf < 0.75:
+                outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+                epistemic = EpistemologicalType.UNCERTAINTY
+                summary = (
+                    f"Manual review required due to insufficient or low-confidence evidence "
+                    f"(minimum confidence {min_conf:.2f}). Claimed damage of {max_claimed_dmg} units cannot be verified automatically."
+                )
+                next_action = "Request higher-resolution inspection photographs or perform human adjudicator review."
+
+            elif conflicts:
+                outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+                epistemic = EpistemologicalType.UNCERTAINTY
+                conflict_summaries = "; ".join(c.description for c in conflicts)
+                summary = (
+                    f"Manual review required: {len(conflicts)} cross-modal contradiction(s) detected. "
+                    f"{conflict_summaries}"
+                )
+                next_action = "Reconcile conflicting quantities across Purchase Order, Challan, Voice, and Image evidence."
+
+            elif ordered_qty > 0 and delivered_qty == ordered_qty and verified_dmg == 0 and max_claimed_dmg == 0 and all(tr.passed for tr in rule_traces):
+                outcome = DecisionOutcome.APPROVED
+                epistemic = EpistemologicalType.RULE
+                summary = (
+                    f"Approved for full settlement: All {ordered_qty} ordered units were delivered intact "
+                    "with 0 damaged units verified across documents, images, and voice reports."
+                )
+                next_action = "Release full invoice payment to supplier."
+
+            elif (
+                ordered_qty > 0
+                and delivered_qty == ordered_qty
+                and verified_dmg > 0
+                and all(tr.passed for tr in rule_traces)
+            ):
+                outcome = DecisionOutcome.PARTIALLY_APPROVED
+                epistemic = EpistemologicalType.RULE
+                summary = (
+                    f"Partially approved: {delivered_qty} of {ordered_qty} ordered units delivered, "
+                    f"with {verified_dmg} damaged units corroborated across visual and voice inspection. "
+                    f"Approve {accepted_qty} intact units and credit buyer ${payout_adj:.2f} for {disputed_qty} damaged units."
+                )
+                next_action = f"Issue credit note for ${payout_adj:.2f} ({disputed_qty} damaged units) and settle remaining {accepted_qty} units."
+
+            else:
+                outcome = DecisionOutcome.MANUAL_REVIEW_REQUIRED
+                epistemic = EpistemologicalType.UNCERTAINTY
+                summary = "Manual review required: SLA thresholds or quantity checks did not pass automatic settlement rules."
+                next_action = "Assign to procurement dispute specialist for manual determination."
 
         decision = CaseDecision(
             case_id=case_id,
@@ -280,7 +318,15 @@ class CaseVerificationPipeline:
     def __init__(self, extractor: Optional[MultimodalExtractionService] = None) -> None:
         self.extractor = extractor or MultimodalExtractionService()
 
-    def run_case_pipeline(self, db: Session, case_id: str) -> Dict[str, Any]:
+    def run_case_pipeline(
+        self,
+        db: Session,
+        case_id: str,
+        use_rule_engine: bool = True,
+        enable_historical_matching: bool = True,
+    ) -> Dict[str, Any]:
+        import time
+
         case = db.query(CaseModel).filter(CaseModel.id == case_id).first()
         if not case:
             raise ValueError(f"Case '{case_id}' not found.")
@@ -295,32 +341,61 @@ class CaseVerificationPipeline:
             .all()
         )
 
+        stage_latencies_ms: Dict[str, float] = {
+            "pdf_extraction_ms": 0.0,
+            "image_analysis_ms": 0.0,
+            "voice_analysis_ms": 0.0,
+            "normalization_ms": 0.0,
+            "entity_resolution_ms": 0.0,
+            "conflict_detection_ms": 0.0,
+            "historical_matching_ms": 0.0,
+            "rule_and_decision_ms": 0.0,
+        }
+
         # Stage 1-3: Extract each evidence artifact
         has_docs = False
         has_images = False
         has_voice = False
         for rec in evidence_records:
+            t_ext = time.perf_counter()
             self.extractor.extract_evidence_record(db, rec)
+            dt_ext = (time.perf_counter() - t_ext) * 1000.0
             if rec.document_role in ("purchase_order", "delivery_challan", "invoice"):
                 has_docs = True
+                stage_latencies_ms["pdf_extraction_ms"] += dt_ext
             elif rec.document_role == "inspection_image":
                 has_images = True
+                stage_latencies_ms["image_analysis_ms"] += dt_ext
             elif rec.document_role == "voice_report":
                 has_voice = True
+                stage_latencies_ms["voice_analysis_ms"] += dt_ext
 
         # Stage 4: Evidence Normalization
+        t_norm = time.perf_counter()
         claims = EvidenceNormalizationService.normalize_case_evidence(db, case_id, evidence_records)
+        stage_latencies_ms["normalization_ms"] = round((time.perf_counter() - t_norm) * 1000.0, 3)
 
         # Stage 5: Cross-Modal Entity Resolution
+        t_ent = time.perf_counter()
         entities = EntityResolutionService.resolve_entities(db, case_id, evidence_records, claims)
+        stage_latencies_ms["entity_resolution_ms"] = round((time.perf_counter() - t_ent) * 1000.0, 3)
 
         # Stage 6: Conflict Detection & Historical Matching
+        t_conf = time.perf_counter()
         conflicts = ConflictDetectionService.detect_conflicts(db, case_id, entities)
-        historical_warnings = HistoricalMatchingService.match_against_historical_cases(
-            db, case_id, evidence_records
-        )
+        stage_latencies_ms["conflict_detection_ms"] = round((time.perf_counter() - t_conf) * 1000.0, 3)
+
+        t_hist = time.perf_counter()
+        if enable_historical_matching:
+            historical_warnings = HistoricalMatchingService.match_against_historical_cases(
+                db, case_id, evidence_records
+            )
+        else:
+            historical_warnings = []
+        stage_latencies_ms["historical_matching_ms"] = round((time.perf_counter() - t_hist) * 1000.0, 3)
 
         # Stage 7: Deterministic Rule & Decision Engine
+        t_dec = time.perf_counter()
         decision = DecisionEngineService.compute_decision(
             db=db,
             case_id=case_id,
@@ -328,7 +403,11 @@ class CaseVerificationPipeline:
             conflicts=conflicts,
             historical_warnings=historical_warnings,
             contract_config=case.contract_sla_config or {},
+            use_rule_engine=use_rule_engine,
         )
+        stage_latencies_ms["rule_and_decision_ms"] = round((time.perf_counter() - t_dec) * 1000.0, 3)
+        for k in ("pdf_extraction_ms", "image_analysis_ms", "voice_analysis_ms"):
+            stage_latencies_ms[k] = round(stage_latencies_ms[k], 3)
 
         # Update Case checklist and header metadata from PO if not already set
         for rec in evidence_records:
@@ -362,6 +441,9 @@ class CaseVerificationPipeline:
             "claims_count": len(claims),
             "entities_count": len(entities),
             "conflicts_count": len(conflicts),
+            "conflicts": [c.model_dump(mode="json") for c in conflicts],
             "historical_warnings_count": len(historical_warnings),
+            "historical_warnings": [w.model_dump(mode="json") for w in historical_warnings],
+            "stage_latencies_ms": stage_latencies_ms,
             "decision": decision.model_dump(mode="json"),
         }

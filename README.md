@@ -1,193 +1,113 @@
-# EvidenceOS — AI Evidence Verification Engine (`VeriDock`)
+# EvidenceOS (`VeriDock`)
 
-> **Positioning:** An AI evidence verification engine for high-stakes business decisions.  
-> **First Vertical Application:** **VeriDock** — Multi-modal B2B delivery and procurement dispute resolution.
+> **An Epistemically Grounded Multimodal AI & Deterministic Rule Engine for B2B Delivery Dispute Verification.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB.svg)](#quick-start)
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%2B%20SQLAlchemy-009688.svg)](#architecture)
-[![React + TypeScript](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript-61DAFB.svg)](#ui-overview)
-
----
-
-## 1. Project Overview: EvidenceOS vs. VeriDock
-
-- **EvidenceOS** is the underlying horizontal **evidence intelligence platform**. It ingests heterogeneous evidence (PDFs, images, audio recordings, JSON, CSV, manual statements), enforces cryptographic and perceptual provenance, normalizes cross-modal claims, resolves entities, surfaces contradictions, and evaluates deterministic rules.
-- **VeriDock** is the first vertical product built on top of EvidenceOS, focused on **B2B delivery and procurement disputes**.
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
+[![React 19 + TypeScript](https://img.shields.io/badge/Frontend-React%2019%20%2B%20TS-61dafb.svg)](https://react.dev/)
+[![Held-Out Accuracy](https://img.shields.io/badge/Held--Out%20150%20Accuracy-94.0%25%20%5B89.0%25%2C%2096.8%25%5D-10b981.svg)](docs/research-report.md)
+[![Confident Error Rate](https://img.shields.io/badge/Confident%20Error%20Rate-0.0%25-059669.svg)](docs/failure-analysis.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-slate.svg)](LICENSE)
 
 ---
 
-## 2. The Problem & Why It Matters
+## 1. What is EvidenceOS?
 
-B2B supply chain and procurement disputes routinely stall millions of dollars in working capital because evidence is fragmented across incompatible modalities:
-- **Purchase Orders (PDF/JSON)** issued by procurement
-- **Delivery Challans / Packing Slips (PDF/CSV)** signed at dispatch or receiving
-- **Dock Inspection Photographs (PNG/JPEG)** taken on warehouse mobile devices
-- **Voice Reports (WAV/MP3)** recorded by unloading supervisors during dock intake
-- **Historical Dispute Claims** and **Contract SLA Rules**
+B2B supply chain and procurement disputes require reconciling conflicting, noisy, multimodal evidence—**Purchase Orders (PDF)**, **Delivery Challans (PDF)**, **Dock Inspection Photographs (PNG)**, **Warehouse Voice Reports (WAV)**, and **Historical Claim Ledgers**—against strict contractual Service-Level Agreements (SLAs).
 
-Manual reconciliation causes slow dispute resolution, human error, inconsistent payout adjustments, duplicate/reused photo claims, and opaque audit trails. Generic LLM chatbots fail in this domain because they hallucinate visual details, average out conflicting numbers, and cannot guarantee deterministic contract arithmetic.
+Purely generative LLM pipelines are unsafe for autonomous financial settlement: they hallucinate unstated quantities, fail to enforce exact SLA deadlines, and are vulnerable to adversarial prompt injection. Conversely, purely deterministic regex pipelines break down on colloquial warehouse speech, OCR typos, and degraded visual evidence.
 
----
-
-## 3. Core Epistemological Principle
-
-**Never allow an LLM to silently invent facts.**
-
-Every claim and conclusion in EvidenceOS carries a mandatory [`Provenance`](core/schemas.py) record (`evidence_id`, `source_type`, `document_role`, `location`, `extraction_method`, `timestamp`, `confidence`, `raw_snippet`) and is classified into one of four explicit epistemological types:
-
-| Epistemological Type | Meaning | Example in VeriDock |
-| :--- | :--- | :--- |
-| **`FACT`** | Directly extracted from a single piece of primary evidence ($\text{confidence} \ge 0.75$) | Purchase Order `PO-2026-1001` (`page:1`) states `ordered_quantity = 10` for `SKU-IND-100`. |
-| **`INFERENCE`** | Derived by linking multiple pieces of evidence across modalities | Connecting `PO-2026-1002`, `DC-2026-1002`, `dock_photo_case2_2damaged.png`, and `dock_voice_case2.wav` to canonical entity `ITEM:SKU-IND-100`. |
-| **`RULE`** | Determined by explicit deterministic Python business logic | `RULE_04_CONTRACT_SLA_THRESHOLD`: Damage ratio $2/10 = 20\% \le 25\%$ (`PASS`); buyer credit $= 2 \times \$250 = \$500.00$. |
-| **`UNCERTAINTY`** | Insufficient, low-confidence ($< 0.75$), or conflicting evidence | Case 3 Voice claims `5` damaged units vs. Image shows `2` damaged units; Case 5 obstructed photo has `confidence = 0.45`. |
+**EvidenceOS (`VeriDock`)** solves this through an **epistemically typed hybrid architecture**:
+1. **Multimodal Semantic Extraction with Explicit Epistemic Typing**: Extracts claims from documents, blind pixel-level computer vision (`analyze_pallet_pixels_blind`), and audio transcripts while tagging every claim as `FACT`, `INFERENCE`, `RULE`, or `UNCERTAINTY` with exact source provenance (`evidence_id`, `sha256`, character/pixel span).
+2. **Cross-Modal Conflict Graph & Entity Resolution**: Links claims across modalities to canonical SKU entities and isolates quantity, damage, and missing-evidence contradictions.
+3. **Cryptographic (`SHA-256`) + Perceptual (`64-bit dHash`) Fraud Detection**: Detects both byte-identical and visually perturbed (recompressed, brightness-shifted, cropped) duplicate photos across historical claims (`Hamming distance <= 6`).
+4. **Deterministic Rule Engine (`R1–R8`) & Hash-Chained Audit Ledger**: Enforces 48-hour SLA windows, high-value manual review thresholds (`>= $5,000`), and mandatory abstention (`manual_review_required`) whenever evidence is degraded (`UNCERTAINTY`) or contradictory.
 
 ---
 
-## 4. Architecture & 12-Stage Pipeline
+## 2. Reproducible Research Evaluation Summary
 
-```mermaid
-flowchart TD
-    E["Heterogeneous Evidence<br/>(PDF, PNG/JPG, WAV/MP3, JSON, CSV, Manual)"] --> ING["1. Evidence Ingestion<br/>(Magic Byte Validation, SHA-256, 64-bit dHash, StorageProvider)"]
-    ING --> PAR["2. Parsing & Prompt-Injection Defense<br/>(pypdf, Pillow, RIFF/WAVE, Untrusted Directive Redaction)"]
-    PAR --> EXT["3. Multimodal Structured Extraction<br/>(AIProvider: Gemini 2.5 Flash / Deterministic Local Extractor)"]
-    EXT --> NRM["4. Evidence Normalization<br/>(Atomic NormalizedClaim Tuples + Provenance)"]
-    NRM --> ENT["5. Cross-Modal Entity Resolution<br/>(SKU Canonicalization + 64-D Vector Cosine Similarity)"]
-    ENT --> GRF["6. Evidence Provenance Graph<br/>(Directed DAG: Shipment -> Item -> Claim -> Evidence -> Conflict)"]
-    GRF --> CNF["7. Cross-Modal Conflict Detection<br/>(Short Delivery Mismatch, Voice vs. Image Damage Contradiction)"]
-    ING --> HST["8. Historical Evidence Matching<br/>(Exact SHA-256 + 64-bit Perceptual dHash Hamming Distance <= 10)"]
-    CNF --> RUL["9. Deterministic Rule & SLA Engine<br/>(Rules 01-05: Sufficiency, Completeness, Corroboration, SLA Ratio, Uniqueness)"]
-    HST --> RUL
-    RUL --> DEC["10. Decision Engine & Human Review Override<br/>(Approved, Partially Approved, Disputed, Manual Review, Insufficient Evidence)"]
-    DEC --> AUD["11. Tamper-Evident SHA-256 Hash-Chained Audit Trail"]
-```
+We evaluate EvidenceOS across three strictly separated datasets (`seed=42`) to prevent benchmark overfitting. **We never market regression or development metrics as open-world accuracy.**
 
-### AI vs. Deterministic Separation
+### 2.1 Performance Across Dataset Splits (`System D: Full EvidenceOS`)
 
-- **AI Tasks (`core/ai/`, `core/extraction/`)**: Multimodal document parsing, visual damage/packaging observation, speech-to-claim extraction, and semantic token embeddings.
-- **Deterministic Tasks (`core/rules/`, `core/decisions/`, `core/matching/`, `core/audit/`)**: All quantity arithmetic, payout calculations, SLA ratio checks, SHA-256 & 64-bit perceptual dHash comparisons, and hash-chained audit logging.
+| Dataset Split | Cases / Files | Decision Accuracy (95% Wilson CI) | Macro-F1 | Field Accuracy (95% CI) | Conflict F1 | Confident Error Rate |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1. Canonical Regression (`canonical_5`)** | `5` / `20` | `100.0%` (`5/5`) `[56.6%, 100.0%]` | `1.0000` | `100.0%` `[83.9%, 100.0%]` | `1.0000` | `0.0%` (`0/5`) |
+| **2. Development Benchmark (`development_60`)** | `60` / `234` | `96.7%` (`58/60`) `[88.6%, 99.1%]` | `0.9583` | `100.0%` `[98.4%, 100.0%]` | `0.9643` | `1.7%` (`1/60`) |
+| **3. Blind Held-Out Test Set (`heldout_150`)** | **`150` / `564`** | **`94.0%` (`141/150`) `[89.0%, 96.8%]`** | **`0.9132`** | **`95.6%` `[93.2%, 97.1%]`** | **`0.9505`** | **`0.0%` (`0/150`)** |
+
+*Note on Held-Out Data Origins (`N=150`)*: All filename hints and PNG metadata chunks are stripped (`artifact_01.pdf`..`artifact_04.wav`). On the `116` `SYNTHETIC` held-out cases, `System D` achieves **100.0%** (`116/116`, CI `[96.8%, 100.0%]`). On the `34` `REAL_WORLD_INSPIRED` adversarial cases (unseen slang, severe OCR noise, multilingual headers, blind multi-SKU attribution), `System D` achieves **73.5%** (`25/34`, CI `[56.9%, 85.4%]`), with all `9` errors safely abstaining to `manual_review_required` (`0.0%` Confident Error Rate).
+
+### 2.2 Four-System Comparison on Blind Held-Out Test Set (`N = 150`)
+
+| Evaluated System | Decision Accuracy (95% CI) | Macro-F1 | Field Accuracy | Conflict F1 | Abstention Rate | Confident Error Rate |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Baseline A**: Strict Regex + Rules | `72.0%` (`108/150`) `[64.3%, 78.6%]` | `0.4245` | `85.8%` | `0.7161` | `94.4%` | `4.0%` (`6/150`) |
+| **Baseline B**: Structured Normalizer + Rules | `78.0%` (`117/150`) `[70.7%, 83.9%]` | `0.4558` | `85.8%` | `0.7902` | `100.0%` | `0.0%` (`0/150`) |
+| **System C**: Semantic Multimodal AI Only (No Rules) | `44.0%` (`66/150`) `[36.3%, 52.0%]` | `0.4969` | `90.2%` | `0.9505` | `33.3%` | **48.0%** (`72/150`) |
+| **System D**: **Full EvidenceOS (Semantic AI + Rules)** | **94.0%** (`141/150`) `[89.0%, 96.8%]` | **0.9132** | **95.6%** | **0.9505** | **100.0%** | **0.0%** (`0/150`) |
+
+### 2.3 Six-Stage Modality & Component Ablation Study (`N = 150`)
+
+| Ablation Stage | Decision Accuracy (95% CI) | Macro-F1 | Duplicate Acc | Confident Error Rate | Key Finding |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Ablation A**: Documents Only | `36.7%` `[29.4%, 44.6%]` | `0.2561` | `88.0%` | **62.0%** | Blind to physical transit damage and reused photo fraud |
+| **Ablation B**: Documents + Voice | `76.7%` `[69.3%, 82.7%]` | `0.5173` | `88.0%` | `6.7%` | Misses visual fraud and uncorroborated audio claims |
+| **Ablation C**: Documents + Images | `76.7%` `[69.3%, 82.7%]` | `0.5389` | `88.0%` | `4.0%` | Misses spoken dock inspection context and audio conflicts |
+| **Ablation D**: Docs + Voice + Images (No History) | `82.0%` `[75.1%, 87.3%]` | `0.8041` | `88.0%` | `12.0%` | Fails on all `18` reused/perturbed historical image fraud cases |
+| **Ablation E**: All Modalities + History (No Rules) | `44.0%` `[36.3%, 52.0%]` | `0.4969` | `100.0%` | **48.0%** | Dangerous auto-settlements on SLA breaches & high-value claims |
+| **Ablation F**: **Full EvidenceOS** | **94.0%** `[89.0%, 96.8%]` | **0.9132** | **100.0%** | **0.0%** | Optimal accuracy and zero unsafe automated payouts |
+
+### 2.4 Specialized Security, Hashing, & Latency Benchmarks
+- **Perceptual Hashing (`64-bit dHash`) vs. `SHA-256` (`40` Image Pairs)**: `SHA-256` achieves `100.0%` precision but only **`25.0%` recall** (`8/32` — misses all recompressed, cropped, and brightness-shifted duplicates). Combined `SHA-256 + 64-bit dHash (Hamming <= 6)` achieves **`100.0%` precision and `100.0%` recall (`F1 = 1.000`)**.
+- **Prompt Injection Robustness (`15` Adversarial Cases across 5 Vectors)**: **100.0% (`15/15`)** sanitization trigger rate, **0.0% (`0/15`)** attack success rate.
+- **Stage Latency (`N = 150`)**: End-to-end case verification completes in **`148.8 ms` mean (`112.9 ms` P50, `286.7 ms` P95)** locally (`$0.00` offline cost; estimated `$0.00055/case` when routed through cloud Gemini 2.5 Flash).
 
 ---
 
-## 5. Canonical Demo Cases (Seeded Out-of-the-Box)
+## 3. Research & Engineering Documentation
 
-On startup (or via `python -m scripts.seed_demo`), EvidenceOS generates and processes 5 realistic multimodal B2B dispute cases with real PDF documents, PNG inspection photos, and WAV audio reports in [`datasets/synthetic_cases/`](datasets/synthetic_cases/):
-
-| Case ID | Scenario | PO | Challan | Image Evidence | Voice Report | Conflicts / Warnings | Expected & Actual Decision |
-| :--- | :--- | :---: | :---: | :---: | :---: | :--- | :--- |
-| **`case_01_clean_delivery`** | Clean delivery | 10 | 10 | 10 intact, 0 dmg | 0 damaged | 0 conflicts | **`approved`** |
-| **`case_02_partial_damage`** | Legitimate partial damage | 10 | 10 | 2 crushed boxes | 2 damaged | 0 conflicts | **`partially_approved`** (\$500 credit) |
-| **`case_03_conflicting_evidence`** | Conflicting evidence | 10 | 8 | 2 damaged | 5 damaged | 2 conflicts (`SHORT_DELIVERY_MISMATCH`, `DAMAGE_QUANTITY_CONTRADICTION`) | **`manual_review_required`** |
-| **`case_04_reused_evidence`** | Reused historical photo | 10 | 10 | Perturbed copy of Case 2 photo | 2 damaged | Historical dHash match (`98.4%` similarity, Hamming dist `1/64`) | **`manual_review_required`** (*"Potentially reused evidence detected."*) |
-| **`case_05_insufficient_evidence`** | Weak / blurry evidence | 10 | 10 | Low-clarity photo (`conf=0.45`) | 4 damaged | 1 conflict (`INSUFFICIENT_VISUAL_CORROBORATION`) | **`manual_review_required`** |
+- **[Research Report (`docs/research-report.md`)](docs/research-report.md)**: 15-section empirical study covering the research questions, blind computer vision design, statistical confidence intervals, confusion matrices, and limitations.
+- **[Failure Analysis (`docs/failure-analysis.md`)](docs/failure-analysis.md)**: Complete case-by-case dissection of all `9` held-out errors in `System D` (`ENTITY_LINKING_ERROR`, `VOICE_INTERPRETATION_ERROR`, `OCR_OR_TEXT_NOISE_ERROR`, `DOCUMENT_EXTRACTION_ERROR`) and comparison against the `84` errors in `System C`.
+- **[Security Evaluation (`docs/security-evaluation.md`)](docs/security-evaluation.md)**: 15-case prompt injection evaluation and Threat / Impact / Likelihood / Mitigation / Residual Risk matrix.
+- **[Evaluation Methodology (`docs/evaluation.md`)](docs/evaluation.md)**: Dataset split specifications and category-by-category breakdown across all 25 held-out categories.
+- **[Reproducibility Guide (`docs/reproducibility.md`)](docs/reproducibility.md)**: Exact one-command instructions to regenerate all datasets, metrics, and failure logs (`seed=42`).
+- **[System Architecture (`docs/architecture.md`)](docs/architecture.md)** & **[API Reference (`docs/api.md`)](docs/api.md)**.
 
 ---
 
-## 6. Quick Start & Installation
+## 4. Quick Start
 
-### Option A: Local Development (Python 3.12+ & Node 22+)
-
-1. **Install Backend & Run Tests**:
-   ```bash
-   python -m pip install -e ".[dev]"
-   cp .env.example .env
-   python -m pytest -v
-   ```
-
-2. **Start the FastAPI Backend** (automatically initializes SQLite/PostgreSQL and seeds all 5 canonical cases):
-   ```bash
-   python -m uvicorn apps.api.app.main:app --host 127.0.0.1 --port 8000 --reload
-   ```
-   OpenAPI Docs available at `http://127.0.0.1:8000/docs`.
-
-3. **Start the React + TypeScript Frontend**:
-   ```bash
-   cd apps/web
-   npm install
-   npm run dev
-   ```
-   Open `http://localhost:5173` in your browser.
-
-### Option B: Docker Compose (PostgreSQL + `pgvector` + FastAPI + Nginx React Web)
+### Option A: Local Development (Python + Node.js)
 
 ```bash
-docker compose up --build
+# 1. Install backend dependencies
+pip install -e ".[dev]"
+
+# 2. Start the FastAPI server (seeds the 5 canonical demo cases automatically)
+uvicorn apps.api.main:app --reload --port 8000
+
+# 3. In a second terminal, start the React 19 + Vite frontend
+cd apps/web
+npm install
+npm run dev
 ```
 
----
+Open **`http://localhost:5173`** to explore the **Guided Investigation Tour**, **Interactive Provenance Drawer**, **Evidence DAG**, **Rule Trace**, **Tamper-Evident Audit Ledger**, and **Research Evaluation Dashboard**.
 
-## 7. Empirical Evaluation & Head-to-Head Ablation Study
-
-Rather than claiming "100% accuracy" on a tiny demo set, EvidenceOS includes a **two-tier reproducible evaluation suite** ([`evaluation/runner.py`](evaluation/runner.py) and [`docs/evaluation.md`](docs/evaluation.md)):
-
-1. **5-Case Canonical Regression Suite (`N=5` cases, `20` files)**:
-   - Reproducible regression benchmark covering clean delivery, legitimate partial damage, contradictory multimodal evidence, perceptually reused historical evidence, and insufficient/blurry visual evidence (`5/5` pass rate verified in CI).
-2. **60-Case Stratified Adversarial Benchmark (`N=60` cases, `234` files)**:
-   - Tests 8 controlled adversarial categories (unstructured prose documents, colloquial voice transcripts, short deliveries, cross-modal contradictions, missing photos, blurry images, perceptually perturbed duplicate images, and SLA threshold breaches) and compares the **Semantic Multimodal Pipeline** against a **Strict Deterministic Regex Baseline**:
+### Option B: Reproduce the Complete Research Evaluation (`seed=42`)
 
 ```bash
-python -m evaluation.runner
+python -m scripts.run_evaluation
 ```
-
-| Metric (`N=60` Cases, `234` Multimodal Files) | Semantic Multimodal Pipeline | Strict Regex Baseline | Engineering Takeaway |
-| :--- | :---: | :---: | :--- |
-| **Overall Decision Accuracy** | **`96.7%` (`58/60`)** | `66.7%` (`40/60`) | **`+30.0%`** — Rigid regex baseline fails on unstructured prose POs and spoken/colloquial voice claims |
-| **Field-Level Quantity Accuracy** | **`100.0%` (`180/180`)** | `86.7%` (`156/180`) | **`+13.3%`** — Semantic parser extracts quantities from prose dispatch statements |
-| **Conflict Detection Precision / Recall** | **`96.4%` / `96.4%`** | `37.1%` / `46.4%` | Baseline triggers false mismatches on prose POs and misses spoken number words |
-| **False Positive Rate (Clean Flagged)** | **`0.0%` (`0/60`)** | `6.7%` (`4/60`) | Zero clean deliveries erroneously rejected |
-| **False Negative Rate (Dispute Missed)** | **`1.7%` (`1/60`)** | `10.0%` (`6/60`) | Documented slang edge cases (`"busted up"`, `"totally trashed"`) require cloud LLM (`AI_PROVIDER=gemini`) |
-| **Mean Processing Latency** | **`~123 ms / case`** | `~104 ms / case` | Sub-200ms end-to-end verification |
+This regenerates the `canonical_5`, `development_60`, and blind `heldout_150` splits, runs all 4 baselines, 6 modality ablations, 40-pair perceptual hash tests, and 15 prompt injection tests, and writes [`evaluation/results.json`](evaluation/results.json) and [`evaluation/failures.json`](evaluation/failures.json).
 
 ---
 
-## 8. REST API Reference
+## 5. Known Limitations
 
-| Method & Endpoint | Description |
-| :--- | :--- |
-| `GET /health` | Service health and active AI provider status |
-| `GET /api/cases` | List all dispute cases with pipeline checklist and decision status |
-| `POST /api/cases` | Create a new B2B delivery dispute case |
-| `POST /api/cases/{id}/evidence` | Upload a binary evidence file (PDF, PNG/JPG, WAV/MP3, JSON, CSV) |
-| `POST /api/cases/{id}/evidence/manual` | Add a manual receiving note or transcript |
-| `POST /api/cases/{id}/process` | Run the 12-stage EvidenceOS verification pipeline on the case |
-| `GET /api/cases/{id}` | Retrieve full case detail, claims, entities, conflicts, decision, and graph |
-| `GET /api/cases/{id}/evidence` | List all ingested evidence items and their provenance metadata |
-| `GET /api/cases/{id}/evidence/{ev_id}/raw` | Stream the immutable original evidence file |
-| `GET /api/cases/{id}/conflicts` | Retrieve cross-modal contradictions and historical reuse warnings |
-| `GET /api/cases/{id}/decision` | Retrieve the latest deterministic decision and rule traces |
-| `POST /api/cases/{id}/review` | Submit a human adjudicator override decision (logged to audit trail) |
-| `GET /api/cases/{id}/audit` | Retrieve and verify the SHA-256 hash-chained audit trail |
-| `POST /api/demo/seed` | Re-seed and process all 5 canonical VeriDock cases |
-| `GET /api/evaluation/run` | Run the empirical evaluation benchmark suite and return live metrics |
-
----
-
-## 9. Documentation Index
-
-- [Architecture & 12-Stage Pipeline](docs/architecture.md)
-- [Evidence & Epistemological Model (`FACT` / `INFERENCE` / `RULE` / `UNCERTAINTY`)](docs/evidence-model.md)
-- [AI vs. Deterministic Pipeline & Provider Abstraction](docs/ai-pipeline.md)
-- [Security, Prompt-Injection Defenses & Privacy Policy](docs/security.md)
-- [Empirical Evaluation Methodology & Results](docs/evaluation.md)
-- [Deterministic Rules & Decision State Machine](docs/decisions.md)
-
----
-
-## 10. Current Limitations & Roadmap
-
-### Honest Limitations
-1. **Handwritten Cursive OCR on Degraded Thermal Paper**: The offline extractor (`HeuristicLocalAIProvider`) parses digital text streams from PDFs (`pypdf`) and structured layouts; scanned handwritten delivery notes require enabling `AI_PROVIDER=gemini` with a valid `GEMINI_API_KEY`.
-2. **Perceptual Hashing Scope**: The 64-bit difference hash (`dHash`) reliably detects re-compression, brightness shifts, and minor crops (Hamming distance $\le 10$), but severe $90^\circ$ rotations or heavy perspective warps require keypoint matching (e.g., ORB/SIFT) in future iterations.
-3. **Single-Currency Settlement Math**: The current deterministic rule engine normalizes payout adjustments in USD (`unit_price * disputed_quantity`). Multi-currency FX conversion tables are planned for v0.2.
-
-### Roadmap
-- **v0.2**: Multi-SKU partial shipment splits and automated ERP webhook connectors (SAP / NetSuite).
-- **v0.3**: Video keyframe extraction for continuous unloading dock CCTV feeds.
-- **v0.4**: Additional vertical packs built on EvidenceOS (Warranty Verification & Construction Progress Claims).
-
----
-
-## 11. License
-
-Released under the [MIT License](LICENSE). See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+1. **Controlled Procedural & Real-World-Inspired Testbed**: While `heldout_150` eliminates filename/metadata leakage and includes `34` real-world-inspired cases (`73.5%` accuracy), artifacts are generated deterministically rather than drawn from private enterprise ERP logs.
+2. **Multi-SKU Optical Grounding (`3` Held-Out Errors)**: Without optical barcode/QR text on individual pallet parcels, blind pixel CV attributes visual damage to the primary SKU in multi-SKU shipments.
+3. **Unseen Slang, Heavy OCR Corruption, & Untranslated Headers (`6` Held-Out Errors)**: Unseen regional slang (*"munted"*, *"total toast"*), digit-level OCR corruption (`lO` for `10`), and untranslated German headers (`Bestellmenge`) cause partial extraction misses that safely abstain to `manual_review_required`.
+4. **90°/180° Image Rotation**: `64-bit dHash` handles recompression, brightness shifts, and minor crops (`100%` recall), but requires rotational alignment or learned visual embeddings for `90°/180°` rotated duplicates.

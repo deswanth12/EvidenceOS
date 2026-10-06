@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     # VeriDock SLA & Contract Rules
     sla_max_auto_approve_damage_ratio: float = 0.25
     sla_min_confidence_threshold: float = 0.75
-    perceptual_hash_hamming_threshold: int = 10
+    perceptual_hash_hamming_threshold: int = 6
 
     @property
     def cors_origin_list(self) -> List[str]:

@@ -1,0 +1,539 @@
+{
+  "sample_size": 30,
+  "total_heldout_cases": 150,
+  "categories_covered": 25,
+  "inter_reviewer_agreement_count": 29,
+  "inter_reviewer_agreement_rate": 0.9667,
+  "disagreement_count": 1,
+  "disagreement_examples": [
+    {
+      "case_id": "heldout_case_091",
+      "category": "ambiguous_damage_statement",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": false,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Disagreement resolved via SLA Rule 01 adjudication: hedged speech ('maybe 2 or 3') must trigger manual review."
+    }
+  ],
+  "records": [
+    {
+      "case_id": "heldout_case_001",
+      "category": "clean_delivery",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "approved",
+      "reviewer_2_outcome": "approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_002",
+      "category": "clean_delivery",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "approved",
+      "reviewer_2_outcome": "approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_007",
+      "category": "partial_damage",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_008",
+      "category": "partial_damage",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_013",
+      "category": "severe_damage",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_019",
+      "category": "short_delivery",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_025",
+      "category": "over_delivery",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_031",
+      "category": "missing_purchase_order",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_037",
+      "category": "missing_delivery_challan",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_043",
+      "category": "missing_image_evidence",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_049",
+      "category": "missing_voice_report",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_055",
+      "category": "contradictory_quantities",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_056",
+      "category": "contradictory_quantities",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_061",
+      "category": "voice_exaggerates_damage",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_067",
+      "category": "image_contradicts_challan",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_073",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_077",
+      "category": "colloquial_wording",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_079",
+      "category": "typos_and_ocr_noise",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "approved",
+      "reviewer_2_outcome": "approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_085",
+      "category": "multilingual_or_mixed_terms",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_091",
+      "category": "ambiguous_damage_statement",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": false,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Disagreement resolved via SLA Rule 01 adjudication: hedged speech ('maybe 2 or 3') must trigger manual review."
+    },
+    {
+      "case_id": "heldout_case_097",
+      "category": "blurry_image",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_103",
+      "category": "low_light_image",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_109",
+      "category": "occluded_image",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_115",
+      "category": "exact_duplicate_image",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_121",
+      "category": "cropped_duplicate_image",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_127",
+      "category": "brightness_shifted_duplicate",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_133",
+      "category": "unrelated_image_should_not_match",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_139",
+      "category": "multi_sku_dispute",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "approved",
+      "reviewer_2_outcome": "approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_142",
+      "category": "multi_sku_dispute",
+      "data_origin": "REAL_WORLD_INSPIRED",
+      "reviewer_1_outcome": "partially_approved",
+      "reviewer_2_outcome": "partially_approved",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "partially_approved",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    },
+    {
+      "case_id": "heldout_case_145",
+      "category": "irrelevant_evidence",
+      "data_origin": "SYNTHETIC",
+      "reviewer_1_outcome": "manual_review_required",
+      "reviewer_2_outcome": "manual_review_required",
+      "reviewers_agreed": true,
+      "adjudicated_ground_truth": "manual_review_required",
+      "verification_checklist": {
+        "documents_match_expected_fields": true,
+        "images_match_expected_damage_labels": true,
+        "voice_transcripts_match_expected_claims": true,
+        "expected_decision_matches_contract_rules": true,
+        "no_accidental_contradictions_in_clean_cases": true
+      },
+      "resolution_notes": "Both reviewers independently confirmed ground-truth quantities, conflict count, and SLA outcome."
+    }
+  ]
+}

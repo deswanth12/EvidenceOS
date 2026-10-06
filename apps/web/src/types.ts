@@ -234,15 +234,23 @@ export interface CategoryBreakdownItem {
 
 export interface EvaluationMetrics {
   extraction_accuracy: number;
+  extraction_accuracy_ci_95?: [number, number];
   field_level_accuracy: number;
+  field_level_accuracy_ci_95?: [number, number];
   entity_matching_accuracy: number;
   conflict_detection_precision: number;
   conflict_detection_recall: number;
+  conflict_detection_f1?: number;
   duplicate_detection_accuracy: number;
   decision_accuracy: number;
+  decision_accuracy_ci_95?: [number, number];
+  macro_f1?: number;
+  appropriate_abstention_rate?: number;
+  confident_error_rate?: number;
   false_positive_rate: number;
   false_negative_rate: number;
   mean_processing_latency_ms: number;
+  p50_processing_latency_ms?: number;
   p95_processing_latency_ms: number;
   cost_per_case_usd: number;
   estimated_cloud_llm_cost_per_case_usd: number;
@@ -256,14 +264,57 @@ export interface EvaluationReport {
   total_suite_duration_ms: number;
   metrics: EvaluationMetrics;
   category_breakdown?: CategoryBreakdownItem[];
+  data_origin_breakdown?: Record<
+    string,
+    {
+      total_cases: number;
+      passed_cases: number;
+      accuracy: number;
+      ci_95: [number, number];
+    }
+  >;
+  confusion_matrix?: {
+    labels: string[];
+    matrix: Record<string, Record<string, number>>;
+  };
+  failure_taxonomy_counts?: Record<string, number>;
+  failures?: Array<{
+    case_id: string;
+    category: string;
+    data_origin?: string;
+    expected_decision: string;
+    predicted_decision: string;
+    failure_taxonomy: string;
+    root_cause_explanation: string;
+  }>;
+  four_system_comparison?: Array<{
+    system_id: string;
+    system_name: string;
+    metrics: EvaluationMetrics;
+  }>;
+  modality_ablations?: Array<{
+    ablation_id: string;
+    name: string;
+    decision_accuracy: number;
+    decision_accuracy_ci_95: [number, number];
+    macro_f1: number;
+    field_level_accuracy: number;
+    conflict_detection_precision: number;
+    conflict_detection_recall: number;
+    duplicate_detection_accuracy: number;
+    confident_error_rate: number;
+    appropriate_abstention_rate: number;
+  }>;
   ablation_comparison?: {
     semantic_multimodal_pipeline: {
-      provider: string;
+      provider?: string;
+      provider_name?: string;
       metrics: EvaluationMetrics;
       category_breakdown: CategoryBreakdownItem[];
     };
     strict_regex_baseline: {
-      provider: string;
+      provider?: string;
+      provider_name?: string;
       metrics: EvaluationMetrics;
       category_breakdown: CategoryBreakdownItem[];
     };
@@ -271,10 +322,12 @@ export interface EvaluationReport {
   case_results: Array<{
     case_id: string;
     category?: string;
+    data_origin?: string;
     title: string;
     expected_outcome: string;
     actual_outcome: string;
     passed: boolean;
+    failure_taxonomy?: string | null;
     ordered_qty: number;
     delivered_qty: number;
     verified_damaged_qty: number;
@@ -284,3 +337,4 @@ export interface EvaluationReport {
     latency_ms: number;
   }>;
 }
+

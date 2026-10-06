@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvidenceOS (VeriDock) — Technical & Research Showcase</title>
+
+    <!-- Google Fonts: Fraunces (Editorial Serif), Archivo (Swiss Display), DM Sans (Body), JetBrains Mono (Data/Hashes) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (SWISS EDITORIAL LIGHT)
+           High-contrast archival paper & ink for academic/technical defense
+           =========================================== */
+        :root {
+            --bg-paper: #FAF8F5;
+            --bg-card: #FFFFFF;
+            --bg-subtle: #F2EFE9;
+            --ink-primary: #111111;
+            --ink-secondary: #4A4843;
+            --ink-muted: #78756E;
+            --border-hairline: #DEDAD2;
+            --border-strong: #111111;
+
+            /* Semantic Signal Accents */
+            --accent-vermilion: #D92D20;
+            --accent-vermilion-soft: #FEF3F2;
+            --accent-emerald: #067647;
+            --accent-emerald-soft: #ECFDF3;
+            --accent-amber: #B54708;
+            --accent-amber-soft: #FFFAEB;
+            --accent-navy: #1D4ED8;
+            --accent-navy-soft: #EFF6FF;
+
+            /* Typography Families */
+            --font-display: 'Archivo', sans-serif;
+            --font-serif: 'Fraunces', serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.55s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           Include this ENTIRE file in every presentation.
+           These styles ensure slides fit exactly in the viewport.
+           =========================================== */
+
+        /* 1. Lock html/body to viewport */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg-paper);
+            color: var(--ink-primary);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* 2. Each slide = exact viewport height */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile browsers */
+            overflow: hidden; /* CRITICAL: Prevent ANY overflow */
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--bg-paper);
+            background-image:
+                linear-gradient(to right, rgba(17, 17, 17, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(17, 17, 17, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        /* 3. Content container with flex for centering */
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden; /* Double-protection against overflow */
+            padding: var(--slide-padding);
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* 4. ALL typography uses clamp() for responsive scaling */
+        :root {
+            /* Titles scale from mobile to desktop */
+            --title-size: clamp(1.75rem, 4.2vw, 3.35rem);
+            --h2-size: clamp(1.3rem, 2.7vw, 2.15rem);
+            --h3-size: clamp(0.95rem, 1.6vw, 1.25rem);
+
+            /* Body text */
+            --body-size: clamp(0.78rem, 1.15vw, 0.98rem);
+            --small-size: clamp(0.68rem, 0.9vw, 0.82rem);
+
+            /* Spacing scales with viewport */
+            --slide-padding: clamp(1.25rem, 3.5vw, 3.25rem);
+            --content-gap: clamp(0.65rem, 1.6vw, 1.35rem);
+            --element-gap: clamp(0.35rem, 0.9vw, 0.75rem);
+        }
+
+        /* 5. Cards/containers use viewport-relative max sizes */
+        .card, .container, .content-box {
+            max-width: min(92vw, 1280px);
+            max-height: min(80vh, 700px);
+        }
+
+        /* 6. Lists auto-scale with viewport */
+        .feature-list, .bullet-list {
+            gap: clamp(0.35rem, 0.9vh, 0.75rem);
+        }
+
+        .feature-list li, .bullet-list li {
+            font-size: var(--body-size);
+            line-height: 1.42;
+        }
+
+        /* 7. Grids adapt to available space */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+            gap: clamp(0.5rem, 1.2vw, 1rem);
+        }
+
+        /* 8. Images constrained to viewport */
+        img, .image-container {
+            max-width: 100%;
+            max-height: min(50vh, 400px);
+            object-fit: contain;
+        }
+
+        /* Short viewports (< 700px height) */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 2.5vw, 1.75rem);
+                --content-gap: clamp(0.4rem, 1.2vw, 0.85rem);
+                --title-size: clamp(1.35rem, 3.8vw, 2.3rem);
+                --h2-size: clamp(1.1rem, 2.4vw, 1.6rem);
+            }
+        }
+
+        /* Very short viewports (< 600px height) */
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2vw, 1.25rem);
+                --content-gap: clamp(0.3rem, 0.9vw, 0.65rem);
+                --title-size: clamp(1.15rem, 3.5vw, 1.85rem);
+                --body-size: clamp(0.7rem, 1.05vw, 0.88rem);
+            }
+
+            .nav-dots, .keyboard-hint, .decorative {
+                display: none;
+            }
+        }
+
+        /* Extremely short (landscape phones, < 500px height) */
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 1.5vw, 0.9rem);
+                --title-size: clamp(1rem, 3vw, 1.4rem);
+                --h2-size: clamp(0.9rem, 2.2vw, 1.2rem);
+                --body-size: clamp(0.65rem, 0.95vw, 0.8rem);
+            }
+        }
+
+        /* Narrow viewports (< 600px width) */
+        @media (max-width: 600px) {
+            :root {
+                --title-size: clamp(1.25rem, 6vw, 2.2rem);
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+        }
+
+        /* ===========================================
+           SWISS EDITORIAL COMPONENT ARCHITECTURE
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-vermilion);
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.25s ease;
+        }
+
+        /* Top Swiss Header Bar per Slide */
+        .swiss-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--ink-primary);
+            padding-bottom: clamp(0.4rem, 1vh, 0.75rem);
+            margin-bottom: var(--content-gap);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .swiss-topbar .section-num {
+            font-weight: 700;
+            color: var(--accent-vermilion);
+        }
+
+        .swiss-topbar .tag-pill {
+            background: var(--ink-primary);
+            color: var(--bg-paper);
+            padding: 0.18rem 0.55rem;
+            font-size: clamp(0.6rem, 0.8vw, 0.74rem);
+            font-weight: 600;
+        }
+
+        /* Typography Hierarchy */
+        h1.hero-title {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.06;
+            letter-spacing: -0.03em;
+            color: var(--ink-primary);
+        }
+
+        h2.slide-title {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+            color: var(--ink-primary);
+            margin-bottom: clamp(0.25rem, 0.7vh, 0.5rem);
+        }
+
+        .slide-subtitle {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: clamp(0.9rem, 1.45vw, 1.2rem);
+            color: var(--ink-secondary);
+            margin-bottom: var(--content-gap);
+            line-height: 1.38;
+        }
+
+        /* Thesis Callout Banner */
+        .thesis-banner {
+            border-left: 4px solid var(--accent-vermilion);
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-hairline);
+            border-right: 1px solid var(--border-hairline);
+            border-bottom: 1px solid var(--border-hairline);
+            padding: clamp(0.65rem, 1.4vh, 1.15rem) clamp(0.9rem, 1.8vw, 1.5rem);
+            margin: var(--element-gap) 0;
+        }
+
+        .thesis-banner p {
+            font-family: var(--font-serif);
+            font-size: clamp(0.95rem, 1.55vw, 1.3rem);
+            font-weight: 600;
+            color: var(--ink-primary);
+            line-height: 1.35;
+        }
+
+        /* Swiss Cards */
+        .swiss-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-top: 3px solid var(--ink-primary);
+            padding: clamp(0.7rem, 1.4vh, 1.2rem);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.25rem, 0.6vh, 0.5rem);
+        }
+
+        .swiss-card.emerald-top { border-top-color: var(--accent-emerald); }
+        .swiss-card.vermilion-top { border-top-color: var(--accent-vermilion); }
+        .swiss-card.amber-top { border-top-color: var(--accent-amber); }
+        .swiss-card.navy-top { border-top-color: var(--accent-navy); }
+
+        .card-kicker {
+            font-family: var(--font-mono);
+            font-size: clamp(0.62rem, 0.8vw, 0.74rem);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--ink-muted);
+            font-weight: 600;
+        }
+
+        .card-metric {
+            font-family: var(--font-display);
+            font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 700;
+            color: var(--ink-primary);
+        }
+
+        .card-body {
+            font-size: var(--body-size);
+            color: var(--ink-secondary);
+            line-height: 1.4;
+        }
+
+        /* Swiss Data Tables */
+        .swiss-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border: 1px solid var(--ink-primary);
+            font-size: clamp(0.7rem, 1.02vw, 0.9rem);
+        }
+
+        .swiss-table th {
+            background: var(--ink-primary);
+            color: var(--bg-paper);
+            font-family: var(--font-mono);
+            font-size: clamp(0.64rem, 0.85vw, 0.78rem);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: clamp(0.4rem, 0.9vh, 0.68rem) clamp(0.5rem, 1vw, 0.85rem);
+            text-align: left;
+        }
+
+        .swiss-table td {
+            padding: clamp(0.38rem, 0.85vh, 0.62rem) clamp(0.5rem, 1vw, 0.85rem);
+            border-bottom: 1px solid var(--border-hairline);
+            color: var(--ink-primary);
+        }
+
+        .swiss-table tr.highlight-row {
+            background: var(--accent-emerald-soft);
+            font-weight: 700;
+        }
+
+        .swiss-table tr.danger-row {
+            background: var(--accent-vermilion-soft);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+            font-weight: 600;
+            padding: 0.12rem 0.45rem;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        .badge-emerald { background: var(--accent-emerald-soft); color: var(--accent-emerald); border: 1px solid var(--accent-emerald); }
+        .badge-vermilion { background: var(--accent-vermilion-soft); color: var(--accent-vermilion); border: 1px solid var(--accent-vermilion); }
+        .badge-amber { background: var(--accent-amber-soft); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+        .badge-navy { background: var(--accent-navy-soft); color: var(--accent-navy); border: 1px solid var(--accent-navy); }
+
+        /* Pipeline Flow Steps */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.45rem, 1vw, 0.85rem);
+        }
+
+        .stage-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hairline);
+            border-left: 3px solid var(--ink-primary);
+            padding: clamp(0.45rem, 0.95vh, 0.75rem);
+        }
+
+        .stage-box .stage-id {
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+            color: var(--accent-vermilion);
+            font-weight: 700;
+        }
+
+        .stage-box .stage-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(0.76rem, 1.05vw, 0.92rem);
+            margin: 0.12rem 0;
+        }
+
+        .stage-box .stage-desc {
+            font-size: clamp(0.64rem, 0.85vw, 0.76rem);
+            color: var(--ink-secondary);
+            line-height: 1.32;
+        }
+
+        /* Slide Footer */
+        .swiss-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-hairline);
+            padding-top: clamp(0.35rem, 0.8vh, 0.6rem);
+            margin-top: auto;
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.78vw, 0.72rem);
+            color: var(--ink-muted);
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.6rem, 1.5vw, 1.25rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            z-index: 9000;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-hairline);
+            border: 1px solid var(--ink-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-vermilion);
+            border-color: var(--accent-vermilion);
+            transform: scale(1.35);
+        }
+
+        /* Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+
+        /* Inline Editing Controls (JS-controlled hover hotzone) */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            background: var(--ink-primary);
+            color: var(--bg-paper);
+            border: none;
+            padding: 0.4rem 0.7rem;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            border-radius: 3px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10001;
+        }
+
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .edit-toggle.active {
+            background: var(--accent-vermilion);
+        }
+
+        [contenteditable="true"] {
+            outline: 1px dashed var(--accent-vermilion);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Inline Edit Hotzone & Button -->
+    <div class="edit-hotzone" id="editHotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="Toggle Inline Edit Mode (Press E)">EDIT MODE (E)</button>
+
+    <!-- Right-side Navigation Dots -->
+    <nav class="nav-dots" id="navDots" aria-label="Slide Navigation"></nav>
+
+    <!-- ===========================================
+         SLIDE 01: TITLE & CORE ARCHITECTURAL THESIS
+         =========================================== -->
+    <section class="slide visible" data-title="Title">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">01 / 14</span> — TECHNICAL & RESEARCH DEFENSE</span>
+                <span class="tag-pill">v1.1.0-RESEARCH-HARDENED</span>
+            </div>
+
+            <div class="reveal" style="margin: auto 0;">
+                <p style="font-family: var(--font-mono); font-size: var(--small-size); color: var(--accent-vermilion); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+                    OPEN-SOURCE AI EVIDENCE VERIFICATION ENGINE • APPLICATION: VERIDOCK
+                </p>
+                <h1 class="hero-title" style="margin-bottom: 0.75rem;">
+                    EvidenceOS (<span style="color: var(--accent-vermilion);">VeriDock</span>)
+                </h1>
+                <p class="slide-subtitle" style="max-width: 920px;">
+                    An Epistemically Grounded Multimodal AI, Cross-Modal Conflict Graph &amp; Deterministic Rule Engine for High-Stakes B2B Delivery Dispute Verification.
+                </p>
+
+                <div class="thesis-banner" style="max-width: 960px;">
+                    <p>“The AI interprets evidence; deterministic rules constrain the decision; uncertainty triggers human review.”</p>
+                </div>
+
+                <div class="grid" style="grid-template-columns: repeat(4, 1fr); margin-top: var(--content-gap);">
+                    <div class="swiss-card emerald-top">
+                        <span class="card-kicker">Frozen Held-Out (N=150)</span>
+                        <span class="card-metric" style="color: var(--accent-emerald);">94.0%</span>
+                        <span class="card-body">Decision Accuracy (`141/150`, 95% CI `[89.0%, 96.8%]`)</span>
+                    </div>
+                    <div class="swiss-card emerald-top">
+                        <span class="card-kicker">Auto-Settlement Precision</span>
+                        <span class="card-metric" style="color: var(--accent-emerald);">100.0%</span>
+                        <span class="card-body">`33/33` autonomous payouts correct (`ECE = 0.0207`)</span>
+                    </div>
+                    <div class="swiss-card navy-top">
+                        <span class="card-kicker">Confident Error Rate</span>
+                        <span class="card-metric" style="color: var(--accent-navy);">0.0%</span>
+                        <span class="card-body">All `9/150` misses safely abstain to human review</span>
+                    </div>
+                    <div class="swiss-card vermilion-top">
+                        <span class="card-kicker">AI-Only Baseline Risk</span>
+                        <span class="card-metric" style="color: var(--accent-vermilion);">48.0%</span>
+                        <span class="card-body">Confident error rate when deterministic rules are removed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>REPO: github.com/deswanth12/EvidenceOS</span>
+                <span>FREEZE TAG: v1.0.0-benchmark-frozen (seed=42)</span>
+                <span>USE ARROW KEYS / SPACE TO NAVIGATE</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 02: THE REAL-WORLD PROBLEM
+         =========================================== -->
+    <section class="slide" data-title="The Problem">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">02 / 14</span> — PROBLEM STATEMENT</span>
+                <span class="tag-pill">B2B PROCUREMENT &amp; LOGISTICS</span>
+            </div>
+
+            <h2 class="slide-title reveal">Why B2B Delivery Disputes Break Traditional Automation</h2>
+            <p class="slide-subtitle reveal">
+                High-stakes B2B claims require reconciling fragmented, contradictory multimodal artifacts against strict contractual SLAs.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="swiss-card">
+                    <span class="card-kicker">01. Structured &amp; Prose PDFs</span>
+                    <span class="card-title">Purchase Orders &amp; Challans</span>
+                    <p class="card-body">Line-item quantities, unit prices, SKU codes, and delivery dates—often buried in free-form narrative notes, OCR noise, or backdated filings.</p>
+                </div>
+                <div class="swiss-card">
+                    <span class="card-kicker">02. Physical Dock Vision</span>
+                    <span class="card-title">Pallet Inspection Photos (PNG)</span>
+                    <p class="card-body">Crushed cartons, broken tamper seals, dark warehouse lighting, motion blur, shrink-wrap occlusion, or recycled photos from old claims.</p>
+                </div>
+                <div class="swiss-card">
+                    <span class="card-kicker">03. Acoustic Dock Reports</span>
+                    <span class="card-title">Warehouse Voice Notes (WAV)</span>
+                    <p class="card-body">Colloquial speech (<em>"half a dozen cartons smashed"</em>), hedged uncertainty (<em>"maybe 3 or 4 boxes"</em>), and conflicting SKU attributions.</p>
+                </div>
+            </div>
+
+            <div class="thesis-banner reveal" style="margin-top: var(--content-gap);">
+                <p style="font-size: var(--body-size); font-family: var(--font-body); font-weight: 500;">
+                    <strong style="color: var(--accent-vermilion);">Operational Failure Modes Today:</strong> Slow manual reconciliation, inconsistent payouts, undetected duplicate photo fraud, zero claim-level provenance, and non-auditable decisions.
+                </p>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>MULTIMODAL DISPUTE VERIFICATION</span>
+                <span>SLIDE 02</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 03: WHY EXISTING APPROACHES FAIL
+         =========================================== -->
+    <section class="slide" data-title="Why LLMs & Regex Fail">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">03 / 14</span> — ARCHITECTURAL MOTIVATION</span>
+                <span class="tag-pill">THE FALSE DICHOTOMY</span>
+            </div>
+
+            <h2 class="slide-title reveal">Neither Pure Regex Nor Pure Generative AI Is Safe</h2>
+            <p class="slide-subtitle reveal">
+                Empirical findings from our 150-case blind held-out evaluation show why both standard paradigms fail in financial adjudication.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="swiss-card amber-top">
+                    <span class="card-kicker">Approach A: Strict Regex + Rules</span>
+                    <span class="card-metric" style="color: var(--accent-amber);">72.0% Acc</span>
+                    <span class="card-title">Brittle on Real-World Language</span>
+                    <p class="card-body">Fails on prose PDFs, spoken number words (<em>"two boxes damaged"</em>, <em>"half a dozen"</em>), and minor OCR typos—missing valid claims.</p>
+                </div>
+
+                <div class="swiss-card vermilion-top">
+                    <span class="card-kicker">Approach B: Standalone Multimodal AI</span>
+                    <span class="card-metric" style="color: var(--accent-vermilion);">48.0% Confident Error</span>
+                    <span class="card-title">Unsafe Autonomous Payouts</span>
+                    <p class="card-body">Achieves only <code>44.0%</code> decision accuracy and <code>33.3%</code> auto-settlement precision—auto-approving late SLA filings, <code>&gt;=$5,000</code> claims, and uncorroborated damage.</p>
+                </div>
+
+                <div class="swiss-card emerald-top">
+                    <span class="card-kicker">Approach C: EvidenceOS Hybrid</span>
+                    <span class="card-metric" style="color: var(--accent-emerald);">94.0% Acc / 0% Error</span>
+                    <span class="card-title">Epistemic AI + Deterministic Rules</span>
+                    <p class="card-body">Uses multimodal AI strictly for structured claim extraction and epistemic typing, while deterministic Python rules govern every settlement outcome.</p>
+                </div>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>BASELINE A (72.0%) VS SYSTEM C (44.0%) VS SYSTEM D (94.0%)</span>
+                <span>SLIDE 03</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 04: CORE ARCHITECTURAL THESIS
+         =========================================== -->
+    <section class="slide" data-title="Epistemic Architecture">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">04 / 14</span> — SYSTEM ARCHITECTURE</span>
+                <span class="tag-pill">EPISTEMIC SEPARATION OF POWERS</span>
+            </div>
+
+            <h2 class="slide-title reveal">Five-Pillar Verification Architecture</h2>
+            <p class="slide-subtitle reveal">
+                AI interprets. Rules decide. Uncertainty escalates. Evidence proves. Audit logs preserve.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="swiss-card navy-top">
+                    <span class="card-kicker">Pillar 1 • Epistemic Multimodal Extraction</span>
+                    <span class="card-title">Explicit Epistemic Typing (`FACT` | `INFERENCE` | `UNCERTAINTY`)</span>
+                    <p class="card-body">Every extracted claim carries an epistemic tag, confidence score, and exact source provenance (`evidence_id`, `sha256`, page/char offset, or pixel bounding grid). Blurry/dark images (`conf &lt; 0.50`) and hedged audio (`conf = 0.58`) emit `UNCERTAINTY`, never fabricated facts.</p>
+                </div>
+
+                <div class="swiss-card amber-top">
+                    <span class="card-kicker">Pillar 2 • Cross-Modal Entity &amp; Conflict Graph</span>
+                    <span class="card-title">SKU Grounding &amp; Contradiction Isolation</span>
+                    <p class="card-body">Links claims across PDFs, photos, and audio into a directed Evidence DAG (`Shipment → Item → Claim → Evidence → Conflict`), surfacing quantity mismatches, chronology violations (`Challan &lt; PO`), and uncorroborated single-source claims.</p>
+                </div>
+
+                <div class="swiss-card vermilion-top">
+                    <span class="card-kicker">Pillar 3 • Cryptographic + Perceptual Fraud Detection</span>
+                    <span class="card-title">SHA-256 + 64-bit Perceptual `dHash` (`Hamming &lt;= 6`)</span>
+                    <p class="card-body">Cross-checks every incoming dock photo against the historical ledger. Catches both exact byte duplicates and recompressed, cropped, or brightness-shifted reused photos (`100.0%` recall on 40 test pairs).</p>
+                </div>
+
+                <div class="swiss-card emerald-top">
+                    <span class="card-kicker">Pillar 4 • Deterministic Rules (`R1–R8`) &amp; Audit Chain</span>
+                    <span class="card-title">Zero Hallucinated Arithmetic + SHA-256 Hash Chain</span>
+                    <p class="card-body">Enforces 48-hour SLA windows, high-value manual review thresholds (`&gt;= $5,000`), and 2-source corroboration. Every event is chained (`previous_event_hash → event_hash`) in a tamper-evident ledger.</p>
+                </div>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>CORE/AI + CORE/GRAPH + CORE/RULES + CORE/AUDIT</span>
+                <span>SLIDE 04</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 05: 12-STAGE PIPELINE & LATENCY
+         =========================================== -->
+    <section class="slide" data-title="12-Stage Pipeline">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">05 / 14</span> — END-TO-END EXECUTION</span>
+                <span class="tag-pill">MEAN LATENCY: 148.8 MS / CASE</span>
+            </div>
+
+            <h2 class="slide-title reveal">End-to-End 12-Stage Verification Pipeline</h2>
+            <p class="slide-subtitle reveal">
+                Identical downstream graph, conflict, and rule execution across both Live Gemini (`gemini-2.5-flash`) and Offline Deterministic CI/CD modes.
+            </p>
+
+            <div class="pipeline-grid reveal">
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 01–02</div>
+                    <div class="stage-name">Ingestion &amp; Hashing</div>
+                    <div class="stage-desc">Magic-byte validation, filename sanitization, SHA-256 + 64-bit dHash (`34.8 ms`).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 03</div>
+                    <div class="stage-name">Injection Sanitizer</div>
+                    <div class="stage-desc">Strips untrusted system directives from PDFs, WAVs &amp; PNG chunks (`100%` block rate).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 04</div>
+                    <div class="stage-name">Multimodal Extraction</div>
+                    <div class="stage-desc">PDF (`22.8 ms`), Blind Pixel CV (`12.0 ms`), &amp; WAV acoustic parser (`9.5 ms`).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 05</div>
+                    <div class="stage-name">Claim Normalization</div>
+                    <div class="stage-desc">Atomic `NormalizedClaim` tuples with epistemic tags &amp; spans (`11.1 ms`).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 06</div>
+                    <div class="stage-name">SKU Entity Resolution</div>
+                    <div class="stage-desc">Links PO, Challan, Photo &amp; Audio claims (`v1_frozen` / `v2_context_aware`, `9.4 ms`).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 07–08</div>
+                    <div class="stage-name">DAG &amp; Conflict Engine</div>
+                    <div class="stage-desc">Builds provenance graph &amp; isolates quantity/chronology conflicts (`6.1 ms`).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 09</div>
+                    <div class="stage-name">Historical dHash Match</div>
+                    <div class="stage-desc">Scans prior cases for exact or perturbed reused images (`20.9 ms`).</div>
+                </div>
+                <div class="stage-box">
+                    <div class="stage-id">STAGE 10–12</div>
+                    <div class="stage-name">Rules R1–R8 &amp; Audit</div>
+                    <div class="stage-desc">Computes settlement or abstention + SHA-256 hash chain (`8.4 ms`).</div>
+                </div>
+            </div>
+
+            <div class="thesis-banner reveal" style="margin-top: var(--content-gap);">
+                <p style="font-size: var(--body-size); font-family: var(--font-mono);">
+                    <strong>THROUGHPUT &amp; COST:</strong> 148.83 ms mean (112.92 ms P50, 286.67 ms P95) • $0.00 local execution • ~$0.00055/case on Gemini 2.5 Flash (~1,532 tokens/case).
+                </p>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>564 FILES PROCESSED ACROSS 150 HELD-OUT CASES</span>
+                <span>SLIDE 05</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 06: EXPERIMENTAL DESIGN & FREEZE
+         =========================================== -->
+    <section class="slide" data-title="Experimental Design">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">06 / 14</span> — EVALUATION METHODOLOGY</span>
+                <span class="tag-pill">TAG: v1.0.0-BENCHMARK-FROZEN</span>
+            </div>
+
+            <h2 class="slide-title reveal">Strict Train/Dev/Test Separation &amp; Zero-Leakage Protocol</h2>
+            <p class="slide-subtitle reveal">
+                Development data → Tune system → Lock system (`v1.0.0-benchmark-frozen`) → Blind Held-Out 150 → Audit &amp; Failure Analysis.
+            </p>
+
+            <table class="swiss-table reveal">
+                <thead>
+                    <tr>
+                        <th>Dataset Split (`seed=42`)</th>
+                        <th>Cases / Files</th>
+                        <th>Role in Research Lifecycle</th>
+                        <th>Decision Accuracy (95% CI)</th>
+                        <th>Confident Error Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. `canonical_5`</strong></td>
+                        <td><code>5 / 20</code></td>
+                        <td>Deterministic end-to-end regression &amp; UI demo smoke suite</td>
+                        <td><code>100.0%</code> <code>[56.6%, 100.0%]</code></td>
+                        <td><code>0.0% (0/5)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. `development_60`</strong></td>
+                        <td><code>60 / 234</code></td>
+                        <td>Adversarial development &amp; normalizer tuning set</td>
+                        <td><code>96.7%</code> <code>[88.6%, 99.1%]</code></td>
+                        <td><code>1.7% (1/60)</code></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>3. `heldout_150` (Frozen Primary)</strong></td>
+                        <td><code>150 / 564</code></td>
+                        <td><strong>Blind 25-category evaluation (116 synthetic + 34 real-world-inspired)</strong></td>
+                        <td><strong>94.0% [89.0%, 96.8%]</strong></td>
+                        <td><strong>0.0% (0/150)</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(3, 1fr); margin-top: var(--content-gap);">
+                <div class="swiss-card">
+                    <span class="card-kicker">Anti-Leakage Rule 1</span>
+                    <span class="card-title">Opaque Filenames &amp; Roles</span>
+                    <p class="card-body">All 564 held-out files are named <code>artifact_01.pdf..artifact_04.wav</code> and ingested with <code>role="unknown"</code>.</p>
+                </div>
+                <div class="swiss-card">
+                    <span class="card-kicker">Anti-Leakage Rule 2</span>
+                    <span class="card-title">Stripped PNG Metadata</span>
+                    <p class="card-body">Every held-out image is generated with <code>blind_mode=True</code> and verified via <code>assert b"tEXt" not in png_bytes</code>.</p>
+                </div>
+                <div class="swiss-card">
+                    <span class="card-kicker">Anti-Leakage Rule 3</span>
+                    <span class="card-title">Cryptographic Freeze Manifest</span>
+                    <p class="card-body">SHA-256 digests of <code>results.json</code>, <code>failures.json</code>, and <code>heldout_test_150_manifest.json</code> are locked in Git.</p>
+                </div>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>SYNTHETIC (100.0%, 116/116) • REAL-WORLD-INSPIRED ADVERSARIAL (73.5%, 25/34)</span>
+                <span>SLIDE 06</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 07: FOUR-SYSTEM HEAD-TO-HEAD RESULTS
+         =========================================== -->
+    <section class="slide" data-title="Held-Out 150 Results">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">07 / 14</span> — PRIMARY HELD-OUT BENCHMARK (N = 150)</span>
+                <span class="tag-pill">4-TIER HEAD-TO-HEAD</span>
+            </div>
+
+            <h2 class="slide-title reveal">Four-System Comparison on Blind Held-Out Set (N = 150)</h2>
+            <p class="slide-subtitle reveal">
+                Full EvidenceOS outperforms Strict Regex by +22.0% and Structured Normalizer by +16.0% while eliminating the 48.0% confident error rate of standalone AI.
+            </p>
+
+            <table class="swiss-table reveal">
+                <thead>
+                    <tr>
+                        <th>Evaluated System</th>
+                        <th>Decision Accuracy (95% CI)</th>
+                        <th>Macro-F1</th>
+                        <th>Field Acc</th>
+                        <th>Conflict F1</th>
+                        <th>Abstention Recall</th>
+                        <th>Confident Error Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Baseline A</strong>: Strict Regex + Rules</td>
+                        <td><code>72.0% (108/150) [64.3%, 78.6%]</code></td>
+                        <td><code>0.4245</code></td>
+                        <td><code>85.8%</code></td>
+                        <td><code>0.7161</code></td>
+                        <td><code>94.4%</code></td>
+                        <td><span class="badge badge-amber">4.0% (6/150)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Baseline B</strong>: Structured Normalizer + Rules</td>
+                        <td><code>78.0% (117/150) [70.7%, 83.9%]</code></td>
+                        <td><code>0.4558</code></td>
+                        <td><code>85.8%</code></td>
+                        <td><code>0.7902</code></td>
+                        <td><code>100.0%</code></td>
+                        <td><span class="badge badge-emerald">0.0% (0/150)</span></td>
+                    </tr>
+                    <tr class="danger-row">
+                        <td><strong>System C</strong>: Semantic Multimodal AI Only (No Rules)</td>
+                        <td><code>44.0% (66/150) [36.3%, 52.0%]</code></td>
+                        <td><code>0.4969</code></td>
+                        <td><code>90.2%</code></td>
+                        <td><code>0.9505</code></td>
+                        <td><code>33.3%</code></td>
+                        <td><span class="badge badge-vermilion">48.0% (72/150)</span></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>System D: Full EvidenceOS (AI + Graph + Rules)</strong></td>
+                        <td><strong>94.0% (141/150) [89.0%, 96.8%]</strong></td>
+                        <td><strong>0.9132</strong></td>
+                        <td><strong>95.6%</strong></td>
+                        <td><strong>0.9505</strong></td>
+                        <td><strong>100.0%</strong></td>
+                        <td><span class="badge badge-emerald">0.0% (0/150)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="thesis-banner reveal" style="margin-top: var(--content-gap);">
+                <p style="font-size: var(--body-size); font-family: var(--font-body);">
+                    <strong>Where AI Gains +22.0% Over Regex:</strong> Unstructured prose PDFs (`100%` vs `0%`), colloquial warehouse speech (`66.7%` vs `0%`), and pixel-level detection of blurry/dark/occluded dock photos (`100%` vs `0%`).
+                </p>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>EVALUATION/RESULTS.JSON • SHA-256: 3d235d99...84eca8</span>
+                <span>SLIDE 07</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 08: SIX-STAGE MODALITY & RULE ABLATION
+         =========================================== -->
+    <section class="slide" data-title="Ablation Study">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">08 / 14</span> — COMPONENT ABLATION STUDY (N = 150)</span>
+                <span class="tag-pill">6-STAGE ABLATION</span>
+            </div>
+
+            <h2 class="slide-title reveal">Why Every Modality &amp; Component Is Necessary</h2>
+            <p class="slide-subtitle reveal">
+                Removing any single modality or removing perceptual hashing / deterministic rules causes severe accuracy or safety degradation.
+            </p>
+
+            <table class="swiss-table reveal">
+                <thead>
+                    <tr>
+                        <th>Ablation Configuration</th>
+                        <th>Decision Accuracy (95% CI)</th>
+                        <th>Macro-F1</th>
+                        <th>Duplicate Acc</th>
+                        <th>Confident Error Rate</th>
+                        <th>Primary Failure Mode Exposed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="danger-row">
+                        <td><strong>Ablation A</strong>: Documents Only (PO + Challan)</td>
+                        <td><code>36.7% [29.4%, 44.6%]</code></td>
+                        <td><code>0.2561</code></td>
+                        <td><code>88.0%</code></td>
+                        <td><span class="badge badge-vermilion">62.0%</span></td>
+                        <td>Blind to physical transit damage &amp; visual fraud</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ablation B</strong>: Documents + Voice (No Images)</td>
+                        <td><code>76.7% [69.3%, 82.7%]</code></td>
+                        <td><code>0.5173</code></td>
+                        <td><code>88.0%</code></td>
+                        <td><code>6.7%</code></td>
+                        <td>Misses visual fraud &amp; uncorroborated voice claims</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ablation C</strong>: Documents + Images (No Voice)</td>
+                        <td><code>76.7% [69.3%, 82.7%]</code></td>
+                        <td><code>0.5389</code></td>
+                        <td><code>88.0%</code></td>
+                        <td><code>4.0%</code></td>
+                        <td>Misses spoken dock inspection context &amp; audio conflicts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ablation D</strong>: Docs + Voice + Images (No dHash)</td>
+                        <td><code>82.0% [75.1%, 87.3%]</code></td>
+                        <td><code>0.8041</code></td>
+                        <td><code>88.0%</code></td>
+                        <td><code>12.0%</code></td>
+                        <td>Fails on all 18 reused/perturbed historical image cases</td>
+                    </tr>
+                    <tr class="danger-row">
+                        <td><strong>Ablation E</strong>: All Modalities + dHash (No Rules)</td>
+                        <td><code>44.0% [36.3%, 52.0%]</code></td>
+                        <td><code>0.4969</code></td>
+                        <td><code>100.0%</code></td>
+                        <td><span class="badge badge-vermilion">48.0%</span></td>
+                        <td>Unsafe auto-settlements on SLA breaches &amp; &gt;=$5k claims</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>Ablation F: Full EvidenceOS</strong></td>
+                        <td><strong>94.0% [89.0%, 96.8%]</strong></td>
+                        <td><strong>0.9132</strong></td>
+                        <td><strong>100.0%</strong></td>
+                        <td><span class="badge badge-emerald">0.0%</span></td>
+                        <td><strong>Optimal accuracy + zero wrong automated payouts</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>MODALITY REDUNDANCY + PERCEPTUAL HASHING + RULE CONSTRAINTS</span>
+                <span>SLIDE 08</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 09: CONFIDENCE CALIBRATION & SELECTIVE PREDICTION
+         =========================================== -->
+    <section class="slide" data-title="Confidence Calibration">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">09 / 14</span> — SELECTIVE PREDICTION &amp; RISK-COVERAGE (N = 150)</span>
+                <span class="tag-pill">ECE = 0.0207 (2.1%)</span>
+            </div>
+
+            <h2 class="slide-title reveal">When EvidenceOS Acts Autonomously, Precision Is 100.0%</h2>
+            <p class="slide-subtitle reveal">
+                In high-stakes financial decisions, selective prediction (knowing when to abstain to human review) matters more than raw accuracy.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(2, 1fr); margin-bottom: var(--element-gap);">
+                <div class="swiss-card emerald-top">
+                    <span class="card-kicker">System D: Full EvidenceOS (Selective Prediction)</span>
+                    <span class="card-metric" style="color: var(--accent-emerald);">33 / 33 (100.0% Precision)</span>
+                    <p class="card-body">Auto-settles <code>33/150</code> cases (<code>100%</code> of clean deliveries + <code>66.7%</code> of valid partial claims) with <strong>zero wrong payouts</strong> (95% CI <code>[89.6%, 100.0%]</code>, <code>ECE = 0.0207</code>). Captures <code>108/108</code> (<code>100.0%</code>) of genuine manual-review cases.</p>
+                </div>
+                <div class="swiss-card vermilion-top">
+                    <span class="card-kicker">System C: Semantic AI Alone (Unconstrained)</span>
+                    <span class="card-metric" style="color: var(--accent-vermilion);">36 / 108 (33.3% Precision)</span>
+                    <p class="card-body">Recklessly auto-settles <code>108/150</code> cases (<code>72.0%</code> coverage), producing <strong>72 confident errors (48.0%)</strong> and missing two-thirds of required human escalations (<code>ECE = 0.5694</code>).</p>
+                </div>
+            </div>
+
+            <table class="swiss-table reveal">
+                <thead>
+                    <tr>
+                        <th>Minimum Modality Confidence Bin</th>
+                        <th>Cases (N)</th>
+                        <th>Mean Conf</th>
+                        <th>Auto-Settled</th>
+                        <th>Auto-Settlement Precision</th>
+                        <th>Abstained (`manual_review`)</th>
+                        <th>Root Cause of Bin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>`[0.00, 0.50]` (Degraded Vision)</strong></td>
+                        <td><code>24</code></td>
+                        <td><code>0.3875</code></td>
+                        <td><code>0</code></td>
+                        <td><code>N/A (100% abstained)</code></td>
+                        <td><span class="badge badge-emerald">24 / 24 (100%)</span></td>
+                        <td>Blurry, dark, occluded, or off-topic photos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>`[0.50, 0.70]` (Hedged Audio)</strong></td>
+                        <td><code>6</code></td>
+                        <td><code>0.5800</code></td>
+                        <td><code>0</code></td>
+                        <td><code>N/A (100% abstained)</code></td>
+                        <td><span class="badge badge-emerald">6 / 6 (100%)</span></td>
+                        <td>Uncertain speech (<em>"maybe around 4 boxes..."</em>)</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>`[0.85, 0.92]` (Corroborated)</strong></td>
+                        <td><code>114</code></td>
+                        <td><code>0.9058</code></td>
+                        <td><code>33</code></td>
+                        <td><strong>100.0% (33 / 33)</strong></td>
+                        <td><code>81 / 114 (71.1%)</code></td>
+                        <td>33 valid auto-settlements + SLA/conflict escalations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>`[0.92, 1.00]` (High Certainty)</strong></td>
+                        <td><code>6</code></td>
+                        <td><code>0.9200</code></td>
+                        <td><code>0</code></td>
+                        <td><code>N/A (100% abstained)</code></td>
+                        <td><span class="badge badge-emerald">6 / 6 (100%)</span></td>
+                        <td>Clear documents that violate SLA/policy rules</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>SELECTIVE PREDICTION THRESHOLD SWEEP: τ ∈ [0.50, 0.90] MAINTAINS 100.0% PRECISION</span>
+                <span>SLIDE 09</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 10: INDEPENDENT CODE AUDIT & FAILURE ANALYSIS
+         =========================================== -->
+    <section class="slide" data-title="Code Audit & Failures">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">10 / 14</span> — INDEPENDENT CODE AUDIT &amp; FAILURE TAXONOMY</span>
+                <span class="tag-pill">DOCS/INDEPENDENT-AUDIT.MD</span>
+            </div>
+
+            <h2 class="slide-title reveal">Auditing Our Own Metrics &amp; Dissecting All 9 Errors</h2>
+            <p class="slide-subtitle reveal">
+                We audited the evaluation harness for synthetic shortcuts and metric edge cases—and published every failure without editing the frozen benchmark.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(2, 1fr); margin-bottom: var(--element-gap);">
+                <div class="swiss-card amber-top">
+                    <span class="card-kicker">Self-Audit Finding • `AUDIT_FINDING_02`</span>
+                    <span class="card-title">Entity Count (100%) vs. Strict SKU Attribution (98.0%)</span>
+                    <p class="card-body">Our original <code>entity_matching_accuracy</code> checked whether resolved entity <em>counts</em> matched ground truth (<code>100.0%</code>). Our audit showed this masked 3 <code>multi_sku_dispute</code> cases where blind parcel damage (<code>ITEM:UNKNOWN</code>) linked to <code>SKU-IND-201</code> instead of <code>SKU-IND-202</code>. Under <strong>strict claim-to-SKU attribution</strong>, accuracy is <strong>98.0% (147/150)</strong> overall and <strong>50.0% (3/6)</strong> on Multi-SKU.</p>
+                </div>
+                <div class="swiss-card navy-top">
+                    <span class="card-kicker">Self-Audit Disclosure • `AUDIT_NOTE_01`</span>
+                    <span class="card-title">Offline 2×5 Pixel Grid vs. Live Gemini Vision</span>
+                    <p class="card-body">While <code>heldout_150</code> strips all PNG text chunks, offline CV (<code>analyze_pallet_pixels_blind</code>) inspects the <code>2x5</code> parcel grid (<code>320x240</code>) of our procedural renderer. Real-world smartphone dock photos require enabling <code>GEMINI_API_KEY</code> (<code>GeminiAIProvider</code>) or a trained object detector.</p>
+                </div>
+            </div>
+
+            <table class="swiss-table reveal">
+                <thead>
+                    <tr>
+                        <th>Failure Taxonomy Code (`System D`)</th>
+                        <th>Count</th>
+                        <th>Affected Category</th>
+                        <th>Root Cause &amp; Safe Fallback Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>`ENTITY_LINKING_ERROR`</strong></td>
+                        <td><code>3 / 9</code></td>
+                        <td><code>multi_sku_dispute (50.0%)</code></td>
+                        <td>Blind photo (<code>ITEM:UNKNOWN</code>) defaults to primary SKU (<code>201</code>) while voice names secondary SKU (<code>202</code>) → <code>manual_review_required</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>`VOICE_INTERPRETATION_ERROR`</strong></td>
+                        <td><code>2 / 9</code></td>
+                        <td><code>colloquial_wording (66.7%)</code></td>
+                        <td>Unseen regional slang (<em>"munted"</em>, <em>"total toast"</em>) not in lexicon → triggers cross-modal conflict → <code>manual_review_required</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>`OCR_OR_TEXT_NOISE_ERROR`</strong></td>
+                        <td><code>2 / 9</code></td>
+                        <td><code>typos_and_ocr_noise (66.7%)</code></td>
+                        <td>Severe digit substitution (<code>lO</code> for <code>10</code>, <code>0RD3R3D</code>) → triggers missing-evidence review → <code>manual_review_required</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>`DOCUMENT_EXTRACTION_ERROR`</strong></td>
+                        <td><code>2 / 9</code></td>
+                        <td><code>multilingual_terms (66.7%)</code></td>
+                        <td>Untranslated German headers (<code>Bestellmenge</code>, <code>Geliefert</code>) → triggers completeness rule → <code>manual_review_required</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>ALL 9 ERRORS ARE CONSERVATIVE OVER-ABSTENTIONS ON PARTIAL CLAIMS (ZERO WRONG PAYOUTS)</span>
+                <span>SLIDE 10</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 11: ATTACKING THE WEAKEST POINT (MULTI-SKU N=42)
+         =========================================== -->
+    <section class="slide" data-title="Multi-SKU Stress Study">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">11 / 14</span> — POST-FREEZE ABLATION: MULTI-SKU STRESS SUITE (N = 42)</span>
+                <span class="tag-pill">SCOPED SUB-BENCHMARK</span>
+            </div>
+
+            <h2 class="slide-title reveal">Attacking Our Weakest Category Without Touching Frozen v1.0.0</h2>
+            <p class="slide-subtitle reveal">
+                We built a separate 42-case Multi-SKU stress suite across 7 failure modes and compared `v1_frozen` against `v2_context_aware` (OCR canonicalization + cross-modal damage corroboration).
+            </p>
+
+            <table class="swiss-table reveal">
+                <thead>
+                    <tr>
+                        <th>Multi-SKU Stress Category (6 Cases Each, N = 42)</th>
+                        <th>`v1_frozen` Decision Acc</th>
+                        <th>`v1_frozen` Strict Attribution</th>
+                        <th>`v2_context_aware` Decision Acc</th>
+                        <th>`v2_context_aware` Strict Attribution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. `explicit_multi_sku`</strong> (Primary SKU damaged)</td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr class="danger-row">
+                        <td><strong>2. `similar_sku_names_and_codes`</strong> (`SKU-IND-201A` vs `201B`)</td>
+                        <td><code>0.0% (0/6)</code></td>
+                        <td><code>0.0% (0/6)</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr class="danger-row">
+                        <td><strong>3. `reordered_line_items`</strong> (PO vs Challan reversed)</td>
+                        <td><code>0.0% (0/6)</code></td>
+                        <td><code>0.0% (0/6)</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr class="danger-row">
+                        <td><strong>4. `missing_visual_barcodes_blind_cv`</strong> (`ITEM:UNKNOWN` photo)</td>
+                        <td><code>0.0% (0/6)</code></td>
+                        <td><code>0.0% (0/6)</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>5. `partial_pallet_visibility`</strong> (50% occluded pallet → abstain)</td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>6. `conflicting_sku_references`</strong> (Challan `201` vs Voice `202` → abstain)</td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>7. `ocr_noisy_sku_identifiers`</strong> (`SKU-IND-2O2` / `SKU-1ND-2O2`)</td>
+                        <td><code>100.0% (6/6)</code></td>
+                        <td><code>0.0% (0/6)*</code></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                        <td><strong>100.0% (6/6)</strong></td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td><strong>OVERALL MULTI-SKU STRESS SUITE (N = 42)</strong></td>
+                        <td><strong>57.1% (24/42)</strong></td>
+                        <td><strong>42.9% (18/42)</strong></td>
+                        <td><strong>100.0% (42/42)</strong></td>
+                        <td><strong>100.0% (42/42)</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>SCOPE NOTE: 100.0% APPLIES SPECIFICALLY TO THE 42-CASE MULTI-SKU STRESS SUITE (PRIMARY 150-CASE BENCHMARK REMAINS FROZEN AT 94.0%)</span>
+                <span>SLIDE 11</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 12: PERCEPTUAL HASHING & PROMPT INJECTION SECURITY
+         =========================================== -->
+    <section class="slide" data-title="Security & Fraud">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">12 / 14</span> — ADVERSARIAL SECURITY &amp; FRAUD BENCHMARKS</span>
+                <span class="tag-pill">DOCS/SECURITY-EVALUATION.MD</span>
+            </div>
+
+            <h2 class="slide-title reveal">Resisting Reused Image Fraud &amp; Multimodal Prompt Injection</h2>
+            <p class="slide-subtitle reveal">
+                Cryptographic hashes fail on recompressed images; raw LLMs fail on embedded adversarial instructions. EvidenceOS neutralizes both.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="swiss-card emerald-top">
+                    <span class="card-kicker">Experiment 1 • 40 Controlled Image Pairs (32 Duplicates + 8 Controls)</span>
+                    <span class="card-metric" style="color: var(--accent-emerald);">25.0% → 100.0% Recall</span>
+                    <span class="card-title">SHA-256 Only vs. SHA-256 + 64-bit Perceptual `dHash`</span>
+                    <p class="card-body">
+                        • <strong>Exact Byte Duplicates (8 pairs):</strong> SHA-256 <code>100%</code> | dHash <code>100%</code><br>
+                        • <strong>Recompressed / Palette Shifted (8 pairs):</strong> SHA-256 <code>0%</code> | dHash <code>100%</code><br>
+                        • <strong>Brightness Shifted +14..21 RGB (8 pairs):</strong> SHA-256 <code>0%</code> | dHash <code>100%</code><br>
+                        • <strong>Cropped / Border Shifted 2..3px (8 pairs):</strong> SHA-256 <code>0%</code> | dHash <code>100%</code><br>
+                        • <strong>Distinct Negative Controls (8 pairs):</strong> <code>0.0%</code> False Positives (`F1 = 1.000`).
+                    </p>
+                </div>
+
+                <div class="swiss-card navy-top">
+                    <span class="card-kicker">Experiment 2 • 15 Adversarial Prompt Injections Across 5 Vectors</span>
+                    <span class="card-metric" style="color: var(--accent-navy);">0.0% Attack Success</span>
+                    <span class="card-title">Defense-in-Depth Against Embedded Directives</span>
+                    <p class="card-body">
+                        Tested against 5 attack vectors: PDF override instructions, Delivery Challan hidden `<system>` prompts, Voice transcript jailbreaks, JSON field injections, and fake PNG `tEXt` authority claims.<br><br>
+                        • <strong>Sanitization Trigger Rate:</strong> <code>100.0% (15/15)</code> redacted<br>
+                        • <strong>Architectural Isolation:</strong> Downstream <code>RuleEngine</code> is pure deterministic Python and cannot be overridden by prose claims.
+                    </p>
+                </div>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>64-BIT DIFFERENCE HASH (HAMMING DISTANCE &lt;= 6) + REGEX/STRUCTURAL SANITIZATION</span>
+                <span>SLIDE 12</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 13: 3-MINUTE INVESTIGATION WORKBENCH WALKTHROUGH
+         =========================================== -->
+    <section class="slide" data-title="3-Minute Demo Flow">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">13 / 14</span> — INVESTIGATION WORKBENCH UI</span>
+                <span class="tag-pill">DOCS/DEMO-WALKTHROUGH.MD</span>
+            </div>
+
+            <h2 class="slide-title reveal">3-Minute Live Investigation Walkthrough</h2>
+            <p class="slide-subtitle reveal">
+                Designed for procurement, compliance, and operations investigators—every number clicks through to its exact physical evidence span.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="swiss-card emerald-top">
+                    <span class="card-kicker">0:00 – 0:45 • Step 1: Clean Auto-Approval</span>
+                    <span class="card-title">`CASE-2026-001` — Zero-Touch Settlement</span>
+                    <p class="card-body">50 Industrial Valves ordered, 50 delivered, 0 damaged across PO, Challan, Dock Photo, and Driver Audio. All 8 deterministic rules pass (`APPROVED`, `$12,500.00` verified).</p>
+                </div>
+
+                <div class="swiss-card navy-top">
+                    <span class="card-kicker">0:45 – 1:30 • Step 2: Inline PDF Provenance Highlighting</span>
+                    <span class="card-title">`CASE-2026-002` — Corroborated Partial Damage</span>
+                    <p class="card-body">2 of 20 units crushed (`$900.00` credit). Clicking any claim badge opens the <strong>Provenance Drawer</strong> with amber character-offset highlighting (`char_start..char_end`) directly inside the extracted PDF text.</p>
+                </div>
+
+                <div class="swiss-card vermilion-top">
+                    <span class="card-kicker">1:30 – 2:15 • Step 3: Side-by-Side Reused Image Fraud</span>
+                    <span class="card-title">`CASE-2026-004` — Perceptual `dHash` Match</span>
+                    <p class="card-body">Flags a recompressed dock photo reused from historical claim <code>CASE-2025-889</code> (`Hamming distance <= 6`). Renders a side-by-side visual comparison and 64-bit hash bit-strip, escalating to <code>MANUAL_REVIEW_REQUIRED</code>.</p>
+                </div>
+
+                <div class="swiss-card amber-top">
+                    <span class="card-kicker">2:15 – 3:00 • Step 4: Research &amp; Calibration Dashboard</span>
+                    <span class="card-title">Live 4-System &amp; 6-Ablation Telemetry</span>
+                    <p class="card-body">Interactive inspection of the frozen 150-case held-out benchmark (`94.0%`), 95% Wilson confidence intervals, per-category accuracy breakdown, and tamper-evident SHA-256 audit log verification.</p>
+                </div>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>EVIDENCEOS / VERIDOCK</span>
+                <span>REACT 19 + TYPESCRIPT + FASTAPI + SQLALCHEMY</span>
+                <span>SLIDE 13</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 14: LIMITATIONS, REPRODUCIBILITY & CONCLUSION
+         =========================================== -->
+    <section class="slide" data-title="Limitations & Release">
+        <div class="slide-content">
+            <div class="swiss-topbar reveal">
+                <span><span class="section-num">14 / 14</span> — LIMITATIONS, REPRODUCIBILITY &amp; SIGN-OFF</span>
+                <span class="tag-pill">CLEAN-ROOM VERIFIED</span>
+            </div>
+
+            <h2 class="slide-title reveal">Documented Limitations &amp; Clean-Room Verification</h2>
+            <p class="slide-subtitle reveal">
+                A trustworthy engineering project is defined not by claiming perfection, but by proving exactly where it works, where it fails, and why.
+            </p>
+
+            <div class="grid reveal" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="swiss-card amber-top">
+                    <span class="card-kicker">Explicit Threats to Validity &amp; Limitations</span>
+                    <span class="card-title">What We Disclose Upfront</span>
+                    <p class="card-body">
+                        1. <strong>Controlled Procedural &amp; Adversarial Testbed (`AUDIT_NOTE_01`):</strong> Offline pixel CV inspects our 2×5 parcel grid; unconstrained smartphone photos require live <code>GeminiAIProvider</code> vision or a fine-tuned detector.<br>
+                        2. <strong>Unseen Slang, Heavy OCR Noise &amp; Multilingual Headers:</strong> Account for 6/9 held-out errors (all safely abstaining to human review).<br>
+                        3. <strong>90°/180° Image Rotation:</strong> 64-bit <code>dHash</code> handles recompression, crops &amp; brightness (`100%` recall) but requires CLIP/orientation alignment for 90° rotations.
+                    </p>
+                </div>
+
+                <div class="swiss-card emerald-top">
+                    <span class="card-kicker">Clean-Room Release Verification (`commit 66df00c`)</span>
+                    <span class="card-title">Single-Command Reproducibility (`seed=42`)</span>
+                    <p class="card-body" style="font-family: var(--font-mono); font-size: clamp(0.68rem, 0.92vw, 0.82rem); line-height: 1.55;">
+                        $ git checkout v1.1.0-research-hardened<br>
+                        $ python -m ruff check . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# PASS (0 errors)<br>
+                        $ python -m pytest -v &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# PASS (13/13 passed)<br>
+                        $ npm test -- --run &amp;&amp; npm run build # PASS (10/10 passed)<br>
+                        $ python -m scripts.run_evaluation &nbsp;# Regenerates N=150<br>
+                        $ python -m evaluation.multi_sku_and_calibration
+                    </p>
+                </div>
+            </div>
+
+            <div class="thesis-banner reveal" style="margin-top: var(--content-gap);">
+                <p>“AI interprets. Rules decide. Uncertainty escalates. Evidence proves. Audit logs preserve.”</p>
+            </div>
+
+            <div class="swiss-footer reveal">
+                <span>GITHUB: https://github.com/deswanth12/EvidenceOS</span>
+                <span>TAGS: v1.0.0-benchmark-frozen • v1.1.0-research-hardened</span>
+                <span>THANK YOU — Q&amp;A</span>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = Array.from(document.querySelectorAll('.slide'));
+                this.currentSlide = 0;
+                this.progressBar = document.getElementById('progressBar');
+                this.navDotsContainer = document.getElementById('navDots');
+                this.setupNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.updateUI(0);
+            }
+
+            setupNavDots() {
+                this.slides.forEach((slide, idx) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot' + (idx === 0 ? ' active' : '');
+                    dot.title = `Slide ${idx + 1}: ${slide.dataset.title || ''}`;
+                    dot.setAttribute('aria-label', `Go to slide ${idx + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(idx));
+                    this.navDotsContainer.appendChild(dot);
+                });
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const idx = this.slides.indexOf(entry.target);
+                            if (idx !== -1) {
+                                this.currentSlide = idx;
+                                this.updateUI(idx);
+                            }
+                        }
+                    });
+                }, { threshold: 0.55 });
+
+                this.slides.forEach((slide) => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.getAttribute('contenteditable') === 'true') return;
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                        e.preventDefault();
+                        this.goToSlide(Math.min(this.slides.length - 1, this.currentSlide + 1));
+                    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                        e.preventDefault();
+                        this.goToSlide(Math.max(0, this.currentSlide - 1));
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        this.goToSlide(0);
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        this.goToSlide(this.slides.length - 1);
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let startY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const diffY = startY - e.changedTouches[0].clientY;
+                    if (Math.abs(diffY) > 50) {
+                        if (diffY > 0) {
+                            this.goToSlide(Math.min(this.slides.length - 1, this.currentSlide + 1));
+                        } else {
+                            this.goToSlide(Math.max(0, this.currentSlide - 1));
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            goToSlide(idx) {
+                this.currentSlide = idx;
+                this.slides[idx].scrollIntoView({ behavior: 'smooth' });
+                this.updateUI(idx);
+            }
+
+            updateUI(idx) {
+                const pct = ((idx + 1) / this.slides.length) * 100;
+                this.progressBar.style.width = `${pct}%`;
+                const dots = this.navDotsContainer.querySelectorAll('.nav-dot');
+                dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITING CONTROLLER (E KEY OR HOTZONE)
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.editToggle = document.getElementById('editToggle');
+                this.hotzone = document.getElementById('editHotzone');
+                this.editableSelectors = 'h1, h2, p, td, th, .card-title, .card-body, .card-metric, .stage-name, .stage-desc';
+                this.setupEvents();
+            }
+
+            setupEvents() {
+                let hideTimeout = null;
+                this.hotzone.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                    this.editToggle.classList.add('show');
+                });
+                this.hotzone.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.editToggle.classList.remove('show');
+                    }, 400);
+                });
+                this.editToggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+                this.editToggle.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isActive) this.editToggle.classList.remove('show');
+                    }, 400);
+                });
+                this.editToggle.addEventListener('click', () => this.toggleEditMode());
+                this.hotzone.addEventListener('click', () => this.toggleEditMode());
+
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') && e.target.getAttribute('contenteditable') !== 'true') {
+                        e.preventDefault();
+                        this.toggleEditMode();
+                    }
+                });
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+                this.editToggle.classList.toggle('active', this.isActive);
+                this.editToggle.textContent = this.isActive ? 'DONE EDITING (E)' : 'EDIT MODE (E)';
+                document.querySelectorAll(this.editableSelectors).forEach((el) => {
+                    el.setAttribute('contenteditable', this.isActive ? 'true' : 'false');
+                });
+            }
+        }
+
+        new SlidePresentation();
+        new InlineEditor();
+    </script>
+</body>
+</html>

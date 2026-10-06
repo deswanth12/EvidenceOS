@@ -117,26 +117,27 @@ docker compose up --build
 
 ---
 
-## 7. Empirical Evaluation Results
+## 7. Empirical Evaluation & Head-to-Head Ablation Study
 
-Run the reproducible benchmark harness directly from the command line:
+Rather than claiming "100% accuracy" on a tiny demo set, EvidenceOS includes a **two-tier reproducible evaluation suite** ([`evaluation/runner.py`](evaluation/runner.py) and [`docs/evaluation.md`](docs/evaluation.md)):
+
+1. **5-Case Canonical Regression Suite (`N=5` cases, `20` files)**:
+   - Reproducible regression benchmark covering clean delivery, legitimate partial damage, contradictory multimodal evidence, perceptually reused historical evidence, and insufficient/blurry visual evidence (`5/5` pass rate verified in CI).
+2. **60-Case Stratified Adversarial Benchmark (`N=60` cases, `234` files)**:
+   - Tests 8 controlled adversarial categories (unstructured prose documents, colloquial voice transcripts, short deliveries, cross-modal contradictions, missing photos, blurry images, perceptually perturbed duplicate images, and SLA threshold breaches) and compares the **Semantic Multimodal Pipeline** against a **Strict Deterministic Regex Baseline**:
 
 ```bash
 python -m evaluation.runner
 ```
 
-Measured output across the 5 canonical multimodal cases (`20` binary PDF, PNG, and WAV files):
-
-| Metric | Measured Result |
-| :--- | :--- |
-| **Extraction Accuracy** | `100.0%` (`20/20` files) |
-| **Field-Level Accuracy** | `100.0%` (`15/15` core quantity fields) |
-| **Entity Matching Accuracy** | `100.0%` (`5/5` cross-modal SKU resolutions) |
-| **Conflict Detection Precision / Recall** | `100.0%` / `100.0%` |
-| **Duplicate / Reused Evidence Detection Accuracy** | `100.0%` (`5/5` cases) |
-| **Decision Accuracy** | `100.0%` (`5/5` cases) |
-| **False Positive / False Negative Rate** | `0.0%` / `0.0%` |
-| **Mean / P95 Processing Latency** | `~158 ms` / `~184 ms` per case |
+| Metric (`N=60` Cases, `234` Multimodal Files) | Semantic Multimodal Pipeline | Strict Regex Baseline | Engineering Takeaway |
+| :--- | :---: | :---: | :--- |
+| **Overall Decision Accuracy** | **`96.7%` (`58/60`)** | `66.7%` (`40/60`) | **`+30.0%`** — Rigid regex baseline fails on unstructured prose POs and spoken/colloquial voice claims |
+| **Field-Level Quantity Accuracy** | **`100.0%` (`180/180`)** | `86.7%` (`156/180`) | **`+13.3%`** — Semantic parser extracts quantities from prose dispatch statements |
+| **Conflict Detection Precision / Recall** | **`96.4%` / `96.4%`** | `37.1%` / `46.4%` | Baseline triggers false mismatches on prose POs and misses spoken number words |
+| **False Positive Rate (Clean Flagged)** | **`0.0%` (`0/60`)** | `6.7%` (`4/60`) | Zero clean deliveries erroneously rejected |
+| **False Negative Rate (Dispute Missed)** | **`1.7%` (`1/60`)** | `10.0%` (`6/60`) | Documented slang edge cases (`"busted up"`, `"totally trashed"`) require cloud LLM (`AI_PROVIDER=gemini`) |
+| **Mean Processing Latency** | **`~123 ms / case`** | `~104 ms / case` | Sub-200ms end-to-end verification |
 
 ---
 

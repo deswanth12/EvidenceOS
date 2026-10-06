@@ -225,28 +225,52 @@ export interface AuditTrailResponse {
   events: AuditEvent[];
 }
 
+export interface CategoryBreakdownItem {
+  category: string;
+  total_cases: number;
+  passed_cases: number;
+  accuracy: number;
+}
+
+export interface EvaluationMetrics {
+  extraction_accuracy: number;
+  field_level_accuracy: number;
+  entity_matching_accuracy: number;
+  conflict_detection_precision: number;
+  conflict_detection_recall: number;
+  duplicate_detection_accuracy: number;
+  decision_accuracy: number;
+  false_positive_rate: number;
+  false_negative_rate: number;
+  mean_processing_latency_ms: number;
+  p95_processing_latency_ms: number;
+  cost_per_case_usd: number;
+  estimated_cloud_llm_cost_per_case_usd: number;
+}
+
 export interface EvaluationReport {
   benchmark_version: string;
+  suite_type?: string;
   total_cases: number;
   total_evidence_files: number;
   total_suite_duration_ms: number;
-  metrics: {
-    extraction_accuracy: number;
-    field_level_accuracy: number;
-    entity_matching_accuracy: number;
-    conflict_detection_precision: number;
-    conflict_detection_recall: number;
-    duplicate_detection_accuracy: number;
-    decision_accuracy: number;
-    false_positive_rate: number;
-    false_negative_rate: number;
-    mean_processing_latency_ms: number;
-    p95_processing_latency_ms: number;
-    cost_per_case_usd: number;
-    estimated_cloud_llm_cost_per_case_usd: number;
+  metrics: EvaluationMetrics;
+  category_breakdown?: CategoryBreakdownItem[];
+  ablation_comparison?: {
+    semantic_multimodal_pipeline: {
+      provider: string;
+      metrics: EvaluationMetrics;
+      category_breakdown: CategoryBreakdownItem[];
+    };
+    strict_regex_baseline: {
+      provider: string;
+      metrics: EvaluationMetrics;
+      category_breakdown: CategoryBreakdownItem[];
+    };
   };
   case_results: Array<{
     case_id: string;
+    category?: string;
     title: string;
     expected_outcome: string;
     actual_outcome: string;

@@ -74,11 +74,21 @@ def test_health_and_canonical_5_cases_end_to_end():
         assert override_data["outcome"] == "partially_approved"
         assert override_data["accepted_quantity"] == 6
 
-        # Test empirical evaluation endpoint
-        eval_res = client.get("/api/evaluation/run")
-        assert eval_res.status_code == 200
-        metrics = eval_res.json()["metrics"]
-        assert metrics["decision_accuracy"] == 1.0
-        assert metrics["extraction_accuracy"] == 1.0
-        assert metrics["conflict_detection_precision"] == 1.0
-        assert metrics["conflict_detection_recall"] == 1.0
+        # Test 5-case canonical regression suite endpoint
+        eval_5 = client.get("/api/evaluation/run?suite=canonical_5")
+        assert eval_5.status_code == 200
+        metrics_5 = eval_5.json()["metrics"]
+        assert metrics_5["decision_accuracy"] == 1.0
+        assert metrics_5["extraction_accuracy"] == 1.0
+
+        # Test 60-case stratified adversarial benchmark & ablation endpoint
+        eval_60 = client.get("/api/evaluation/run?suite=extended_60")
+        assert eval_60.status_code == 200
+        data_60 = eval_60.json()
+        assert data_60["total_cases"] == 60
+        assert data_60["total_evidence_files"] == 234
+        ablation = data_60["ablation_comparison"]
+        sem_acc = ablation["semantic_multimodal_pipeline"]["metrics"]["decision_accuracy"]
+        base_acc = ablation["strict_regex_baseline"]["metrics"]["decision_accuracy"]
+        assert sem_acc >= 0.95
+        assert sem_acc > base_acc

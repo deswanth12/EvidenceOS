@@ -589,6 +589,6 @@ def seed_canonical_demo_cases(db: Session = Depends(get_db)) -> Dict[str, Any]:
 
 
 @router.get("/evaluation/run")
-def run_evaluation_endpoint() -> Dict[str, Any]:
-    """Execute the empirical evaluation suite and return live metrics."""
-    return run_empirical_evaluation()
+def run_evaluation_endpoint(suite: str = "extended_60") -> Dict[str, Any]:
+    """Execute the empirical evaluation suite ('extended_60' or 'canonical_5') and return live metrics."""
+    return run_empirical_evaluation(suite=suite)

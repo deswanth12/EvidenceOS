@@ -196,6 +196,7 @@ class AuditLogModel(Base):
 
     id = Column(String(64), primary_key=True, index=True)
     case_id = Column(String(64), ForeignKey("cases.id", ondelete="CASCADE"), nullable=False, index=True)
+    sequence_num = Column(Integer, nullable=False, default=1, index=True)
     event_type = Column(String(128), nullable=False)
     actor = Column(String(128), nullable=False, default="system")
     stage = Column(String(64), nullable=False)
@@ -233,6 +234,24 @@ def get_engine(database_url: Optional[str] = None):
 def init_db(database_url: Optional[str] = None) -> None:
     engine = get_engine(database_url)
     Base.metadata.create_all(bind=engine)
+    # Ensure backwards compatibility for existing SQLite databases missing sequence_num
+    try:
+        with engine.begin() as conn:
+            result = conn.exec_driver_sql("PRAGMA table_info(audit_logs)").fetchall()
+            cols = [r[1] for r in result]
+            if "sequence_num" not in cols and len(cols) > 0:
+                conn.exec_driver_sql("ALTER TABLE audit_logs ADD COLUMN sequence_num INTEGER DEFAULT 1")
+                cases = conn.exec_driver_sql("SELECT DISTINCT case_id FROM audit_logs").fetchall()
+                for (cid,) in cases:
+                    rows = conn.exec_driver_sql(
+                        "SELECT id FROM audit_logs WHERE case_id = ? ORDER BY rowid ASC", (cid,)
+                    ).fetchall()
+                    for idx, (rid,) in enumerate(rows, start=1):
+                        conn.exec_driver_sql(
+                            "UPDATE audit_logs SET sequence_num = ? WHERE id = ?", (idx, rid)
+                        )
+    except Exception:
+        pass
 
 
 def get_session_factory(database_url: Optional[str] = None):

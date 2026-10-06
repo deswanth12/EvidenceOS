@@ -58,9 +58,10 @@ class AuditService:
         last_event = (
             db.query(AuditLogModel)
             .filter(AuditLogModel.case_id == case_id)
-            .order_by(AuditLogModel.created_at.desc(), AuditLogModel.id.desc())
+            .order_by(AuditLogModel.sequence_num.desc(), AuditLogModel.created_at.desc(), AuditLogModel.id.desc())
             .first()
         )
+        sequence_num = (last_event.sequence_num + 1) if (last_event and last_event.sequence_num is not None) else 1
         previous_hash = last_event.event_hash if last_event else "GENESIS"
         now = datetime.now(timezone.utc)
         event_hash = _compute_event_hash(
@@ -76,6 +77,7 @@ class AuditService:
         entry = AuditLogModel(
             id=new_id("aud"),
             case_id=case_id,
+            sequence_num=sequence_num,
             event_type=event_type,
             actor=actor,
             stage=stage,
@@ -97,7 +99,7 @@ class AuditService:
         return (
             db.query(AuditLogModel)
             .filter(AuditLogModel.case_id == case_id)
-            .order_by(AuditLogModel.created_at.asc(), AuditLogModel.id.asc())
+            .order_by(AuditLogModel.sequence_num.asc(), AuditLogModel.created_at.asc(), AuditLogModel.id.asc())
             .all()
         )
 

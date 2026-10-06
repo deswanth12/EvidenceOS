@@ -6,11 +6,11 @@ This walkthrough demonstrates the complete **EvidenceOS (`VeriDock`)** architect
 
 ## 1. Prerequisites (`30 seconds`)
 
-Start the FastAPI backend and React 19 frontend workstation:
+Start the FastAPI backend and React 18 (18.3.1) frontend workstation:
 
 ```bash
 # Terminal 1: Start API Server (automatically seeds the 5 canonical cases)
-uvicorn apps.api.main:app --reload --port 8000
+uvicorn apps.api.app.main:app --reload --port 8000
 
 # Terminal 2: Start Investigation Workstation UI
 cd apps/web

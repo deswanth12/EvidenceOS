@@ -4,7 +4,7 @@
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
-[![React 19 + TypeScript](https://img.shields.io/badge/Frontend-React%2019%20%2B%20TS-61dafb.svg)](https://react.dev/)
+[![React 18 (18.3.1) + TypeScript](https://img.shields.io/badge/Frontend-React%2018%20(18.3.1)%20%2B%20TS-61dafb.svg)](https://react.dev/)
 [![Held-Out Accuracy](https://img.shields.io/badge/Held--Out%20150%20Accuracy-94.0%25%20%5B89.0%25%2C%2096.8%25%5D-10b981.svg)](docs/research-report.md)
 [![Confident Error Rate](https://img.shields.io/badge/Confident%20Error%20Rate-0.0%25-059669.svg)](docs/failure-analysis.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-slate.svg)](LICENSE)
@@ -186,7 +186,7 @@ In the frozen `heldout_150` benchmark (`v1.0.0-benchmark-frozen`), `multi_sku_di
 - **[Security Evaluation (`docs/security-evaluation.md`)](docs/security-evaluation.md)**: 15-case prompt injection evaluation and Threat / Impact / Likelihood / Mitigation / Residual Risk matrix.
 - **[Evaluation Methodology (`docs/evaluation.md`)](docs/evaluation.md)**: Dataset split specifications and category-by-category breakdown across all 25 held-out categories.
 - **[Reproducibility Guide (`docs/reproducibility.md`)](docs/reproducibility.md)**: Exact one-command instructions to regenerate all datasets, metrics, and failure logs (`seed=42`).
-- **[System Architecture (`docs/architecture.md`)](docs/architecture.md)** & **[API Reference (`docs/api.md`)](docs/api.md)**.
+- **[System Architecture (`docs/architecture.md`)](docs/architecture.md)** & **API Reference** (FastAPI interactive OpenAPI docs at `http://localhost:8000/docs` and `/redoc`).
 
 ---
 
@@ -199,9 +199,9 @@ In the frozen `heldout_150` benchmark (`v1.0.0-benchmark-frozen`), `multi_sku_di
 pip install -e ".[dev]"
 
 # 2. Start the FastAPI server (seeds the 5 canonical demo cases automatically)
-uvicorn apps.api.main:app --reload --port 8000
+uvicorn apps.api.app.main:app --reload --port 8000
 
-# 3. In a second terminal, start the React 19 + Vite frontend
+# 3. In a second terminal, start the React 18 (18.3.1) + Vite frontend
 cd apps/web
 npm install
 npm run dev

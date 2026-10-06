@@ -32,3 +32,4 @@ apps/web/.vite/
 .idea/
 .DS_Store
 Thumbs.db
+.agents/

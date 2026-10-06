@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import {
   EpistemicBadge,
+  EvidenceInspectorDrawer,
   InteractiveEvidenceGraph,
   OutcomeBadge,
 } from './components/EvidenceWidgets';
@@ -388,4 +389,90 @@ describe('VeriDock EvidenceOS Investigation Workstation UI', () => {
       screen.getByText(/Reviewer override → partially approved/i)
     ).toBeInTheDocument();
   });
+
+  it('highlights extracted PDF line items inline in EvidenceInspectorDrawer when claim pills are clicked', () => {
+    const pdfEvidence: EvidenceItem = {
+      id: 'ev_pdf_challan',
+      case_id: 'case_02',
+      original_filename: 'DC-2026-1002.pdf',
+      safe_filename: 'DC-2026-1002.pdf',
+      mime_type: 'application/pdf',
+      modality: 'pdf',
+      document_role: 'delivery_challan',
+      file_size_bytes: 2048,
+      sha256_hash: '1234567890abcdef1234567890abcdef',
+      uploaded_at: '2026-10-06T09:41:02Z',
+      extracted_payload: {
+        document_id: 'DC-2026-1002',
+        items: [
+          {
+            sku: 'SKU-IND-100',
+            name: 'Industrial Servo Valve Assembly',
+            delivered_quantity: 10,
+            damaged_quantity: 2,
+            unit_price: 250,
+          },
+        ],
+        provenance: {
+          evidence_id: 'ev_pdf_challan',
+          source_type: 'pdf',
+          document_role: 'delivery_challan',
+          location: 'page:1',
+          extraction_method: 'evidenceos-semantic-extractor-v1:document_parser',
+          timestamp: '2026-10-06T09:41:03Z',
+          confidence: 0.96,
+          epistemic_type: 'FACT',
+          raw_snippet:
+            'DELIVERY CHALLAN\nDOCUMENT ID: DC-2026-1002\nITEM | SKU: SKU-IND-100 | NAME: Industrial Servo Valve Assembly | DELIVERED: 10 | DAMAGED: 2 | PRICE: 250.0',
+        },
+      },
+    };
+
+    render(
+      <EvidenceInspectorDrawer
+        caseId="case_02"
+        item={pdfEvidence}
+        onClose={() => {}}
+      />
+    );
+
+    expect(
+      screen.getByText(/Inline PDF \/ Source Evidence Highlighting/i)
+    ).toBeInTheDocument();
+    const dmgChip = screen.getByRole('button', {
+      name: /Damaged: 2 units \(SKU-IND-100\)/i,
+    });
+    fireEvent.click(dmgChip);
+    expect(screen.getByText(/← Extracted Claim Span/i)).toBeInTheDocument();
+  });
+
+  it('renders side-by-side visual comparison for reused/near-duplicate images in ConflictPresentationList', () => {
+    render(
+      <ConflictPresentationList
+        conflicts={[]}
+        historicalWarnings={[
+          {
+            match_id: 'hm_01',
+            case_id: 'case_04_reused_historical_evidence',
+            current_evidence_id: 'ev_curr_img',
+            historical_case_id: 'case_02_partial_damage',
+            historical_evidence_id: 'ev_hist_img',
+            match_type: 'PERCEPTUAL_DHASH_NEAR_DUPLICATE',
+            similarity_score: 0.984,
+            hamming_distance: 1,
+            warning_message:
+              'Uploaded inspection image matches historical dispute case_02_partial_damage.',
+          },
+        ]}
+        onInspectEvidenceById={() => {}}
+        onSelectCase={() => {}}
+      />
+    );
+
+    expect(screen.getByText(/Potentially reused evidence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Current Claim Image/i)).toBeInTheDocument();
+    expect(screen.getByText(/Historical Image \(Prior Claim\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hamming Distance: 1\/64/i)).toBeInTheDocument();
+  });
 });
+

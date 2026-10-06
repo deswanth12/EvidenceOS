@@ -219,15 +219,60 @@ export function ProvenanceModal({
             </div>
           </div>
 
-          {/* Verbatim Source Snippet if present */}
+          {/* Inline Highlighted Source Snippet */}
           {claim.provenance.raw_snippet && (
-            <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
-              <span className="text-[11px] font-mono uppercase text-slate-400 block">
-                VERBATIM SOURCE SNIPPET (@ {claim.provenance.location || 'Document'})
-              </span>
-              <pre className="font-mono text-slate-200 whitespace-pre-wrap bg-slate-900 p-2.5 rounded border border-slate-800">
-                {claim.provenance.raw_snippet}
-              </pre>
+            <div className="p-3.5 rounded-lg bg-slate-950 border border-slate-800 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-mono uppercase text-amber-300 font-semibold block">
+                  INLINE SOURCE HIGHLIGHT (@ {claim.provenance.location || 'Document'})
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  Exact line supporting {claim.attribute}={String(claim.value)}
+                </span>
+              </div>
+              <div className="rounded border border-slate-800 bg-slate-900 divide-y divide-slate-800/60 font-mono text-xs overflow-hidden">
+                {String(claim.provenance.raw_snippet)
+                  .split(/\r?\n/)
+                  .filter((l) => l.trim().length > 0)
+                  .map((line, idx, arr) => {
+                    const upper = line.toUpperCase();
+                    const skuClean = claim.entity_key.replace('ITEM:', '').toUpperCase();
+                    const valStr =
+                      claim.value !== null && claim.value !== undefined
+                        ? String(claim.value).toUpperCase()
+                        : '';
+                    const isMatch =
+                      arr.length === 1 ||
+                      upper.includes('ITEM |') ||
+                      upper.includes(skuClean) ||
+                      (valStr.length > 0 && upper.includes(valStr)) ||
+                      upper.includes('DAMAGED') ||
+                      upper.includes('ORDERED') ||
+                      upper.includes('DELIVERED');
+                    return (
+                      <div
+                        key={idx}
+                        className={`px-3 py-1.5 flex items-start justify-between gap-3 ${
+                          isMatch
+                            ? 'bg-amber-500/20 border-l-4 border-amber-400 text-amber-100 font-semibold'
+                            : 'text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <span className="text-[10px] text-slate-500 select-none shrink-0 pt-0.5">
+                            L{String(idx + 1).padStart(2, '0')}
+                          </span>
+                          <span className="break-all">{line}</span>
+                        </div>
+                        {isMatch && (
+                          <span className="shrink-0 px-1.5 py-0.5 rounded bg-amber-500/25 text-amber-200 border border-amber-400/40 text-[10px]">
+                            ← Highlighted Claim Line
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
           )}
 

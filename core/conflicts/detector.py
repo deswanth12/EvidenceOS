@@ -42,6 +42,24 @@ class ConflictDetectionService:
             delivered_list: List[Dict[str, Any]] = attrs.get("delivered_quantity", [])
             damaged_list: List[Dict[str, Any]] = attrs.get("damaged_quantity", [])
             irrelevant_list: List[Dict[str, Any]] = attrs.get("document_relevance", [])
+            chronology_list: List[Dict[str, Any]] = attrs.get("timestamp_chronology", [])
+
+            if chronology_list:
+                conflicts.append(
+                    EvidenceConflict(
+                        case_id=case_id,
+                        conflict_type="TIMESTAMP_CHRONOLOGY_CONFLICT",
+                        severity=ConflictSeverity.HIGH,
+                        entity_key=ent.canonical_key,
+                        attribute="timestamp_chronology",
+                        description=(
+                            f"Conflicting document timestamps ({chronology_list[0].get('value')}): "
+                            "Delivery Challan date precedes the Purchase Order authorization date."
+                        ),
+                        competing_values=chronology_list,
+                        epistemic_type=EpistemologicalType.UNCERTAINTY,
+                    )
+                )
 
             if irrelevant_list:
                 conflicts.append(

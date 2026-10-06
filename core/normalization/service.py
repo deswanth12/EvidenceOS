@@ -34,6 +34,8 @@ class EvidenceNormalizationService:
         db.commit()
 
         claims: List[NormalizedClaim] = []
+        po_dates: List[tuple[str, Provenance, str]] = []
+        challan_dates: List[tuple[str, Provenance, str]] = []
 
         for record in evidence_records:
             payload = record.extracted_payload
@@ -45,7 +47,15 @@ class EvidenceNormalizationService:
             role = DocumentRole(record.document_role)
 
             if role in (DocumentRole.PURCHASE_ORDER, DocumentRole.DELIVERY_CHALLAN, DocumentRole.INVOICE):
+                doc_date = payload.get("date")
                 items = payload.get("items", [])
+                primary_sku = (items[0].get("sku") if items else "SKU-IND-100") or "SKU-IND-100"
+                if isinstance(doc_date, str) and len(doc_date) == 10:
+                    if role == DocumentRole.PURCHASE_ORDER:
+                        po_dates.append((doc_date, base_prov, f"ITEM:{primary_sku.upper()}"))
+                    elif role == DocumentRole.DELIVERY_CHALLAN:
+                        challan_dates.append((doc_date, base_prov, f"ITEM:{primary_sku.upper()}"))
+
                 for item in items:
                     sku = (item.get("sku") or "SKU-IND-100").upper()
                     entity_key = f"ITEM:{sku}"
@@ -184,6 +194,27 @@ class EvidenceNormalizationService:
                         epistemic_type=EpistemologicalType.UNCERTAINTY,
                         reason=f"Uploaded artifact ({record.original_filename}) is unrecognized or irrelevant to procurement dispute verification.",
                         provenance=base_prov,
+                    )
+                )
+
+        # Check chronological consistency between Purchase Order date and Delivery Challan date
+        if po_dates and challan_dates:
+            po_date_str, po_prov, po_ent_key = po_dates[0]
+            dc_date_str, dc_prov, _ = challan_dates[0]
+            if dc_date_str < po_date_str:
+                claims.append(
+                    NormalizedClaim(
+                        case_id=case_id,
+                        entity_key=po_ent_key,
+                        attribute="timestamp_chronology",
+                        value=f"PO:{po_date_str} > DC:{dc_date_str}",
+                        unit="date",
+                        epistemic_type=EpistemologicalType.UNCERTAINTY,
+                        reason=(
+                            f"Chronological timestamp conflict: Delivery Challan date ({dc_date_str}) "
+                            f"precedes Purchase Order authorization date ({po_date_str})."
+                        ),
+                        provenance=dc_prov,
                     )
                 )
 

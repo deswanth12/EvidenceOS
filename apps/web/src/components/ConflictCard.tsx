@@ -171,41 +171,111 @@ export function ConflictPresentationList({
             ✓ All uploaded files and inspection images passed SHA-256 and 64-bit dHash uniqueness checks against prior disputes.
           </div>
         ) : (
-          <div className="space-y-3">
-            {historicalWarnings.map((w) => (
-              <div
-                key={w.match_id}
-                className="p-4 rounded-xl bg-rose-950/25 border border-rose-500/40 space-y-2.5 text-xs"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-bold text-rose-300 font-mono">
-                    ⚠ Potentially reused evidence detected
-                  </span>
-                  <span className="font-mono text-rose-200 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30">
-                    Match: {w.match_type} • Similarity:{' '}
-                    {(w.similarity_score * 100).toFixed(1)}% (Hamming Distance:{' '}
-                    {w.hamming_distance ?? 0}/64)
-                  </span>
-                </div>
-                <p className="text-slate-200">{w.warning_message}</p>
-                <div className="flex flex-wrap gap-2.5 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => onInspectEvidenceById(w.current_evidence_id)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-sky-300 font-medium border border-slate-700"
+          <div className="space-y-4">
+            {historicalWarnings.map((w) => {
+              const currentImgUrl = `/api/cases/${w.case_id}/evidence/${w.current_evidence_id}/raw`;
+              const historicalImgUrl = `/api/cases/${w.historical_case_id}/evidence/${w.historical_evidence_id}/raw`;
+              return (
+                <div
+                  key={w.match_id}
+                  className="p-4 rounded-xl bg-rose-950/25 border border-rose-500/40 space-y-3.5 text-xs"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-500/20 text-rose-200 border border-rose-500/40 font-bold font-mono">
+                      ⚠ Potentially reused evidence
+                    </span>
+                    <span className="font-mono text-rose-200 bg-rose-950/60 px-2.5 py-1 rounded border border-rose-500/30">
+                      Match: {w.match_type} • Similarity:{' '}
+                      {(w.similarity_score * 100).toFixed(1)}% (Hamming Distance:{' '}
+                      {w.hamming_distance ?? 0}/64)
+                    </span>
+                  </div>
+
+                  <p className="text-slate-200">{w.warning_message}</p>
+
+                  {/* Side-by-Side Visual Evidence Comparison */}
+                  <div
+                    aria-label="Side-by-side reused image comparison"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1"
                   >
-                    View Current Evidence ({w.current_evidence_id})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onSelectCase(w.historical_case_id)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 font-medium border border-slate-700"
-                  >
-                    Open Prior Case ({w.historical_case_id})
-                  </button>
+                    {/* Left: Current Claim Image */}
+                    <div className="rounded-lg bg-slate-950 border border-slate-800 p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
+                        <span className="font-semibold text-sky-300 uppercase tracking-wider text-[11px] font-mono">
+                          Current Claim Image
+                        </span>
+                        <span className="font-mono text-[11px] text-slate-400">
+                          {w.current_evidence_id}
+                        </span>
+                      </div>
+                      <div className="flex justify-center items-center bg-slate-900 rounded p-2.5 border border-slate-800 min-h-[140px]">
+                        <img
+                          src={currentImgUrl}
+                          alt={`Current claim evidence ${w.current_evidence_id}`}
+                          className="max-h-40 rounded object-contain"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                        <span>Case: {w.case_id}</span>
+                        <button
+                          type="button"
+                          onClick={() => onInspectEvidenceById(w.current_evidence_id)}
+                          className="text-sky-400 hover:underline font-sans font-medium"
+                        >
+                          Inspect Current File →
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Right: Historical Prior-Claim Image */}
+                    <div className="rounded-lg bg-slate-950 border border-rose-500/30 p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5">
+                        <span className="font-semibold text-amber-300 uppercase tracking-wider text-[11px] font-mono">
+                          Historical Image (Prior Claim)
+                        </span>
+                        <span className="font-mono text-[11px] text-slate-400">
+                          {w.historical_evidence_id}
+                        </span>
+                      </div>
+                      <div className="flex justify-center items-center bg-slate-900 rounded p-2.5 border border-slate-800 min-h-[140px]">
+                        <img
+                          src={historicalImgUrl}
+                          alt={`Historical prior case evidence ${w.historical_evidence_id}`}
+                          className="max-h-40 rounded object-contain"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                        <span>Prior Case: {w.historical_case_id}</span>
+                        <button
+                          type="button"
+                          onClick={() => onSelectCase(w.historical_case_id)}
+                          className="text-amber-400 hover:underline font-sans font-medium"
+                        >
+                          Open Prior Case →
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => onInspectEvidenceById(w.current_evidence_id)}
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-sky-300 font-medium border border-slate-700"
+                    >
+                      View Current Evidence ({w.current_evidence_id})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onSelectCase(w.historical_case_id)}
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 font-medium border border-slate-700"
+                    >
+                      Open Prior Case ({w.historical_case_id})
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

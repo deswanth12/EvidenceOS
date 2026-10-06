@@ -27,6 +27,8 @@ Purely generative LLM pipelines are unsafe for autonomous financial settlement: 
 
 ## 2. Reproducible Research Evaluation Summary
 
+> *"On a held-out evaluation set of 150 cases, the full EvidenceOS pipeline achieved **94.0%** decision accuracy (`141/150`, 95% Wilson CI `[89.0%, 96.8%]`). The deterministic baselines achieved **72.0%** (strict regex) and **78.0%** (structured normalizer), while standalone semantic extraction without deterministic rules achieved **44.0%** (`48.0%` confident error rate). The largest performance gap occurred in unstructured prose documents, colloquial warehouse voice transcripts, and degraded visual evidence."*
+
 We evaluate EvidenceOS across three strictly separated datasets (`seed=42`) to prevent benchmark overfitting. **We never market regression or development metrics as open-world accuracy.**
 
 ```text
@@ -67,7 +69,7 @@ AI limitation:
 Standalone semantic AI without the deterministic rule engine (System C) suffers a 48.0% confident error rate (auto-approving late SLA filings, high-value disputes >= $5,000, and uncorroborated claims). Even with rules (System D), unseen regional slang ("munted", "total toast"), digit-level OCR corruption ("lO" for "10"), and untranslated German headers ("Bestellmenge") cause 6 extraction misses (all safely abstaining to manual_review_required).
 
 Reproducibility:
-PASS (Deterministic seed=42, 11/11 pytest, 3/3 vitest, 0 ruff errors, single-command `python -m scripts.run_evaluation`)
+PASS (Deterministic seed=42, 12/12 pytest, 10/10 vitest, 0 ruff errors, single-command `python -m scripts.run_evaluation`)
 ```
 
 ### 2.1 Performance Across Dataset Splits (`System D: Full EvidenceOS`)

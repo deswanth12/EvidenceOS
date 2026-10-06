@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EvidenceGraph,
   EvidenceItem,
@@ -323,6 +323,12 @@ export function EvidenceInspectorDrawer({
   item: EvidenceItem | null;
   onClose: () => void;
 }) {
+  const [selectedHighlightTerm, setSelectedHighlightTerm] = useState<string>('ALL');
+
+  useEffect(() => {
+    setSelectedHighlightTerm('ALL');
+  }, [item?.id]);
+
   useEffect(() => {
     if (!item) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -338,6 +344,88 @@ export function EvidenceInspectorDrawer({
 
   const prov = item.extracted_payload?.provenance;
   const rawUrl = `/api/cases/${caseId}/evidence/${item.id}/raw`;
+  const extractedItems: Array<Record<string, any>> = Array.isArray(
+    item.extracted_payload?.items
+  )
+    ? item.extracted_payload.items
+    : [];
+
+  // Build interactive highlight chips from extracted PDF line items
+  const highlightChips: Array<{ id: string; label: string; tokens: string[] }> = [
+    {
+      id: 'ALL',
+      label: 'All Extracted Line Items',
+      tokens: ['ITEM', 'SKU:', 'ORDERED', 'DELIVERED', 'DAMAGED', 'PRICE', 'units', 'boxes'],
+    },
+  ];
+  extractedItems.forEach((it, idx) => {
+    const sku = String(it.sku || 'SKU-IND-100');
+    if (it.ordered_quantity !== null && it.ordered_quantity !== undefined) {
+      highlightChips.push({
+        id: `ord-${idx}`,
+        label: `Ordered: ${it.ordered_quantity} units (${sku})`,
+        tokens: [`ORDERED: ${it.ordered_quantity}`, `${it.ordered_quantity} units`, sku],
+      });
+    }
+    if (it.delivered_quantity !== null && it.delivered_quantity !== undefined) {
+      highlightChips.push({
+        id: `del-${idx}`,
+        label: `Delivered: ${it.delivered_quantity} units (${sku})`,
+        tokens: [`DELIVERED: ${it.delivered_quantity}`, `${it.delivered_quantity} units`, sku],
+      });
+    }
+    if (it.damaged_quantity !== null && it.damaged_quantity !== undefined) {
+      highlightChips.push({
+        id: `dmg-${idx}`,
+        label: `Damaged: ${it.damaged_quantity} units (${sku})`,
+        tokens: [`DAMAGED: ${it.damaged_quantity}`, `${it.damaged_quantity} units damaged`, sku],
+      });
+    }
+    if (it.unit_price !== null && it.unit_price !== undefined) {
+      highlightChips.push({
+        id: `prc-${idx}`,
+        label: `Unit Price: $${it.unit_price}`,
+        tokens: [`PRICE: ${it.unit_price}`, `$${it.unit_price}`, sku],
+      });
+    }
+  });
+
+  const activeChip =
+    highlightChips.find((c) => c.id === selectedHighlightTerm) || highlightChips[0];
+
+  // Build numbered document lines for inline PDF highlighting
+  const rawTextLines: string[] = prov?.raw_snippet
+    ? String(prov.raw_snippet)
+        .split(/\r?\n/)
+        .filter((l) => l.trim().length > 0)
+    : [];
+
+  // Ensure extracted line items are represented in the inline viewer even if snippet was truncated
+  if (extractedItems.length > 0) {
+    extractedItems.forEach((it) => {
+      const sku = String(it.sku || 'SKU-IND-100');
+      const alreadyInLines = rawTextLines.some((l) =>
+        l.toUpperCase().includes(sku.toUpperCase())
+      );
+      if (!alreadyInLines) {
+        const parts = [`ITEM | SKU: ${sku} | NAME: ${it.name || 'Component'}`];
+        if (it.ordered_quantity !== null && it.ordered_quantity !== undefined)
+          parts.push(`ORDERED: ${it.ordered_quantity}`);
+        if (it.delivered_quantity !== null && it.delivered_quantity !== undefined)
+          parts.push(`DELIVERED: ${it.delivered_quantity}`);
+        if (it.damaged_quantity !== null && it.damaged_quantity !== undefined)
+          parts.push(`DAMAGED: ${it.damaged_quantity}`);
+        if (it.unit_price !== null && it.unit_price !== undefined)
+          parts.push(`PRICE: ${it.unit_price}`);
+        rawTextLines.push(parts.join(' | '));
+      }
+    });
+  }
+
+  const isLineHighlighted = (line: string): boolean => {
+    const upperLine = line.toUpperCase();
+    return activeChip.tokens.some((tok) => upperLine.includes(tok.toUpperCase()));
+  };
 
   const ModalityIcon =
     item.modality === 'image'
@@ -484,15 +572,70 @@ export function EvidenceInspectorDrawer({
             </div>
           </div>
 
-          {/* Verbatim Source Snippet */}
-          {prov?.raw_snippet && (
-            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
-                Verbatim Source Text / Span
-              </span>
-              <pre className="text-xs font-mono text-slate-200 whitespace-pre-wrap bg-slate-900 p-3 rounded border border-slate-800">
-                {prov.raw_snippet}
-              </pre>
+          {/* Inline PDF / Document Evidence Highlighting */}
+          {rawTextLines.length > 0 && (
+            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-amber-300 block">
+                  Inline PDF / Source Evidence Highlighting ({prov?.location || 'page:1'})
+                </span>
+                <span className="text-[11px] font-mono text-slate-400">
+                  Click a claim below to highlight its exact source line
+                </span>
+              </div>
+
+              {highlightChips.length > 1 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {highlightChips.map((chip) => {
+                    const isSelected = chip.id === selectedHighlightTerm;
+                    return (
+                      <button
+                        key={chip.id}
+                        type="button"
+                        onClick={() => setSelectedHighlightTerm(chip.id)}
+                        className={`px-2 py-1 rounded text-[11px] font-mono transition border ${
+                          isSelected
+                            ? 'bg-amber-500/20 text-amber-200 border-amber-400 font-semibold'
+                            : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
+                        }`}
+                      >
+                        {chip.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div
+                aria-label="Inline highlighted source document lines"
+                className="rounded border border-slate-800 bg-slate-900 divide-y divide-slate-800/60 font-mono text-xs overflow-hidden"
+              >
+                {rawTextLines.map((line, idx) => {
+                  const matched = isLineHighlighted(line);
+                  return (
+                    <div
+                      key={idx}
+                      className={`px-3 py-1.5 flex items-start justify-between gap-3 ${
+                        matched
+                          ? 'bg-amber-500/20 border-l-4 border-amber-400 text-amber-100 font-semibold'
+                          : 'text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        <span className="text-[10px] text-slate-500 select-none shrink-0 pt-0.5">
+                          L{String(idx + 1).padStart(2, '0')}
+                        </span>
+                        <span className="break-all">{line}</span>
+                      </div>
+                      {matched && (
+                        <span className="shrink-0 px-1.5 py-0.5 rounded bg-amber-500/25 text-amber-200 border border-amber-400/40 text-[10px]">
+                          ← Extracted Claim Span
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -510,3 +653,4 @@ export function EvidenceInspectorDrawer({
     </div>
   );
 }
+

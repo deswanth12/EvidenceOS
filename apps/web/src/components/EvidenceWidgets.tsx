@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   EvidenceGraph,
   EvidenceItem,
@@ -12,25 +12,47 @@ import {
   AlertTriangle,
   CheckCircle2,
   ShieldAlert,
-  Cpu,
   Hash,
   ExternalLink,
-  Layers,
+  HelpCircle,
+  Scale,
+  Package,
+  X,
 } from 'lucide-react';
 
-export function EpistemicBadge({ type }: { type?: EpistemologicalType | string | null }) {
+export function EpistemicBadge({
+  type,
+}: {
+  type?: EpistemologicalType | string | null;
+}) {
   if (!type) return null;
-  const styles: Record<string, string> = {
-    FACT: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-    INFERENCE: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
-    RULE: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
-    UNCERTAINTY: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  const styles: Record<string, { cls: string; title: string }> = {
+    FACT: {
+      cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35',
+      title: 'Directly extracted from source evidence with verbatim provenance',
+    },
+    INFERENCE: {
+      cls: 'bg-sky-500/15 text-sky-300 border-sky-500/35',
+      title: 'Derived by linking or reconciling multiple pieces of evidence',
+    },
+    RULE: {
+      cls: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/35',
+      title: 'Determined by explicit contract / SLA rule logic',
+    },
+    UNCERTAINTY: {
+      cls: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+      title: 'Insufficient, degraded, or conflicting evidence requiring human review',
+    },
+  };
+  const cfg = styles[type] || {
+    cls: 'bg-slate-800 text-slate-300 border-slate-700',
+    title: String(type),
   };
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold border ${
-        styles[type] || 'bg-slate-800 text-slate-300 border-slate-700'
-      }`}
+      title={cfg.title}
+      aria-label={`Epistemic type: ${type}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-semibold border ${cfg.cls}`}
     >
       {type}
     </span>
@@ -40,42 +62,85 @@ export function EpistemicBadge({ type }: { type?: EpistemologicalType | string |
 export function OutcomeBadge({ outcome }: { outcome?: string | null }) {
   if (!outcome) {
     return (
-      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
-        Pending Processing
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-400" aria-hidden="true" />
+        <span>Pending Processing</span>
       </span>
     );
   }
-  const map: Record<string, { label: string; cls: string }> = {
+  const map: Record<
+    string,
+    { label: string; cls: string; dotCls: string; symbol: string }
+  > = {
     approved: {
       label: 'Approved',
-      cls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+      cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+      dotCls: 'bg-emerald-400',
+      symbol: '✓',
+    },
+    approved_full: {
+      label: 'Approved',
+      cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
+      dotCls: 'bg-emerald-400',
+      symbol: '✓',
     },
     partially_approved: {
       label: 'Partially Approved',
-      cls: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+      cls: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+      dotCls: 'bg-sky-400',
+      symbol: '◐',
+    },
+    approved_partial_settlement: {
+      label: 'Partially Approved',
+      cls: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
+      dotCls: 'bg-sky-400',
+      symbol: '◐',
     },
     manual_review_required: {
       label: 'Manual Review',
-      cls: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+      cls: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+      dotCls: 'bg-amber-400',
+      symbol: '⚠',
     },
     disputed: {
       label: 'Disputed',
-      cls: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+      cls: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+      dotCls: 'bg-rose-400',
+      symbol: '✕',
+    },
+    rejected_duplicate_evidence: {
+      label: 'Rejected (Duplicate Evidence)',
+      cls: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+      dotCls: 'bg-rose-400',
+      symbol: '✕',
+    },
+    rejected_late_filing: {
+      label: 'Rejected (SLA Expired)',
+      cls: 'bg-rose-500/15 text-rose-300 border-rose-500/40',
+      dotCls: 'bg-rose-400',
+      symbol: '✕',
     },
     insufficient_evidence: {
       label: 'Insufficient Evidence',
-      cls: 'bg-orange-500/20 text-orange-300 border-orange-500/40',
+      cls: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+      dotCls: 'bg-amber-400',
+      symbol: '?',
     },
   };
   const cfg = map[outcome] || {
     label: outcome,
     cls: 'bg-slate-800 text-slate-300 border-slate-700',
+    dotCls: 'bg-slate-400',
+    symbol: '•',
   };
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border ${cfg.cls}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold border ${cfg.cls}`}
     >
-      {cfg.label}
+      <span className="font-mono text-[11px]" aria-hidden="true">
+        {cfg.symbol}
+      </span>
+      <span>{cfg.label}</span>
     </span>
   );
 }
@@ -93,10 +158,28 @@ export function InteractiveEvidenceGraph({
   const conflictNodes = graph.nodes.filter((n) => n.node_type === 'conflict');
   const decisionNodes = graph.nodes.filter((n) => n.node_type === 'decision');
 
+  const getRoleBadge = (node: GraphNode): string => {
+    const lbl = node.label.toLowerCase();
+    if (node.node_type === 'evidence') {
+      if (lbl.includes('purchase order') || lbl.includes('po-')) return 'Purchase Order';
+      if (lbl.includes('challan') || lbl.includes('dc-')) return 'Delivery Challan';
+      if (lbl.includes('invoice')) return 'Invoice';
+      if (lbl.includes('image') || lbl.includes('.png') || lbl.includes('.jpg'))
+        return 'Inspection Image';
+      if (lbl.includes('voice') || lbl.includes('.wav')) return 'Voice Report';
+      return 'Evidence File';
+    }
+    if (node.node_type === 'entity') return 'Shipment / SKU Entity';
+    if (node.node_type === 'claim') return 'Extracted Claim';
+    if (node.node_type === 'conflict') return 'Cross-Modal Conflict';
+    if (node.node_type === 'decision') return 'Rule & Final Decision';
+    return node.node_type;
+  };
+
   const renderNodeCard = (node: GraphNode) => {
     const isClickable =
       node.node_type === 'evidence' ||
-      (node.node_type === 'claim' && node.metadata?.evidence_id);
+      (node.node_type === 'claim' && Boolean(node.metadata?.evidence_id));
     const targetEvId =
       node.node_type === 'evidence' ? node.id : node.metadata?.evidence_id;
 
@@ -104,7 +187,7 @@ export function InteractiveEvidenceGraph({
     if (node.node_type === 'evidence')
       borderStyle = 'border-sky-500/40 bg-sky-950/20 hover:border-sky-400';
     if (node.node_type === 'claim')
-      borderStyle = 'border-emerald-500/30 bg-emerald-950/15 hover:border-emerald-400';
+      borderStyle = 'border-emerald-500/35 bg-emerald-950/15 hover:border-emerald-400';
     if (node.node_type === 'entity')
       borderStyle = 'border-indigo-500/40 bg-indigo-950/25';
     if (node.node_type === 'conflict')
@@ -112,19 +195,32 @@ export function InteractiveEvidenceGraph({
     if (node.node_type === 'decision')
       borderStyle = 'border-violet-500/50 bg-violet-950/30';
 
+    const handleTrigger = () => {
+      if (isClickable && targetEvId) {
+        onSelectEvidenceId(String(targetEvId));
+      }
+    };
+
     return (
       <div
         key={node.id}
-        onClick={() => {
-          if (isClickable && targetEvId) onSelectEvidenceId(targetEvId);
+        role={isClickable ? 'button' : undefined}
+        tabIndex={isClickable ? 0 : undefined}
+        aria-label={`${getRoleBadge(node)}: ${node.label}`}
+        onClick={handleTrigger}
+        onKeyDown={(e) => {
+          if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            handleTrigger();
+          }
         }}
-        className={`p-3 rounded-lg border transition-all ${borderStyle} ${
-          isClickable ? 'cursor-pointer shadow-sm hover:shadow-sky-500/10' : ''
+        className={`p-3 rounded-lg border transition-colors text-left ${borderStyle} ${
+          isClickable ? 'cursor-pointer hover:bg-slate-900' : ''
         }`}
       >
         <div className="flex items-center justify-between gap-2 mb-1">
           <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-            {node.node_type}
+            {getRoleBadge(node)}
           </span>
           <EpistemicBadge type={node.epistemic_type} />
         </div>
@@ -133,13 +229,13 @@ export function InteractiveEvidenceGraph({
         </div>
         {node.metadata?.confidence !== undefined && (
           <div className="mt-1.5 text-[11px] font-mono text-slate-400">
-            Confidence: {(Number(node.metadata.confidence) * 100).toFixed(0)}%
+            Extraction confidence: {(Number(node.metadata.confidence) * 100).toFixed(0)}%
           </div>
         )}
         {isClickable && (
-          <div className="mt-1.5 text-[10px] text-sky-400 flex items-center gap-1">
-            <span>Inspect provenance</span>
-            <ExternalLink className="w-2.5 h-2.5" />
+          <div className="mt-1.5 text-[10px] text-sky-400 flex items-center gap-1 font-medium">
+            <span>Inspect source file & provenance</span>
+            <ExternalLink className="w-2.5 h-2.5" aria-hidden="true" />
           </div>
         )}
       </div>
@@ -148,46 +244,53 @@ export function InteractiveEvidenceGraph({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 border border-slate-800 rounded-lg p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 border border-slate-800 rounded-lg p-3.5">
         <div className="text-xs text-slate-300">
-          <span className="font-semibold text-white">Cross-Modal Provenance DAG:</span>{' '}
-          Click any Evidence or Claim node to inspect its original source artifact, hash, and extraction payload.
+          <span className="font-semibold text-white">
+            Evidence-to-Decision Provenance Graph:
+          </span>{' '}
+          Traces Purchase Order & Delivery Challan → Shipment SKU → Multimodal Claims (Image & Voice) → Conflicts → Rule Evaluation → Final Decision.
         </div>
         <div className="flex items-center gap-3 text-xs font-mono text-slate-400">
           <span>Nodes: {graph.nodes.length}</span>
-          <span>Edges: {graph.edges.length}</span>
+          <span>Links: {graph.edges.length}</span>
         </div>
       </div>
 
+      {/* Clear Flow Legend */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {/* Column 1: Raw Evidence Sources */}
         <div className="space-y-2.5">
-          <div className="text-xs font-semibold uppercase tracking-wider text-sky-400 border-b border-slate-800 pb-1.5">
-            1. Source Evidence ({evidenceNodes.length})
+          <div className="text-xs font-semibold uppercase tracking-wider text-sky-400 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+            <span>1. Source Files ({evidenceNodes.length})</span>
+            <FileText className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           {evidenceNodes.map(renderNodeCard)}
         </div>
 
         {/* Column 2: Normalized Claims */}
         <div className="space-y-2.5">
-          <div className="text-xs font-semibold uppercase tracking-wider text-emerald-400 border-b border-slate-800 pb-1.5">
-            2. Extracted Claims ({claimNodes.length})
+          <div className="text-xs font-semibold uppercase tracking-wider text-emerald-400 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+            <span>2. Extracted Claims ({claimNodes.length})</span>
+            <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           {claimNodes.map(renderNodeCard)}
         </div>
 
         {/* Column 3: Resolved Canonical Entities */}
         <div className="space-y-2.5">
-          <div className="text-xs font-semibold uppercase tracking-wider text-indigo-400 border-b border-slate-800 pb-1.5">
-            3. Resolved Entities ({entityNodes.length})
+          <div className="text-xs font-semibold uppercase tracking-wider text-indigo-400 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+            <span>3. Shipment & SKU ({entityNodes.length})</span>
+            <Package className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           {entityNodes.map(renderNodeCard)}
         </div>
 
         {/* Column 4: Detected Contradictions */}
         <div className="space-y-2.5">
-          <div className="text-xs font-semibold uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-1.5">
-            4. Conflicts ({conflictNodes.length})
+          <div className="text-xs font-semibold uppercase tracking-wider text-amber-400 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+            <span>4. Conflicts ({conflictNodes.length})</span>
+            <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           {conflictNodes.length === 0 ? (
             <div className="p-3 rounded-lg border border-slate-800/80 bg-slate-900/40 text-xs text-slate-400">
@@ -200,8 +303,9 @@ export function InteractiveEvidenceGraph({
 
         {/* Column 5: Deterministic Decision */}
         <div className="space-y-2.5">
-          <div className="text-xs font-semibold uppercase tracking-wider text-violet-400 border-b border-slate-800 pb-1.5">
-            5. Final Decision ({decisionNodes.length})
+          <div className="text-xs font-semibold uppercase tracking-wider text-violet-400 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+            <span>5. Rule & Decision ({decisionNodes.length})</span>
+            <Scale className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           {decisionNodes.map(renderNodeCard)}
         </div>
@@ -219,6 +323,17 @@ export function EvidenceInspectorDrawer({
   item: EvidenceItem | null;
   onClose: () => void;
 }) {
+  useEffect(() => {
+    if (!item) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [item, onClose]);
+
   if (!item) return null;
 
   const prov = item.extracted_payload?.provenance;
@@ -232,132 +347,164 @@ export function EvidenceInspectorDrawer({
       : FileText;
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col">
-      <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
-        <div className="flex items-center gap-2.5">
-          <ModalityIcon className="w-5 h-5 text-sky-400" />
-          <div>
-            <h3 className="text-sm font-semibold text-white">
-              {item.original_filename}
-            </h3>
-            <p className="text-xs font-mono text-slate-400">
-              ID: {item.id} • Role: {item.document_role}
-            </p>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="evidence-drawer-title"
+      className="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-[1px]"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-xl bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col h-full"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+          <div className="flex items-center gap-2.5">
+            <ModalityIcon className="w-5 h-5 text-sky-400" aria-hidden="true" />
+            <div>
+              <h3 id="evidence-drawer-title" className="text-sm font-semibold text-white">
+                {item.original_filename}
+              </h3>
+              <p className="text-xs font-mono text-slate-400">
+                ID: {item.id} • Role: {item.document_role.replace(/_/g, ' ')} • Modality:{' '}
+                {item.modality.toUpperCase()}
+              </p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close evidence inspector"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
+          >
+            <X className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Close [ESC]</span>
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="px-2.5 py-1 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200"
-        >
-          Close [ESC]
-        </button>
-      </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-5">
-        {/* Cryptographic & Perceptual Provenance */}
-        <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Hash className="w-3.5 h-3.5 text-sky-400" />
-              Cryptographic & Provenance Metadata
-            </span>
-            {prov && <EpistemicBadge type={prov.epistemic_type} />}
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div>
-              <span className="text-slate-500 block">SHA-256 Hash:</span>
-              <span className="font-mono text-[11px] text-slate-200 break-all">
-                {item.sha256_hash}
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+          {/* Direct Action to Open Original File First */}
+          <div className="bg-slate-950 border border-sky-500/30 rounded-lg p-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-xs">
+              <span className="font-semibold text-white block">
+                Original Immutable Evidence File
+              </span>
+              <span className="text-slate-400">
+                Preserved byte-for-byte prior to extraction ({item.file_size_bytes.toLocaleString()} bytes)
               </span>
             </div>
-            <div>
-              <span className="text-slate-500 block">Perceptual dHash (64-bit):</span>
-              <span className="font-mono text-[11px] text-slate-200">
-                {item.perceptual_hash || 'N/A (Non-image modality)'}
-              </span>
-            </div>
-            <div>
-              <span className="text-slate-500 block">Extraction Method:</span>
-              <span className="font-mono text-[11px] text-sky-300">
-                {prov?.extraction_method || item.extraction_metadata?.provider || 'N/A'}
-              </span>
-            </div>
-            <div>
-              <span className="text-slate-500 block">Confidence & Location:</span>
-              <span className="font-mono text-[11px] text-slate-200">
-                {prov ? `${(prov.confidence * 100).toFixed(1)}% @ ${prov.location}` : 'N/A'}
-              </span>
-            </div>
-          </div>
-          <div className="pt-2 border-t border-slate-900 flex justify-end">
             <a
               href={rawUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-sky-400 hover:text-sky-300 font-medium"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition"
             >
-              <span>Open Original Immutable Evidence Artifact</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Open Original File</span>
+              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
             </a>
           </div>
-        </div>
 
-        {/* Visual Preview for Images */}
-        {item.modality === 'image' && (
-          <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
-              Visual Evidence Preview
-            </span>
-            <div className="flex justify-center bg-slate-900 rounded p-2 border border-slate-800">
-              <img
-                src={rawUrl}
-                alt={item.original_filename}
-                className="max-h-56 rounded object-contain"
-              />
-            </div>
-            {item.extracted_payload?.visual_summary && (
-              <p className="text-xs text-slate-300 italic">
-                “{item.extracted_payload.visual_summary}”
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Audio Player & Transcript for Voice Reports */}
-        {item.modality === 'audio' && (
-          <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
-              Audio Recording & Extracted Transcript
-            </span>
-            <audio controls src={rawUrl} className="w-full h-9" />
-            {item.extracted_payload?.transcript && (
-              <div className="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs text-slate-200 font-mono">
-                "{item.extracted_payload.transcript}"
+          {/* Visual Preview for Images */}
+          {item.modality === 'image' && (
+            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
+                Original Image Artifact
+              </span>
+              <div className="flex justify-center bg-slate-900 rounded p-3 border border-slate-800">
+                <img
+                  src={rawUrl}
+                  alt={`Inspection evidence ${item.original_filename}`}
+                  className="max-h-60 rounded object-contain"
+                />
               </div>
-            )}
-          </div>
-        )}
+              {item.extracted_payload?.visual_summary && (
+                <p className="text-xs text-slate-300">
+                  <strong className="text-slate-400">Extracted Observation:</strong>{' '}
+                  {item.extracted_payload.visual_summary}
+                </p>
+              )}
+            </div>
+          )}
 
-        {/* Raw Snippet */}
-        {prov?.raw_snippet && (
+          {/* Audio Player & Transcript for Voice Reports */}
+          {item.modality === 'audio' && (
+            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
+                Original Audio Recording & Verbatim Transcript
+              </span>
+              <audio
+                controls
+                src={rawUrl}
+                aria-label={`Audio playback for ${item.original_filename}`}
+                className="w-full h-9"
+              />
+              {item.extracted_payload?.transcript && (
+                <div className="p-2.5 rounded bg-slate-900 border border-slate-800 text-xs text-slate-200 font-mono">
+                  "{item.extracted_payload.transcript}"
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Cryptographic & Perceptual Provenance */}
+          <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Hash className="w-3.5 h-3.5 text-sky-400" aria-hidden="true" />
+                Provenance & Integrity Metadata
+              </span>
+              {prov && <EpistemicBadge type={prov.epistemic_type} />}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+              <div className="p-2 rounded bg-slate-900/70 border border-slate-800/80">
+                <span className="text-slate-400 block text-[11px]">SHA-256 Content Digest</span>
+                <span className="font-mono text-[11px] text-slate-200 break-all">
+                  {item.sha256_hash}
+                </span>
+              </div>
+              <div className="p-2 rounded bg-slate-900/70 border border-slate-800/80">
+                <span className="text-slate-400 block text-[11px]">64-Bit Perceptual dHash</span>
+                <span className="font-mono text-[11px] text-slate-200">
+                  {item.perceptual_hash || 'Not applicable (non-image)'}
+                </span>
+              </div>
+              <div className="p-2 rounded bg-slate-900/70 border border-slate-800/80">
+                <span className="text-slate-400 block text-[11px]">Processing Method</span>
+                <span className="font-mono text-[11px] text-sky-300">
+                  {prov?.extraction_method || item.extraction_metadata?.provider || 'Deterministic parser'}
+                </span>
+              </div>
+              <div className="p-2 rounded bg-slate-900/70 border border-slate-800/80">
+                <span className="text-slate-400 block text-[11px]">Source Location & Timestamp</span>
+                <span className="font-mono text-[11px] text-slate-200">
+                  {prov?.location || 'Full document'} •{' '}
+                  {item.uploaded_at ? new Date(item.uploaded_at).toLocaleTimeString() : 'Recorded'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Verbatim Source Snippet */}
+          {prov?.raw_snippet && (
+            <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
+                Verbatim Source Text / Span
+              </span>
+              <pre className="text-xs font-mono text-slate-200 whitespace-pre-wrap bg-slate-900 p-3 rounded border border-slate-800">
+                {prov.raw_snippet}
+              </pre>
+            </div>
+          )}
+
+          {/* Full Structured Extraction JSON */}
           <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
-              Verbatim Source Snippet
+              Structured Extraction Output (Schema-Validated)
             </span>
-            <pre className="text-xs font-mono text-slate-300 whitespace-pre-wrap bg-slate-900 p-2.5 rounded border border-slate-800">
-              {prov.raw_snippet}
+            <pre className="text-[11px] font-mono text-emerald-300 overflow-x-auto bg-slate-900 p-3 rounded border border-slate-800">
+              {JSON.stringify(item.extracted_payload, null, 2)}
             </pre>
           </div>
-        )}
-
-        {/* Full Structured Extraction JSON */}
-        <div className="bg-slate-950 border border-slate-800 rounded-lg p-3.5 space-y-1.5">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
-            Structured Extraction Payload (Validated Schema)
-          </span>
-          <pre className="text-[11px] font-mono text-emerald-300 overflow-x-auto bg-slate-900 p-3 rounded border border-slate-800">
-            {JSON.stringify(item.extracted_payload, null, 2)}
-          </pre>
         </div>
       </div>
     </div>

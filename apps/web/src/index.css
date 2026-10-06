@@ -2,13 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #090d16;
-  color: #f1f5f9;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #0b111e;
+    color: #f1f5f9;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Accessible visible focus states for keyboard navigation */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+  }
 }
 
-/* Custom subtle scrollbars */
+/* Subtle, high-contrast scrollbars for tables and drawers */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

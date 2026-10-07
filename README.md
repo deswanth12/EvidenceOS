@@ -2,6 +2,7 @@
 
 > **An Epistemically Grounded Multimodal AI & Deterministic Rule Engine for B2B Delivery Dispute Verification.**
 
+[![CI](https://github.com/deswanth12/EvidenceOS/actions/workflows/ci.yml/badge.svg)](https://github.com/deswanth12/EvidenceOS/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![React 18 (18.3.1) + TypeScript](https://img.shields.io/badge/Frontend-React%2018%20(18.3.1)%20%2B%20TS-61dafb.svg)](https://react.dev/)

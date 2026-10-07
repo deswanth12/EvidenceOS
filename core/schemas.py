@@ -53,6 +53,7 @@ class DocumentRole(str, Enum):
     INSPECTION_IMAGE = "inspection_image"
     VOICE_REPORT = "voice_report"
     INSPECTION_REPORT = "inspection_report"
+    TEMPERATURE_LOGGER = "temperature_logger"
     UNKNOWN = "unknown"
 
 
@@ -321,3 +322,26 @@ class CaseDecision(BaseModel):
     human_reviewer: Optional[str] = None
     human_override_notes: Optional[str] = None
     decided_at: datetime = Field(default_factory=utc_now)
+
+
+class TemperatureReading(BaseModel):
+    """Individual timestamped temperature sensor reading."""
+
+    timestamp: datetime
+    temperature_celsius: float = Field(..., alias="temperature_c")
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+    epistemic_type: EpistemologicalType = Field(default=EpistemologicalType.FACT)
+
+    model_config = {
+        "populate_by_name": True,
+    }
+
+
+class TemperatureTelemetryPayload(BaseModel):
+    """Structured telemetry payload extracted or received from a cold-chain logger."""
+
+    device_id: Optional[str] = None
+    sensor_model: Optional[str] = None
+    recording_interval_seconds: Optional[int] = None
+    readings: List[TemperatureReading] = Field(default_factory=list)
+    provenance: Optional[Provenance] = None

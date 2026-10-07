@@ -7,7 +7,8 @@ corroboration checks, and SLA evaluations. No LLM is ever allowed to compute
 settlement quantities or override contract rules.
 """
 
-from typing import Any, Dict, List, Tuple
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Tuple
 
 from core.config import get_settings
 from core.schemas import (
@@ -17,6 +18,23 @@ from core.schemas import (
     ResolvedEntity,
     RuleEvaluationTrace,
 )
+
+
+def _parse_timestamp(val: Any) -> Optional[datetime]:
+    """Parse timestamps from ISO strings, unix timestamps, or datetime objects."""
+    if isinstance(val, datetime):
+        return val if val.tzinfo is not None else val.replace(tzinfo=timezone.utc)
+    if isinstance(val, (int, float)):
+        try:
+            return datetime.fromtimestamp(val, tz=timezone.utc)
+        except (ValueError, OSError):
+            return None
+    if isinstance(val, str):
+        try:
+            return datetime.fromisoformat(val.replace("Z", "+00:00"))
+        except (ValueError, TypeError):
+            return None
+    return None
 
 
 class DeterministicRuleEngine:
@@ -51,6 +69,7 @@ class DeterministicRuleEngine:
         has_uncertain_evidence = False
         min_observed_conf = 1.0
         all_evidence_ids: List[str] = []
+        temperature_telemetry_entries: List[Dict[str, Any]] = []
 
         for ent in entities:
             all_evidence_ids.extend(ent.linked_evidence_ids)
@@ -90,6 +109,12 @@ class DeterministicRuleEngine:
                         voice_damaged_qty = val if voice_damaged_qty is None else max(voice_damaged_qty, val)
                     elif role == "delivery_challan":
                         challan_damaged_qty = max(challan_damaged_qty, val)
+
+            for tt in attrs.get("temperature_telemetry", []):
+                temperature_telemetry_entries.append(tt)
+                min_observed_conf = min(min_observed_conf, float(tt.get("confidence", 1.0)))
+                if tt.get("epistemic_type") == "UNCERTAINTY":
+                    has_uncertain_evidence = True
 
         all_evidence_ids = sorted(list(set(all_evidence_ids)))
 
@@ -242,6 +267,190 @@ class DeterministicRuleEngine:
             )
         )
 
+        # RULE 9: Cold-Chain Temperature Excursion Check (R9)
+        requires_cold_chain = bool(contract_config.get("requires_cold_chain", False))
+        min_temp_celsius = float(contract_config.get("min_temperature_celsius", 2.0))
+        max_temp_celsius = float(contract_config.get("max_temperature_celsius", 8.0))
+        max_excursion_duration_minutes = float(contract_config.get("max_excursion_duration_minutes", 60.0))
+        excursion_mode = str(contract_config.get("excursion_evaluation_mode", "cumulative")).lower()
+
+        # Gather telemetry readings
+        readings_raw = []
+        if contract_config.get("temperature_telemetry"):
+            cf_val = contract_config["temperature_telemetry"]
+            if isinstance(cf_val, list):
+                readings_raw.extend(cf_val)
+            elif isinstance(cf_val, dict) and "readings" in cf_val:
+                readings_raw.extend(cf_val["readings"])
+
+        for entry in temperature_telemetry_entries:
+            if isinstance(entry, dict) and "readings" in entry:
+                readings_raw.extend(entry["readings"])
+            elif isinstance(entry, dict) and "value" in entry:
+                val = entry.get("value")
+                if isinstance(val, list):
+                    readings_raw.extend(val)
+                elif isinstance(val, dict) and "readings" in val:
+                    readings_raw.extend(val["readings"])
+                elif isinstance(val, dict):
+                    readings_raw.append(val)
+            elif isinstance(entry, dict) and ("temperature_celsius" in entry or "temperature_c" in entry):
+                readings_raw.append(entry)
+
+        cold_chain_inputs: Dict[str, Any] = {
+            "requires_cold_chain": requires_cold_chain,
+            "min_temperature_celsius": min_temp_celsius,
+            "max_temperature_celsius": max_temp_celsius,
+            "max_excursion_duration_minutes": max_excursion_duration_minutes,
+            "excursion_evaluation_mode": excursion_mode,
+            "telemetry_reading_count": len(readings_raw),
+        }
+
+        r9_passed = True
+        r9_epistemic_type = EpistemologicalType.RULE
+        r9_explanation = ""
+        total_excursion_minutes = 0.0
+        max_contiguous_excursion_minutes = 0.0
+        min_recorded_temp: Optional[float] = None
+        max_recorded_temp: Optional[float] = None
+
+        if not requires_cold_chain:
+            r9_passed = True
+            r9_explanation = "Cold-chain temperature monitoring is not required under current contract SLA."
+        else:
+            if not readings_raw:
+                r9_passed = False
+                r9_epistemic_type = EpistemologicalType.UNCERTAINTY
+                r9_explanation = "Cold-chain monitoring required by contract SLA, but no temperature logger telemetry was provided."
+            else:
+                parsed_readings: List[Tuple[datetime, float]] = []
+                malformed_data = False
+                telemetry_confidence_failed = False
+
+                for r in readings_raw:
+                    if not isinstance(r, dict):
+                        malformed_data = True
+                        break
+
+                    conf = float(r.get("confidence", 1.0))
+                    if conf < min_confidence or r.get("epistemic_type") == "UNCERTAINTY":
+                        telemetry_confidence_failed = True
+
+                    ts = _parse_timestamp(r.get("timestamp"))
+                    temp = r.get("temperature_celsius") if "temperature_celsius" in r else r.get("temperature_c")
+                    if ts is None or not isinstance(temp, (int, float)):
+                        malformed_data = True
+                        break
+                    parsed_readings.append((ts, float(temp)))
+
+                if malformed_data or len(parsed_readings) < 2:
+                    r9_passed = False
+                    r9_epistemic_type = EpistemologicalType.UNCERTAINTY
+                    r9_explanation = (
+                        "Temperature telemetry data is malformed, corrupted, or contains fewer than 2 valid timestamped readings."
+                    )
+                elif telemetry_confidence_failed:
+                    r9_passed = False
+                    r9_epistemic_type = EpistemologicalType.UNCERTAINTY
+                    r9_explanation = (
+                        f"Temperature telemetry does not meet required confidence threshold ({min_confidence:.2f}) or has UNCERTAINTY status."
+                    )
+                else:
+                    # Sort readings chronologically
+                    parsed_readings.sort(key=lambda x: x[0])
+                    temps = [p[1] for p in parsed_readings]
+                    min_recorded_temp = min(temps)
+                    max_recorded_temp = max(temps)
+
+                    cold_chain_inputs["min_recorded_temp_celsius"] = min_recorded_temp
+                    cold_chain_inputs["max_recorded_temp_celsius"] = max_recorded_temp
+
+                    current_contiguous_minutes = 0.0
+
+                    calculation_method = str(contract_config.get("excursion_calculation_method", "step")).lower()
+
+                    for i in range(len(parsed_readings) - 1):
+                        t_curr, temp_curr = parsed_readings[i]
+                        t_next, temp_next = parsed_readings[i + 1]
+
+                        delta_seconds = (t_next - t_curr).total_seconds()
+                        if delta_seconds < 0:
+                            malformed_data = True
+                            break
+                        delta_minutes = delta_seconds / 60.0
+
+                        is_curr_excursion = temp_curr < min_temp_celsius or temp_curr > max_temp_celsius
+                        is_next_excursion = temp_next < min_temp_celsius or temp_next > max_temp_celsius
+
+                        if calculation_method == "linear":
+                            if is_curr_excursion and is_next_excursion:
+                                excursion_interval = delta_minutes
+                            elif is_curr_excursion != is_next_excursion:
+                                thresh = max_temp_celsius if max(temp_curr, temp_next) > max_temp_celsius else min_temp_celsius
+                                diff = abs(temp_next - temp_curr)
+                                if diff > 1e-6:
+                                    frac = abs((temp_curr if is_curr_excursion else temp_next) - thresh) / diff
+                                    excursion_interval = delta_minutes * min(1.0, max(0.0, frac))
+                                else:
+                                    excursion_interval = delta_minutes / 2.0
+                            else:
+                                excursion_interval = 0.0
+                        else:
+                            # Step-wise sample-and-hold: if the sensor recorded an excursion at t_curr,
+                            # the temperature was out of spec for that interval until the next reading
+                            excursion_interval = delta_minutes if is_curr_excursion else 0.0
+
+                        if excursion_interval > 0:
+                            total_excursion_minutes += excursion_interval
+                            current_contiguous_minutes += excursion_interval
+                            if current_contiguous_minutes > max_contiguous_excursion_minutes:
+                                max_contiguous_excursion_minutes = current_contiguous_minutes
+                        else:
+                            current_contiguous_minutes = 0.0
+
+                    if malformed_data:
+                        r9_passed = False
+                        r9_epistemic_type = EpistemologicalType.UNCERTAINTY
+                        r9_explanation = "Non-chronological telemetry timestamps encountered during interval analysis."
+                    else:
+                        eval_minutes = (
+                            max_contiguous_excursion_minutes
+                            if excursion_mode == "contiguous"
+                            else total_excursion_minutes
+                        )
+                        cold_chain_inputs["calculated_excursion_minutes"] = round(eval_minutes, 2)
+                        cold_chain_inputs["total_cumulative_excursion_minutes"] = round(total_excursion_minutes, 2)
+                        cold_chain_inputs["max_contiguous_excursion_minutes"] = round(max_contiguous_excursion_minutes, 2)
+
+                        if eval_minutes <= max_excursion_duration_minutes:
+                            r9_passed = True
+                            r9_explanation = (
+                                f"Temperature monitoring compliant: {eval_minutes:.1f} excursion min(s) "
+                                f"within allowed SLA threshold ({max_excursion_duration_minutes:.1f} mins) "
+                                f"[Range: {min_recorded_temp:.1f}°C to {max_recorded_temp:.1f}°C]."
+                            )
+                        else:
+                            r9_passed = False
+                            r9_epistemic_type = EpistemologicalType.RULE
+                            r9_explanation = (
+                                f"Cold-chain SLA violation: {eval_minutes:.1f} excursion min(s) exceeds "
+                                f"allowed threshold of {max_excursion_duration_minutes:.1f} mins "
+                                f"[Allowed: {min_temp_celsius:.1f}°C-{max_temp_celsius:.1f}°C, "
+                                f"Observed: {min_recorded_temp:.1f}°C-{max_recorded_temp:.1f}°C]."
+                            )
+
+        traces.append(
+            RuleEvaluationTrace(
+                rule_id="RULE_09_COLD_CHAIN_TEMPERATURE_EXCURSION",
+                rule_name="Cold-Chain Temperature SLA & Excursion Verification",
+                passed=r9_passed,
+                epistemic_type=r9_epistemic_type,
+                inputs_used=cold_chain_inputs,
+                evidence_ids=all_evidence_ids,
+                explanation=r9_explanation,
+            )
+        )
+
         accepted_qty = max(0, delivered_qty - verified_damaged_qty)
         disputed_qty = max(0, ordered_qty - accepted_qty)
         payout_adjustment = round(disputed_qty * unit_price, 2)
@@ -258,5 +467,10 @@ class DeterministicRuleEngine:
             "min_observed_confidence": round(min_observed_conf, 3),
             "has_uncertain_evidence": has_uncertain_evidence,
             "all_evidence_ids": all_evidence_ids,
+            "requires_cold_chain": requires_cold_chain,
+            "total_excursion_minutes": round(total_excursion_minutes, 2),
+            "max_contiguous_excursion_minutes": round(max_contiguous_excursion_minutes, 2),
+            "min_recorded_temperature_celsius": min_recorded_temp,
+            "max_recorded_temperature_celsius": max_recorded_temp,
         }
         return traces, computed_metrics

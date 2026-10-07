@@ -23,7 +23,7 @@ Purely generative LLM pipelines are unsafe for autonomous financial settlement: 
 1. **Multimodal Semantic Extraction with Explicit Epistemic Typing**: Extracts claims from documents, blind pixel-level computer vision (`analyze_pallet_pixels_blind` / `GeminiAIProvider`), and audio transcripts while tagging every claim as `FACT`, `INFERENCE`, `RULE`, or `UNCERTAINTY` with exact source provenance (`evidence_id`, `sha256`, character/pixel span).
 2. **Cross-Modal Conflict Graph & Entity Resolution**: Links claims across modalities to canonical SKU entities and isolates quantity, damage, chronology, and missing-evidence contradictions.
 3. **Cryptographic (`SHA-256`) + Perceptual (`64-bit dHash`) Fraud Detection**: Detects both byte-identical and visually perturbed (recompressed, brightness-shifted, cropped) duplicate photos across historical claims (`Hamming distance <= 6`).
-4. **Deterministic Rule Engine (`R1–R8`) & Hash-Chained Audit Ledger**: Enforces 48-hour SLA windows, high-value manual review thresholds (`>= \$5,000`), and mandatory abstention (`manual_review_required`) whenever evidence is degraded (`UNCERTAINTY`) or contradictory.
+4. **Deterministic Rule Engine (`R1–R9`) & Hash-Chained Audit Ledger**: Enforces 48-hour SLA windows, cold-chain temperature excursion limits (`R9`: configurable limits [2.0°C–8.0°C], cumulative/contiguous excursion duration tracking), high-value manual review thresholds (`>= \$5,000`), and mandatory abstention (`manual_review_required`) whenever evidence is degraded (`UNCERTAINTY`) or contradictory.
 
 ### 1.1 System Architecture Diagram
 
